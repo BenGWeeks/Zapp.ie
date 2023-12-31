@@ -7,14 +7,13 @@ import reportWebVitals from './reportWebVitals';
 
 const queryClient = new QueryClient();
 
-const root = ReactDOM.unstable_createRoot(document.getElementById('root'));
-
-root.render(
+ReactDOM.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <App />
     </QueryClientProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
+  document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function
