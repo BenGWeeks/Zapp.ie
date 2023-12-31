@@ -1,6 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
+import express from 'express';
+import cors from 'cors';
+import { verbose } from 'sqlite3';
+const sqlite3 = verbose();
 import fetch from 'node-fetch';
 const app = express();
 app.use(cors());
