@@ -3,7 +3,6 @@ const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const app = express();
 app.use(cors());
-app.use(cors());
 const port = 3001;
 
 let db = new sqlite3.Database(':memory:', (err) => {
