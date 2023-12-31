@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import Home from './pages/admin/Home';
 import Users from './pages/admin/Users';
+import LightningWallet from './pages/admin/LightningWallet';
 import Bounties from './pages/Bounties';
 import Feed from './pages/Feed';
 import Leaderboard from './pages/Leaderboard';
@@ -25,6 +26,7 @@ const App = () => {
         <Routes>
           <Route path="/admin" element={<Home />} />
           <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/lightningwallet" element={<LightningWallet />} />
           <Route path="/bounties" element={<Bounties />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
