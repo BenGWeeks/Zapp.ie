@@ -46,13 +46,16 @@ app.post('/users', (req, res) => {
 
 app.get('/zebedee/balance', async (req, res) => {
   const apiKey = req.headers['api-key'];
+  console.log(`Received request to /zebedee/balance with API key: ${apiKey}`);
   const response = await fetch('https://api.zebedee.io/v0/wallet', {
     headers: {
       'Content-Type': 'application/json',
       'api-key': apiKey,
     },
   });
+  console.log(`Received response from Zebedee API: ${response}`);
   const data = await response.json();
+  console.log(`Parsed data from response: ${data}`);
   res.send(data.balance);
 });
 
