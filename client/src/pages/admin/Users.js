@@ -6,7 +6,7 @@ const Users = () => {
   const nameRef = useRef();
   const nPubRef = useRef();
   const { data: users = [], refetch: refetchUsers } = useQuery('users', () =>
-    fetch('/users').then(res => res.json())
+    fetch('https://glowing-space-robot-p6g456r4r6266vj-3001.app.github.dev/users').then(res => res.json())
   );
   const [dialogVisible, setDialogVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -27,7 +27,7 @@ const Users = () => {
   };
 
   const deleteMutation = useMutation((id) =>
-    fetch(`/users/${id}`, {
+    fetch(`https://glowing-space-robot-p6g456r4r6266vj-3001.app.github.dev/users/${id}`, {
       method: 'DELETE',
     }),
     {
@@ -42,7 +42,7 @@ const Users = () => {
   };
 
   const mutation = useMutation((user) =>
-    fetch('/users', {
+    fetch('https://glowing-space-robot-p6g456r4r6266vj-3001.app.github.dev/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
