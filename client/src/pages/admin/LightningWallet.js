@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextField, PrimaryButton } from '@fluentui/react';
 
 const LightningWallet = () => {
-  const apiKey = process.env.REACT_APP_ZEBEDEE_API_KEY;
+  const apiKey = process.env.ZEBEDEE_API_KEY;
   const [balance, setBalance] = useState(0);
 
   const saveApiKey = async () => {
