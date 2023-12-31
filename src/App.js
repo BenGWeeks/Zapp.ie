@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import Home from './pages/admin/Home';
 import Bounties from './pages/Bounties';
 import Feed from './pages/Feed';
@@ -20,12 +20,14 @@ const App = () => {
           <Link to="/rewards">Rewards</Link>
           <Link to="/zaplog">ZapLog</Link>
         </nav>
-        <Route path="/admin" component={Home} />
-        <Route path="/bounties" component={Bounties} />
-        <Route path="/feed" component={Feed} />
-        <Route path="/leaderboard" component={Leaderboard} />
-        <Route path="/rewards" component={Rewards} />
-        <Route path="/zaplog" component={ZapLog} />
+        <Routes>
+          <Route path="/admin" element={<Home />} />
+          <Route path="/bounties" element={<Bounties />} />
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/rewards" element={<Rewards />} />
+          <Route path="/zaplog" element={<ZapLog />} />
+        </Routes>
       </div>
     </Router>
   );
