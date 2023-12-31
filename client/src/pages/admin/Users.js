@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { useQuery, useMutation } from 'react-query';
 import { DetailsList, Dialog, DialogType, TextField, PrimaryButton, DefaultButton } from '@fluentui/react';
 
+console.log('Server URL:', process.env.REACT_APP_SERVER_URL);
+
 const Users = () => {
   const nameRef = useRef();
   const nPubRef = useRef();
