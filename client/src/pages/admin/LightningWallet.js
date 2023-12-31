@@ -35,6 +35,7 @@ const LightningWallet = () => {
     <div>
       <h1>Lightning Wallet</h1>
       <p>Balance: {balance}</p>
+      <PrimaryButton onClick={saveApiKey}>Refresh Balance</PrimaryButton>
     </div>
   );
 };
