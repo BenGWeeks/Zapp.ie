@@ -10,7 +10,7 @@ const LightningWallet = () => {
     console.log(apiKey);
 
     // Fetch the balance from the Zebedee API
-    const response = await fetch('https://api.zebedee.io/v0/wallet/balance', {
+    const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/zebedee/balance`, {
       headers: {
         'Content-Type': 'application/json',
         'api-key': apiKey,

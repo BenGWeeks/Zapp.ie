@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
+const fetch = require('node-fetch');
 const app = express();
 app.use(cors());
 const port = 3001;
@@ -39,6 +40,18 @@ app.post('/users', (req, res) => {
     }
     res.send({ id: this.lastID, name, nPub });
   });
+});
+
+app.get('/zebedee/balance', async (req, res) => {
+  const apiKey = req.headers['api-key'];
+  const response = await fetch('https://api.zebedee.io/v0/wallet/balance', {
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': apiKey,
+    },
+  });
+  const data = await response.json();
+  res.send(data);
 });
 
 function startServer() {
