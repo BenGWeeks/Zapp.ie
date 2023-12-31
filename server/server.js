@@ -16,6 +16,7 @@ let db = new sqlite3.Database(':memory:', (err) => {
       return console.error(err.message);
     }
     console.log('Created users table');
+    startServer();
   });
 });
 
@@ -40,6 +41,8 @@ app.post('/users', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});
+function startServer() {
+  app.listen(port, () => {
+    console.log(`Server listening at http://localhost:${port}`);
+  });
+}
