@@ -1,14 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
+import { useQuery, useMutation } from 'react-query';
 import { DetailsList, Dialog, DialogType, TextField, PrimaryButton, DefaultButton } from '@fluentui/react';
 
 const Users = () => {
   const nameRef = useRef();
   const nPubRef = useRef();
-  const [users, setUsers] = useState([
-    // Example users
-    { id: 1, name: 'User1', nPub: 'nPub1' },
-    { id: 2, name: 'User2', nPub: 'nPub2' },
-  ]);
+  const { data: users = [], refetch: refetchUsers } = useQuery('users', () =>
+    fetch('/users').then(res => res.json())
+  );
   const [dialogVisible, setDialogVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -27,19 +26,38 @@ const Users = () => {
     setDialogVisible(true);
   };
 
+  const deleteMutation = useMutation((id) =>
+    fetch(`/users/${id}`, {
+      method: 'DELETE',
+    }),
+    {
+      onSuccess: () => {
+        refetchUsers();
+      },
+    }
+  );
+
   const onDeleteUser = (user) => {
-    setUsers(users.filter(u => u.id !== user.id));
+    deleteMutation.mutate(user.id);
   };
 
-  const onSaveUser = (name, nPub) => {
-    if (selectedUser) {
-      // Edit existing user
-      setUsers(users.map(user => user.id === selectedUser.id ? { ...user, name, nPub } : user));
-    } else {
-      // Add new user
-      const id = Math.max(...users.map(user => user.id)) + 1;
-      setUsers([...users, { id, name, nPub }]);
+  const mutation = useMutation((user) =>
+    fetch('/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(user),
+    }),
+    {
+      onSuccess: () => {
+        refetchUsers();
+      },
     }
+  );
+
+  const onSaveUser = (name, nPub) => {
+    mutation.mutate({ name, nPub });
     setDialogVisible(false);
   };
 
