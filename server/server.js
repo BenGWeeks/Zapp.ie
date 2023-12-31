@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { verbose } from 'sqlite3';
+import pkg from 'sqlite3';
+const { verbose } = pkg;
 const sqlite3 = verbose();
 import fetch from 'node-fetch';
 const app = express();
