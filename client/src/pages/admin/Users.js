@@ -44,7 +44,7 @@ const Users = () => {
   };
 
   const mutation = useMutation((user) =>
-    fetch(`${process.env.REACT_APP_SERVER_URL}/users`, {
+    fetch(`${process.env.REACT_APP_SERVER_URL}/admin/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
