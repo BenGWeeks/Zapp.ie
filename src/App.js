@@ -13,12 +13,14 @@ const App = () => {
       <div>
         <h1>Hello, world!</h1>
         <nav>
-          <Link to="/admin">Admin</Link>
-          <Link to="/bounties">Bounties</Link>
-          <Link to="/feed">Feed</Link>
-          <Link to="/leaderboard">Leaderboard</Link>
-          <Link to="/rewards">Rewards</Link>
-          <Link to="/zaplog">ZapLog</Link>
+          <ul style={{ listStyleType: 'none', display: 'flex', justifyContent: 'space-around' }}>
+            <li><Link to="/admin">Admin</Link></li>
+            <li><Link to="/bounties">Bounties</Link></li>
+            <li><Link to="/feed">Feed</Link></li>
+            <li><Link to="/leaderboard">Leaderboard</Link></li>
+            <li><Link to="/rewards">Rewards</Link></li>
+            <li><Link to="/zaplog">ZapLog</Link></li>
+          </ul>
         </nav>
         <Routes>
           <Route path="/admin" element={<Home />} />
