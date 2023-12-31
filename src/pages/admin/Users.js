@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { DetailsList, Dialog, DialogType, TextField, PrimaryButton, DefaultButton } from '@fluentui/react';
 
 const Users = () => {
+  const nameRef = useRef();
+  const nPubRef = useRef();
   const [users, setUsers] = useState([
     // Example users
     { id: 1, name: 'User1', nPub: 'nPub1' },
@@ -60,9 +62,9 @@ const Users = () => {
           title: selectedUser ? 'Edit User' : 'Add User',
         }}
       >
-        <TextField label="Name" defaultValue={selectedUser ? selectedUser.name : ''} />
-        <TextField label="nPub" defaultValue={selectedUser ? selectedUser.nPub : ''} />
-        <PrimaryButton onClick={() => onSaveUser(name, nPub)}>Save</PrimaryButton>
+        <TextField label="Name" defaultValue={selectedUser ? selectedUser.name : ''} componentRef={nameRef} />
+        <TextField label="nPub" defaultValue={selectedUser ? selectedUser.nPub : ''} componentRef={nPubRef} />
+        <PrimaryButton onClick={() => onSaveUser(nameRef.current.value, nPubRef.current.value)}>Save</PrimaryButton>
       </Dialog>
     </div>
   );
