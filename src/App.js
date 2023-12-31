@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import Home from './pages/admin/Home';
+import Users from './admin/Users';
 import Bounties from './pages/Bounties';
 import Feed from './pages/Feed';
 import Leaderboard from './pages/Leaderboard';
@@ -24,6 +25,7 @@ const App = () => {
         </nav>
         <Routes>
           <Route path="/admin" element={<Home />} />
+          <Route path="/admin/users" element={<Users />} />
           <Route path="/bounties" element={<Bounties />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
