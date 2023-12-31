@@ -53,7 +53,7 @@ app.get('/zebedee/balance', async (req, res) => {
     },
   });
   const data = await response.json();
-  res.send(data);
+  res.send(data.balance);
 });
 
 function startServer() {
