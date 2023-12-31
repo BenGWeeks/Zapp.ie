@@ -15,7 +15,7 @@ const LightningWallet = () => {
     } catch (error) {
       console.log('There was a problem with the fetch operation: ' + error.message);
     }
-  };
+
     // Save the API key
     console.log(apiKey);
 
