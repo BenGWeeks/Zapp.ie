@@ -20,7 +20,7 @@ const LightningWallet = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setBalance(data.balance);
+      setBalance(data.data.balance);
     } catch (error) {
       console.log('There was a problem with the fetch operation: ' + error.message);
     }
