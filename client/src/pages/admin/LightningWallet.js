@@ -39,7 +39,7 @@ const LightningWallet = () => {
 
   // Fetch the balance when the component mounts
   useEffect(() => {
-    saveApiKey();
+    fetchBalance();
   }, []);
 
   return (
