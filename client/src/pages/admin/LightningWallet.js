@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TextField, PrimaryButton } from '@fluentui/react';
 
 const LightningWallet = () => {
-  const [apiKey, setApiKey] = useState('');
+  const apiKey = process.env.REACT_APP_ZEBEDEE_API_KEY;
   const [balance, setBalance] = useState(0);
 
   const saveApiKey = async () => {
@@ -35,8 +35,7 @@ const LightningWallet = () => {
   return (
     <div>
       <h1>Lightning Wallet</h1>
-      <TextField label="Zebedee API Key" value={apiKey} onChange={(e, newValue) => setApiKey(newValue)} />
-      <PrimaryButton onClick={() => { saveApiKey(); }}>Save API Key</PrimaryButton>
+      <TextField label="Zebedee API Key" value={apiKey} readOnly />
       <p>Balance: {balance}</p>
     </div>
   );
