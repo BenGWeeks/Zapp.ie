@@ -12,3 +12,6 @@ INSERT INTO bounties (title, description, amount, expiry_date, type) VALUES ("Pa
 
 -- Relays
 INSERT INTO relays (name, address) VALUES ("Damus", "wss://relay.damus.io");
+
+-- Users
+INSERT INTO users (name, nPub) VALUES ("Ben Weeks", "npub1jutptdc2m8kgjmudtws095qk2tcale0eemvp4j2xnjnl4nh6669slrf04x");
