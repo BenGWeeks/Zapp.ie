@@ -58,7 +58,7 @@ app.get('/zebedee/balance', async (req, res) => {
   });
   console.log(`Received response from Zebedee API: ${response}`);
   const data = await response.json();
-  console.log(`Parsed data from response: ${data}`);
+  console.log(`Parsed data from response: ${JSON.stringify(data, null, 2)}`);
   res.send(data.balance);
 });
 
