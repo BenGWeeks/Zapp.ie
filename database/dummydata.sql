@@ -15,3 +15,12 @@ INSERT INTO relays (name, address) VALUES ("Damus", "wss://relay.damus.io");
 
 -- Users
 INSERT INTO users (name, nPub) VALUES ("Ben Weeks", "npub1jutptdc2m8kgjmudtws095qk2tcale0eemvp4j2xnjnl4nh6669slrf04x");
+
+-- Zaps
+-- Assuming Valeriia's id is 1 and Ben's id is 2
+INSERT INTO zaps(sender_id, receiver_id, amount, principle_id, description, date_sent) VALUES (1, 2, 100, 1, "Good job", "2022-01-01");
+INSERT INTO zaps(sender_id, receiver_id, amount, principle_id, description, date_sent) VALUES (1, 2, 200, 1, "Well done", "2022-01-02");
+INSERT INTO zaps(sender_id, receiver_id, amount, principle_id, description, date_sent) VALUES (1, 2, 300, 1, "Excellent work", "2022-01-03");
+INSERT INTO zaps(sender_id, receiver_id, amount, principle_id, description, date_sent) VALUES (2, 1, 400, 1, "Great contribution", "2022-01-04");
+INSERT INTO zaps(sender_id, receiver_id, amount, principle_id, description, date_sent) VALUES (2, 1, 500, 1, "Outstanding performance", "2022-01-05");
+INSERT INTO zaps(sender_id, receiver_id, amount, principle_id, description, date_sent) VALUES (2, 1, 600, 1, "Impressive effort", "2022-01-06");
