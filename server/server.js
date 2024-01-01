@@ -8,7 +8,7 @@ const { verbose } = pkg;
 const sqlite3 = verbose();
 import fetch from 'node-fetch';
 const app = express();
-app.use(cors());
+app.use(cors({ origin: 'https://glowing-space-robot-p6g456r4r6266vj-3000.app.github.dev' }));
 const port = 3001; // or any other available port
 
 import WebSocket from 'ws';
