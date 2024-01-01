@@ -1,4 +1,24 @@
-# Getting Started with Create React App
+# Getting Started with ZapVibes
+
+Before running the application, you need to create a `.env` file in the root directory of the client and server. This file should contain the following environment variables:
+
+- `REACT_APP_SERVER_URL`: The URL of the server. For local development, this will typically be `http://localhost:3000`.
+- `ZEBEDEE_API_KEY`: Your Zebedee API key.
+- `ZEBEDEE_API_ENDPOINT`: The endpoint for the Zebedee API. For the sandbox environment, this will be `https://sandbox-api.zebedee.io/v0/wallet`.
+
+Here is an example of what your `.env` file might look like:
+
+```
+REACT_APP_SERVER_URL=http://localhost:3000
+ZEBEDEE_API_KEY=your_zebedee_api_key
+ZEBEDEE_API_ENDPOINT=https://sandbox-api.zebedee.io/v0/wallet
+```
+
+Replace `your_zebedee_api_key` with your actual Zebedee API key.
+
+Once you have created and configured your `.env` file, you can start the application.
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
