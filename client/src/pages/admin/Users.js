@@ -14,6 +14,10 @@ const Users = () => {
     fetch(`${process.env.REACT_APP_SERVER_URL}/relays`).then(res => res.json())
   );
   const relay = relays[0]; // Assuming there is at least one relay in the database
+  const { data: relays = [] } = useQuery('relays', () =>
+    fetch(`${process.env.REACT_APP_SERVER_URL}/relays`).then(res => res.json())
+  );
+  const relay = relays[0]; // Assuming there is at least one relay in the database
   const [dialogVisible, setDialogVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
