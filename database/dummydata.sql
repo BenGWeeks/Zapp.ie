@@ -9,3 +9,6 @@ INSERT INTO rewards (title, description, amount) VALUES ("Corsair ST50 Stand", "
 -- Bounties
 INSERT INTO bounties (title, description, amount, expiry_date, type) VALUES ("Become a Microsoft MVP", "Become a recognized expert in Microsoft technologies", 40000000, "2023-12-31", "Achievement");
 INSERT INTO bounties (title, description, amount, expiry_date, type) VALUES ("Pass a Microsoft Certified: Power Platform Solution Architect", "Pass the certification exam for Power Platform Solution Architect", 1000000, "2023-12-31", "Certification");
+
+-- Relays
+INSERT INTO relays (name, address) VALUES ("Damus", "wss://relay.damus.io");
