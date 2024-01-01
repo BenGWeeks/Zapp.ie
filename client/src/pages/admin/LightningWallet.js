@@ -16,15 +16,12 @@ const LightningWallet = () => {
       console.log('There was a problem with the fetch operation: ' + error.message);
     }
 
-    // Save the API key
-    console.log(apiKey);
-
     // Fetch the balance from the Zebedee API
     try {
       const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/zebedee/balance`, {
         headers: {
-          'Content-Type': 'application/json',
-          'api-key': apiKey,
+          'Content-Type': 'application/json'//,
+          //'api-key': apiKey,
         },
       });
       if (!response.ok) {
@@ -36,11 +33,6 @@ const LightningWallet = () => {
       console.log('There was a problem with the fetch operation: ' + error.message);
     }
   };
-
-  // Fetch the balance when the component mounts
-  useEffect(() => {
-    fetchBalance();
-  }, []);
 
   return (
     <div>
