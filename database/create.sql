@@ -56,3 +56,5 @@ CREATE TABLE relays (
     name TEXT,
     address TEXT
 );
+
+INSERT INTO users(name, nPub) VALUES('Valeriia Khudiakova', 'npub1dg75du7l0usuhlg7ttvkm2x9lfcvq29fh43ckc420m6fk7ps2gls09kvl5');
