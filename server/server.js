@@ -43,6 +43,12 @@ function getRelay() {
   return ws;
 }
 
+function getLightningAddress(nPub, relay) {
+  // Implement the nostr protocol to determine the Lightning Address
+  // This is a placeholder and needs to be replaced with the actual implementation
+  return `${nPub}@${relay.address}`;
+}
+
 app.use(express.json());
 
 app.get('/users', (req, res) => {
