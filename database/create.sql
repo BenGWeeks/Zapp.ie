@@ -11,3 +11,16 @@ CREATE TABLE rewards (
     reward TEXT,
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
+
+CREATE TABLE zaps (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sender_id INTEGER,
+    receiver_id INTEGER,
+    amount INTEGER,
+    principle_id INTEGER,
+    description TEXT,
+    date_sent TEXT,
+    FOREIGN KEY(sender_id) REFERENCES users(id),
+    FOREIGN KEY(receiver_id) REFERENCES users(id),
+    FOREIGN KEY(principle_id) REFERENCES principles(id)
+);
