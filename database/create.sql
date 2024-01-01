@@ -8,7 +8,9 @@ CREATE TABLE users (
 CREATE TABLE rewards (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
-    reward TEXT,
+    title TEXT,
+    description TEXT,
+    amount INTEGER,
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
