@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import './Reports.css';
+import UserOnBoard from '../components/UserOnBoard';
 import { DetailsList } from '@fluentui/react';
 
 const Reports = () => {
@@ -19,15 +21,30 @@ const Reports = () => {
   return (
     <div>
       <h1>Reports</h1>
-      <DetailsList
-        items={topUsers}
-        columns={columns}
-        setKey="set"
-        layoutMode="fixedColumns"
-        selectionPreservedOnEmptyClick={true}
-        ariaLabelForSelectionColumn="Toggle selection"
-        ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-      />
+      <div className="users-list">
+        {topUsers.map((user, index) => (
+          <UserOnBoard
+            key={index}
+            className="user-on-board-instance"
+            frameClassName="frame-3"
+            frameClassNameOverride="frame-5"
+            groupClassName="design-component-instance-node"
+            groupClassNameOverride="frame-4"
+            icon={
+              <Icon
+                className="icon-instance-node"
+                color="url(#paint0_linear_344_1932)"
+                stroke="url(#paint1_linear_344_1932)"
+              />
+            }
+            property1="default"
+            rankProperty1="regular"
+            rankPropertyLeaderClassName="frame-6"
+            text={user.name}
+            text1={user.zaps}
+          />
+        ))}
+      </div>
     </div>
   );
 };
