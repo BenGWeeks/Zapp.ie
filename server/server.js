@@ -57,6 +57,17 @@ app.get('/zebedee/balance', async (req, res) => {
   res.send(data.balance);
 });
 
+app.get('/lightning-address/:nPub', async (req, res) => {
+  const nPub = req.params.nPub;
+  // Connect to the default Relay
+  // This assumes that there is a function getRelay() that returns the default Relay
+  const relay = getRelay();
+  // Determine the Lightning Address using the nostr protocol
+  // This assumes that there is a function getLightningAddress(nPub, relay) that returns the Lightning Address
+  const lightningAddress = getLightningAddress(nPub, relay);
+  res.send(lightningAddress);
+});
+
 function startServer() {
   app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
