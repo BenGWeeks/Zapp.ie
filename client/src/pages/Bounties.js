@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tabs, Tab } from '@material-ui/core';
+import { Pivot, PivotItem } from '@fluentui/react';
 
 const Bounties = () => {
   const [value, setValue] = useState(0);

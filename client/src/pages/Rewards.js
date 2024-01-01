@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Carousel } from 'react-responsive-carousel';
-import { Card, CardMedia, CardContent, Typography, Button } from '@material-ui/core';
+import { DocumentCard, DocumentCardImage, DocumentCardTitle, DocumentCardDetails, PrimaryButton } from '@fluentui/react';
 
 const Rewards = () => {
   const [rewards, setRewards] = useState([]);
