@@ -18,7 +18,7 @@ const App = () => {
             <li><Link to="/admin">Admin</Link></li>
             <li><Link to="/bounties">Bounties</Link></li>
             <li><Link to="/feed">Feed</Link></li>
-            <li><Link to="/leaderboard">Leaderboard</Link></li>
+            <li><Link to="/reports">Reports</Link></li>
             <li><Link to="/rewards">Rewards</Link></li>
             <li><Link to="/zaplog">ZapLog</Link></li>
           </ul>
@@ -29,7 +29,7 @@ const App = () => {
           <Route path="/admin/lightningwallet" element={<LightningWallet />} />
           <Route path="/bounties" element={<Bounties />} />
           <Route path="/feed" element={<Feed />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/zaplog" element={<ZapLog />} />
         </Routes>
