@@ -119,6 +119,15 @@ app.get('/rewards', (req, res) => {
   });
 });
 
+app.get('/topUsers', (req, res) => {
+  db.all('SELECT * FROM users ORDER BY zaps DESC LIMIT 10', [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    res.send(rows);
+  });
+});
+
 function startServer() {
   app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
