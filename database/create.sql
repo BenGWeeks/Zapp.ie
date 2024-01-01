@@ -4,3 +4,10 @@ CREATE TABLE users (
     name TEXT,
     nPub TEXT
 );
+
+CREATE TABLE rewards (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    reward TEXT,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
