@@ -1,4 +1,7 @@
+import dotenv from 'dotenv';
 import express from 'express';
+
+dotenv.config();
 import cors from 'cors';
 import pkg from 'sqlite3';
 const { verbose } = pkg;
@@ -45,7 +48,7 @@ app.post('/users', (req, res) => {
 });
 
 app.get('/zebedee/balance', async (req, res) => {
-  const apiKey = req.headers['api-key'];
+  const apiKey = process.env.ZEBEDEE_API_KEY;
   console.log(`Received request to /zebedee/balance with API key: ${apiKey}`);
   const response = await fetch('https://api.zebedee.io/v0/wallet', {
     headers: {
