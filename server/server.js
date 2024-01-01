@@ -110,6 +110,15 @@ app.get('/lightning-address/:nPub', async (req, res) => {
   res.send(lightningAddress);
 });
 
+app.get('/rewards', (req, res) => {
+  db.all('SELECT * FROM rewards', [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    res.send(rows);
+  });
+});
+
 function startServer() {
   app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
