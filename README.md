@@ -18,6 +18,20 @@ ZapVibes allows users to manage their lightning wallet and view their balance. U
 
 ZapVibes uses Nostr to send and receive zaps over the Bitcoin Lightning Network. A zap is a small amount of Bitcoin that is sent over the Lightning Network. Users can send zaps to each other as a way of tipping or rewarding each other.
 
+## Components of the Solution
+
+### Client
+
+The client is a React application that provides the user interface for ZapVibes. It communicates with the server to fetch data and perform actions. The client is divided into several pages, including a feed, leaderboard, and bounties page.
+
+### Server
+
+The server is a Node.js application that interacts with the Zebedee API and the database. It handles requests from the client and performs actions such as fetching data, updating the database, and interacting with the Bitcoin Lightning Network.
+
+### Database
+
+The database stores data related to users, zaps, bounties, and rewards. It is used by the server to persist data and retrieve it when needed.
+
 For more information about the client, see the [client README](client/README.md).
 
 For more information about the server, see the [server README](server/README.md).
