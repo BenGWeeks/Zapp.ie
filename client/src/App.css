@@ -44,7 +44,7 @@ nav ul li a {
 }
 
 nav ul li a:visited {
-  color: #A8A8A8;
+  color: inherit;
 }
 nav ul li a.active {
   border-bottom: 2px solid #fff;
