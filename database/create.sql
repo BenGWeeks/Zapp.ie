@@ -12,6 +12,11 @@ CREATE TABLE rewards (
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
+CREATE TABLE principles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    principle TEXT
+);
+
 CREATE TABLE zaps (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sender_id INTEGER,
