@@ -44,9 +44,22 @@ function getRelay() {
 }
 
 function getLightningAddress(nPub, relay) {
-  // Implement the nostr protocol to determine the Lightning Address
-  // This is a placeholder and needs to be replaced with the actual implementation
-  return `${nPub}@${relay.address}`;
+  return new Promise((resolve, reject) => {
+    const ws = new WebSocket(relay.address);
+    ws.on('open', function open() {
+      ws.send(JSON.stringify({ id: 1, method: 'get_user_profile', params: { nPub } }));
+    });
+    ws.on('message', function incoming(data) {
+      const response = JSON.parse(data);
+      if (response.error) {
+        reject(response.error);
+      } else {
+        const lightningAddress = response.result.aliases[0];
+        resolve(lightningAddress);
+      }
+      ws.close();
+    });
+  });
 }
 
 app.use(express.json());
