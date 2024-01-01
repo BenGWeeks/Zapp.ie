@@ -17,13 +17,7 @@ let db = new sqlite3.Database(':memory:', (err) => {
   }
   console.log('Connected to the in-memory SQlite database.');
 
-  db.run(`CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, nPub TEXT)`, (err) => {
-    if (err) {
-      return console.error(err.message);
-    }
-    console.log('Created users table');
-    startServer();
-  });
+  startServer();
 });
 
 app.use(express.json());
