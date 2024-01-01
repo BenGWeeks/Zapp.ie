@@ -121,7 +121,7 @@ app.get('/rewards', (req, res) => {
 });
 
 app.get('/topUsers', (req, res) => {
-  db.all('SELECT * FROM users ORDER BY zaps DESC LIMIT 10', [], (err, rows) => {
+  db.all('SELECT users.*, COUNT(zaps.id) as zaps FROM users LEFT JOIN zaps ON users.id = zaps.receiver_id GROUP BY users.id ORDER BY zaps DESC LIMIT 10', [], (err, rows) => {
     if (err) {
       throw err;
     }
