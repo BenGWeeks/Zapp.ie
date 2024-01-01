@@ -42,3 +42,10 @@ nav ul li a {
   font-family: 'Inter', sans-serif;
   font-weight: 400;
 }
+
+nav ul li a:visited {
+  color: #A8A8A8;
+}
+nav ul li a.active {
+  border-bottom: 2px solid #fff;
+}
