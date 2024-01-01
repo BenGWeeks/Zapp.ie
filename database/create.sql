@@ -2,7 +2,9 @@
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
-    nPub TEXT
+    nPub TEXT,
+    birthday TEXT,
+    email TEXT
 );
 
 CREATE TABLE rewards (
