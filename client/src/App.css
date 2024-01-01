@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+nav ul li a {
+  color: #A8A8A8;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+}
