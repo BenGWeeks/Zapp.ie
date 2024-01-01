@@ -9,7 +9,7 @@ const sqlite3 = verbose();
 import fetch from 'node-fetch';
 const app = express();
 app.use(cors());
-const port = 3002; // or any other available port
+const port = 3001; // or any other available port
 
 import WebSocket from 'ws';
 
