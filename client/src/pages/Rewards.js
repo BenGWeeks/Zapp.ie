@@ -15,26 +15,15 @@ const Rewards = () => {
     <Carousel>
       {rewards.map((reward, index) => (
         <div key={index}>
-          <Card>
-            <CardMedia
-              image={reward.image}
-              title={reward.title}
-            />
-            <CardContent>
-              <Typography variant="h5" component="div">
-                {reward.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {reward.description}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Amount: {reward.amount}
-              </Typography>
-              <Button variant="contained" color="primary">
-                Redeem
-              </Button>
-            </CardContent>
-          </Card>
+          <DocumentCard>
+            <DocumentCardImage imageFit='cover' height={150} imageSrc={reward.image} />
+            <DocumentCardDetails>
+              <DocumentCardTitle title={reward.title} shouldTruncate />
+              <Text variant="medium">{reward.description}</Text>
+              <Text variant="medium">Amount: {reward.amount}</Text>
+              <PrimaryButton text="Redeem" />
+            </DocumentCardDetails>
+          </DocumentCard>
         </div>
       ))}
     </Carousel>

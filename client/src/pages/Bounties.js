@@ -10,10 +10,10 @@ const Bounties = () => {
 
   return (
     <div>
-      <Tabs value={value} onChange={handleChange}>
-        <Tab label="All active bounties" />
-        <Tab label="History of awards" />
-      </Tabs>
+      <Pivot selectedKey={value} onLinkClick={handleChange}>
+        <PivotItem headerText="All active bounties" />
+        <PivotItem headerText="History of awards" />
+      </Pivot>
       {value === 0 && <h1>All active bounties</h1>}
       {value === 1 && <h1>History of awards</h1>}
     </div>
