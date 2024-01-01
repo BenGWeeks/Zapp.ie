@@ -50,3 +50,9 @@ CREATE TABLE bounty_awarded (
     FOREIGN KEY(bounty_id) REFERENCES bounties(id),
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
+
+CREATE TABLE relays (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    address TEXT
+);
