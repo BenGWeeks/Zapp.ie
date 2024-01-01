@@ -44,8 +44,8 @@ nav ul li a {
 }
 
 nav ul li a:visited {
-  color: inherit;
+  color: #ffffff; /* Replace with the color you want */
 }
 nav ul li a.active {
-  border-bottom: 2px solid #fff;
+  border-bottom: 2px solid #ffffff; /* Replace with the color you want */
 }
