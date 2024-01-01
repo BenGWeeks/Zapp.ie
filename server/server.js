@@ -19,6 +19,13 @@ let db = new sqlite3.Database(':memory:', (err) => {
   }
   console.log('Connected to the in-memory SQlite database.');
 
+  db.run(`CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, name TEXT, nPub TEXT, zaps INTEGER)`, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Created users table if it did not exist.');
+  });
+
   startServer();
 });
 
