@@ -11,6 +11,8 @@ const app = express();
 app.use(cors());
 const port = 3001;
 
+import WebSocket from 'ws';
+
 let db = new sqlite3.Database(':memory:', (err) => {
   if (err) {
     return console.error(err.message);
@@ -19,6 +21,27 @@ let db = new sqlite3.Database(':memory:', (err) => {
 
   startServer();
 });
+
+function getRelay() {
+  let relay;
+  db.get('SELECT * FROM relays LIMIT 1', [], (err, row) => {
+    if (err) {
+      throw err;
+    }
+    relay = row;
+  });
+
+  const ws = new WebSocket(relay.address);
+  ws.on('open', function open() {
+    console.log('connected to relay:', relay.name);
+  });
+
+  ws.on('close', function close() {
+    console.log('disconnected from relay:', relay.name);
+  });
+
+  return ws;
+}
 
 app.use(express.json());
 
