@@ -5,9 +5,7 @@ const Reports = () => {
   const [topUsers, setTopUsers] = useState([]);
 
   useEffect(() => {
-    // Fetch the top 10 users by Zaps received
-    // This is a placeholder, replace with actual API call
-    fetch('/api/topUsers')
+    fetch(`${process.env.REACT_APP_SERVER_URL}/topUsers`)
       .then(response => response.json())
       .then(data => setTopUsers(data));
   }, []);
