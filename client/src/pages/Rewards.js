@@ -19,8 +19,8 @@ const Rewards = () => {
             <DocumentCardImage imageFit='cover' height={150} imageSrc={reward.image} />
             <DocumentCardDetails>
               <DocumentCardTitle title={reward.title} shouldTruncate />
-              <Text variant="medium">{reward.description}</Text>
-              <Text variant="medium">Amount: {reward.amount}</Text>
+              <p>{reward.description}</p>
+              <p>Amount: {reward.amount}</p>
               <PrimaryButton text="Redeem" />
             </DocumentCardDetails>
           </DocumentCard>
