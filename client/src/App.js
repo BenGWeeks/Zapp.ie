@@ -5,7 +5,7 @@ import Users from './pages/admin/Users';
 import LightningWallet from './pages/admin/LightningWallet';
 import Bounties from './pages/Bounties';
 import Feed from './pages/Feed';
-import Leaderboard from './pages/Leaderboard';
+import Reports from './pages/Reports';
 import Rewards from './pages/Rewards';
 import ZapLog from './pages/ZapLog';
 

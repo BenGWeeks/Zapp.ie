@@ -13,13 +13,11 @@ const port = 3001; // or any other available port
 
 import WebSocket from 'ws';
 
-let db = new sqlite3.Database(':memory:', (err) => {
+let db = new sqlite3.Database('../database/database.db', (err) => {
   if (err) {
     return console.error(err.message);
   }
-  console.log('Connected to the in-memory SQlite database.');
-
-
+  console.log('Connected to the SQlite database.');
   startServer();
 });
 

@@ -11,21 +11,19 @@ const Rewards = () => {
   }, []);
 
   return (
-    <Carousel axis="horizontal">
+    <div style={{ display: 'flex', overflowX: 'auto', gap: '1rem' }}>
       {rewards.map((reward, index) => (
-        <div key={index}>
-          <DocumentCard>
-            <DocumentCardImage imageFit='cover' height={150} imageSrc={reward.image} />
-            <DocumentCardDetails>
-              <DocumentCardTitle title={reward.title} shouldTruncate />
-              <p>{reward.description}</p>
-              <p>Amount: {reward.amount}</p>
-              <PrimaryButton text="Redeem" />
-            </DocumentCardDetails>
-          </DocumentCard>
-        </div>
+        <DocumentCard key={index}>
+          <DocumentCardImage imageFit='cover' height={150} imageSrc={reward.image} />
+          <DocumentCardDetails>
+            <DocumentCardTitle title={reward.title} shouldTruncate />
+            <p>{reward.description}</p>
+            <p>Amount: {reward.amount}</p>
+            <PrimaryButton text="Redeem" />
+          </DocumentCardDetails>
+        </DocumentCard>
       ))}
-    </Carousel>
+    </div>
   );
 };
 

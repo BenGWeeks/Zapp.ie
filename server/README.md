@@ -24,6 +24,20 @@ node server.js
 
 This will start the server on port 3001.
 
+## Stopping the server
+
+If the server doesn't stop, you can see what is running by using:
+
+```
+ps aux | grep "node server.js"
+```
+
+Then you can use:
+
+```
+kill -9 <PID>
+```
+
 ## API Endpoints
 
 The server has the following API endpoints:
