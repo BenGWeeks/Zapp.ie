@@ -1,4 +1,18 @@
-.aider*
+# TeamsFx files
+env/.env.*.user
+env/.env.local
+.localConfigs
+appPackage/build
+
+# dependencies
+node_modules/
+
+# misc
 .env
-/database/.env
-/database/database.db
+.deployment
+.DS_Store
+
+# build
+lib/
+
+.fake

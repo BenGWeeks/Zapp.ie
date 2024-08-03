@@ -1,0 +1,107 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.16",
+    "version": "1.0.0",
+    "id": "${{TEAMS_APP_ID}}",
+    "packageName": "com.microsoft.teams.extension",
+    "developer": {
+        "name": "Teams App, Inc.",
+        "websiteUrl": "https://www.example.com",
+        "privacyUrl": "https://www.example.com/privacy",
+        "termsOfUseUrl": "https://www.example.com/termofuse"
+    },
+    "icons": {
+        "color": "color.png",
+        "outline": "outline.png"
+    },
+    "name": {
+        "short": "sso-bot${{APP_NAME_SUFFIX}}",
+        "full": "full name for sso-bot"
+    },
+    "description": {
+        "short": "short description for sso-bot",
+        "full": "full description for sso-bot"
+    },
+    "accentColor": "#FFFFFF",
+    "bots": [
+        {
+            "botId": "${{BOT_ID}}",
+            "scopes": [
+                "personal",
+                "team",
+                "groupchat"
+            ],
+            "supportsFiles": false,
+            "isNotificationOnly": false,
+            "commandLists": [
+                {
+                    "scopes": [
+                        "personal",
+                        "team",
+                        "groupchat"
+                    ],
+                    "commands": [
+                        {
+                            "title": "Send Zaps",
+                            "description": "Send Zaps to a user"
+                        },
+                        {
+                            "title": "Show my balance",
+                            "description": "Show the user's balance"
+                        },
+                        {
+                            "title": "Show Leaderboard",
+                            "description": "Withdraw Zaps from the user's account"
+                        },
+                        {
+                            "title": "Withdraw my Zaps",
+                            "description": "Show the leaderboard"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "composeExtensions": [],
+    "configurableTabs": [],
+    "staticTabs": [ 
+    { 
+    "entityId": "feedTab", 
+    "scopes": [       
+      "team","personal"
+    ], 
+    "context": [ 
+      "personalTab",
+      "channelTab"
+
+    ], 
+    "name": "Feed", 
+    "contentUrl": "https://contoso.com/content (displayed in Teams canvas)", 
+    "websiteUrl": "https://contoso.com/content (displayed in web browser)" 
+    },    { 
+      "entityId": "rewardsTab", 
+      "scopes": [       
+        "team","personal"
+      ], 
+      "context": [ 
+        "personalTab",
+        "channelTab"
+  
+      ], 
+      "name": "Rewards", 
+      "contentUrl": "https://www.google.com (displayed in Teams canvas)", 
+      "websiteUrl": "https://www.google.com (displayed in web browser)" 
+      }
+  ],
+    "permissions": [
+        "identity",
+        "messageTeamMembers"
+    ],
+    "validDomains": [
+        "${{BOT_DOMAIN}}"
+    ],
+    "webApplicationInfo": {
+        "id": "${{AAD_APP_CLIENT_ID}}",
+        "resource": "api://botid-${{BOT_ID}}"
+    }
+}
