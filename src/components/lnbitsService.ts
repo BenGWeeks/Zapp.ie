@@ -1,14 +1,12 @@
-// src/services/lnbitsService.ts
-
-const paylinkId: string = (process as any).env.LNBITS_PAYLINK_ID;
+const lnbiturl: string = (process as any).env.LNBITS_NODE_URL;
 const userName = (process as any).env.LNBITS_USERNAME;
 const password = (process as any).env.LNBITS_PASSWORD;
 
-console.log(`${paylinkId} ${userName} ${password}`);
+console.log(`${lnbiturl} ${userName} ${password}`);
 
 const getAccessToken = async (username: string, password: string) => {
   try {
-    const response = await fetch('/api/v1/auth', {
+    const response = await fetch(`${lnbiturl}/api/v1/auth`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,7 +29,7 @@ const getAccessToken = async (username: string, password: string) => {
 const getWallets = async () => {
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
-    const response = await fetch('/api/v1/wallets', {
+    const response = await fetch(`${lnbiturl}/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +52,7 @@ const getWallets = async () => {
 
 const getWalletDetails = async (apiKey: string, walletId: string) => {
   try {
-    const response = await fetch(`/api/v1/wallets/${walletId}`, {
+    const response = await fetch(`${lnbiturl}/api/v1/wallets/${walletId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +75,7 @@ const getWalletDetails = async (apiKey: string, walletId: string) => {
 const getWalletBalance = async (apiKey: string) => {
   console.log("Getting balance ...");
   try {
-    const response = await fetch('/api/v1/wallet', 
+    const response = await fetch(`${lnbiturl}/api/v1/wallet`, 
     {
       method: 'GET',
       headers: {
@@ -102,7 +100,7 @@ const getWalletBalance = async (apiKey: string) => {
 const getWalletName = async (apiKey: string) => {
   console.log("Getting name ...");
   try {
-    const response = await fetch('/api/v1/wallet', 
+    const response = await fetch(`${lnbiturl}/api/v1/wallet`, 
     {
       method: 'GET',
       headers: {
@@ -127,7 +125,7 @@ const getWalletName = async (apiKey: string) => {
 const getPayments = async (apiKey: string) => {
   console.log("Getting balance ...");
   try {
-    const response = await fetch('/api/v1/payments?limit=100', 
+    const response = await fetch(`${lnbiturl}/api/v1/payments?limit=100`, 
     {
       method: 'GET',
       headers: {
@@ -151,7 +149,7 @@ const getPayments = async (apiKey: string) => {
 
 const getWalletPayLinks = async (invoiceKey: string, walletId: string) => {
   try {
-    const response = await fetch(`/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`, {
+    const response = await fetch(`${lnbiturl}/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -175,7 +173,7 @@ const getWalletPayLinks = async (invoiceKey: string, walletId: string) => {
 const getWalletId = async (apiKey: string) => {
   console.log("getWalletId: Starting ...");
   try {
-    const response = await fetch('/api/v1/wallets', {
+    const response = await fetch(`${lnbiturl}/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -209,7 +207,7 @@ const getWalletId = async (apiKey: string) => {
 const getInvoicePayment = async (apiKey: string, invoice: string) => {
   console.log("getInvoicePayment: Starting ...");
   try {
-    const response = await fetch(`/api/v1/payments/${invoice}`, {
+    const response = await fetch(`${lnbiturl}/api/v1/payments/${invoice}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -236,7 +234,7 @@ const getPaymentsSince = async (apiKey: string, timestamp: number) => {
     // Get walletId using the provided apiKey
     const walletId = await getWalletId(apiKey);
 
-    const response = await fetch(`/api/v1/payments?wallet=${walletId}&limit=1`, {
+    const response = await fetch(`${lnbiturl}/api/v1/payments?wallet=${walletId}&limit=1`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -285,7 +283,7 @@ const createInvoice = async (apiKey: string) => {
     // Use the id of the first pay link for that wallet
     const payLinkId = payLinks[0].id;
 
-    const response = await fetch(`/lnurlp/api/v1/links/${payLinkId}`, {
+    const response = await fetch(`${lnbiturl}/lnurlp/api/v1/links/${payLinkId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
