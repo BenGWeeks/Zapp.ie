@@ -5,8 +5,10 @@ import {
   MemoryStorage,
   ConversationState,
   UserState,
+  CardFactory
 } from "botbuilder";
 import { SSOCommand, SSOCommandMap } from "./commands/SSOCommandMap"; // Adjust the import path as necessary
+import { getWallets } from './components/lnbitsService';
 
 // Define specific commands
 class SendZapsCommand extends SSOCommand {
@@ -44,8 +46,44 @@ class ShowLeaderboardCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
     try {
       await context.sendActivity("Showing leaderboard...");
+
+      // Call the getWallets function
+      const wallets = await getWallets();
+
+      if (wallets) {
+        // Sort wallets by balance_msat in descending order
+        const sortedWallets = wallets.sort((a, b) => b.balance_msat - a.balance_msat);
+
+        // Format the sorted wallets into an actionable card response
+        const cardResponse = {
+          type: "AdaptiveCard",
+          body: sortedWallets.map(wallet => ({
+            type: "TextBlock",
+            text: `Wallet: ${wallet.name}\nBalance: ${wallet.balance_msat / 1000} satoshis`,
+            weight: "Bolder",
+            size: "Medium"
+          })),
+          actions: [
+            {
+              type: "Action.OpenUrl",
+              title: "View Wallets",
+              url: "https://example.com/wallets"
+            }
+          ],
+          $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+          version: "1.2"
+        };
+
+        // Send the formatted card as an activity
+        await context.sendActivity({
+          attachments: [CardFactory.adaptiveCard(cardResponse)]
+        });
+      } else {
+        await context.sendActivity("No wallets found.");
+      }
     } catch (error) {
       console.error("Error in ShowLeaderboardCommand:", error);
+      await context.sendActivity("An error occurred while showing the leaderboard.");
     }
   }
 }

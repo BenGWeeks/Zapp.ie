@@ -1,30 +1,29 @@
-const lnbiturl: string = (process as any).env.LNBITS_NODE_URL;
-const userName = (process as any).env.LNBITS_USERNAME;
-const password = (process as any).env.LNBITS_PASSWORD;
+// lnbitsService.ts
+import dotenvFlow from 'dotenv-flow';
 
+dotenvFlow.config({ path: './env' });
+
+const lnbiturl: string = process.env.LNBITS_NODE_URL as string;
+const userName = process.env.LNBITS_USERNAME as string;
+const password = process.env.LNBITS_PASSWORD as string;
 console.log(`${lnbiturl} ${userName} ${password}`);
 
-const getAccessToken = async (username: string, password: string) => {
-  try {
-    const response = await fetch(`${lnbiturl}/api/v1/auth`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    });
+export async function getAccessToken(username: string, password: string): Promise<string> {
+  const response = await fetch(`${lnbiturl}/api/v1/auth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, password }),
+  });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.access_token; // or data.userId, depending on the API
-  } catch (error) {
-    console.error('Error:', error);
-    return null;
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
   }
-};
+
+  const data = await response.json();
+  return data.access_token;
+}
 
 const getWallets = async () => {
   try {
@@ -304,7 +303,7 @@ const createInvoice = async (apiKey: string) => {
   }
 };
 
-export default {
+export {
   getWallets,
   getWalletName,
   getWalletId,
@@ -315,4 +314,5 @@ export default {
   getInvoicePayment,
   getPaymentsSince,
   createInvoice,
+  
 };
