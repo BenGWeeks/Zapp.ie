@@ -31,6 +31,15 @@ const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
+
+    // Retrieve user information
+    const userId = context.activity.from.id;
+    const userName = context.activity.from.name;
+  
+    // Log user information
+    console.log(`User Object ID: ${userId}`);
+    console.log(`User Display Name: ${userName}`);
+    
   // This check writes out errors to console log .vs. app insights.
   // NOTE: In production environment, you should consider logging this to Azure
   //       application insights.

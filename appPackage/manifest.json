@@ -22,7 +22,7 @@
         "short": "short description for sso-bot",
         "full": "full description for sso-bot"
     },
-    "accentColor": "#FFFFFF",
+    "accentColor": "#002A5B",
     "bots": [
         {
             "botId": "${{BOT_ID}}",

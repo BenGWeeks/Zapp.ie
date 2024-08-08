@@ -2,11 +2,12 @@
 import dotenvFlow from 'dotenv-flow';
 
 dotenvFlow.config({ path: './env' });
+let globalWalletId: string | null = null;
 
 const lnbiturl: string = process.env.LNBITS_NODE_URL as string;
 const userName = process.env.LNBITS_USERNAME as string;
 const password = process.env.LNBITS_PASSWORD as string;
-console.log(`${lnbiturl} ${userName} ${password}`);
+const adminkey = process.env.LNBITS_ADMINKEY as string;
 
 export async function getAccessToken(username: string, password: string): Promise<string> {
   const response = await fetch(`${lnbiturl}/api/v1/auth`, {
@@ -24,6 +25,7 @@ export async function getAccessToken(username: string, password: string): Promis
   const data = await response.json();
   return data.access_token;
 }
+
 
 const getWallets = async () => {
   try {
@@ -303,6 +305,86 @@ const createInvoice = async (apiKey: string) => {
   }
 };
 
+const checkWalletExists = async (apiKey: string, walletName: string) => {
+  const wallets = await getWallets();
+  if (wallets) {
+    const wallet = wallets.find((wallet: any) => wallet.name === walletName);
+    return wallet ? wallet.id : null;
+  }
+  return null;
+};
+
+const createWallet = async (apiKey: string, objectID: string, displayName: string) => {
+  console.log("createWallet: Starting ...");
+  try {
+    const url = `${lnbiturl}/api/v1/wallet`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'X-API-KEY': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: `${objectID} - ${displayName}`
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error creating wallet: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating wallet:', error);
+    throw error;
+  }
+};
+
+async function ensureUserWallet(objectID: string, displayName: string): Promise<string | null> {
+  try {
+    const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
+    const walletName = `${objectID} - ${displayName}`;
+    const walletId = await checkWalletExists(apiKey, walletName);
+
+
+    if (walletId) {
+      return walletId;
+    }
+
+    const url = `${lnbiturl}/api/v1/wallet?api-key=${adminkey}`;
+    console.log(`Attempting to create wallet at URL: ${url}`);
+
+    const requestBody = {
+      name: `${objectID} - ${displayName}`
+    };
+
+    console.log(`Request Body:`, JSON.stringify(requestBody));
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      console.error(`HTTP error! status: ${response.status}, statusText: ${response.statusText}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.id;
+  } catch (error) {
+    console.error('Error in ensureUserWallet:', error);
+    return null;
+  }
+}
+
+
 export {
   getWallets,
   getWalletName,
@@ -314,5 +396,8 @@ export {
   getInvoicePayment,
   getPaymentsSince,
   createInvoice,
+  createWallet,
+  checkWalletExists,
+  ensureUserWallet,
   
 };

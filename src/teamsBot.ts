@@ -5,10 +5,46 @@ import {
   MemoryStorage,
   ConversationState,
   UserState,
-  CardFactory
+  CardFactory,
+  Middleware,
 } from "botbuilder";
 import { SSOCommand, SSOCommandMap } from "./commands/SSOCommandMap"; // Adjust the import path as necessary
-import { getWallets } from './components/lnbitsService';
+import { getWallets, ensureUserWallet} from './components/lnbitsService';
+
+let globalWalletId: string | null = null;
+
+
+
+export class EnsureWalletMiddleware implements Middleware {
+  async onTurn(context: TurnContext, next: () => Promise<void>): Promise<void> {
+    try {
+      if (context.activity.type === 'message' || context.activity.type === 'conversationUpdate') {
+        await this.ensureWallet(context);
+      }
+    } catch (error) {
+      console.error('Error in EnsureWalletMiddleware:', error);
+      await context.sendActivity('An error occurred while ensuring the wallet.');
+    }
+
+    // Continue with the next middleware or bot logic
+    await next();
+  }
+
+  private async ensureWallet(context: TurnContext): Promise<void> {
+    const userId = context.activity.from.id;
+    const userName = context.activity.from.name;
+    console.log(`User ID: ${userId}, User Name: ${userName}`);
+
+    // Ensure the user has a wallet and get the wallet ID
+    const walletId = await ensureUserWallet(userId, userName);
+
+    if (walletId) {
+      await context.sendActivity(`Wallet ID: ${walletId}`);
+    } else {
+      await context.sendActivity('Failed to ensure wallet.');
+    }
+  }
+}
 
 // Define specific commands
 class SendZapsCommand extends SSOCommand {
@@ -59,7 +95,7 @@ class ShowLeaderboardCommand extends SSOCommand {
           type: "AdaptiveCard",
           body: sortedWallets.map(wallet => ({
             type: "TextBlock",
-            text: `Wallet: ${wallet.name}\nBalance: ${wallet.balance_msat / 1000} satoshis`,
+            text: `Name: ${wallet.name}\nTotal: ${wallet.balance_msat / 1000} Zaps`,
             weight: "Bolder",
             size: "Medium"
           })),
@@ -101,6 +137,7 @@ export class TeamsBot extends TeamsActivityHandler {
     // Create conversation and user state with in-memory storage provider.
     this.conversationState = new ConversationState(memoryStorage);
     this.userState = new UserState(memoryStorage);
+    
 
     // Register commands
     SSOCommandMap.register("send zaps", new SendZapsCommand());
@@ -112,6 +149,26 @@ export class TeamsBot extends TeamsActivityHandler {
       console.log("Running with Message Activity.");
 
       try {
+
+                // Retrieve user information
+                const userId = context.activity.from.aadObjectId || context.activity.from.id;
+                const userName = context.activity.from.name;
+        
+                // Log user information
+                console.log(`User Object ID: ${userId}`);
+                console.log(`User Display Name: ${userName}`);
+                checkAndEnsureWallet(userId, userName);
+
+                async function checkAndEnsureWallet(objectID: string, displayName: string) {
+                  if (!globalWalletId) {
+                    globalWalletId = await ensureUserWallet(objectID, displayName);
+                    if (!globalWalletId) {
+                      console.error('Failed to ensure user wallet');
+                    }
+                  }
+                }
+
+        
         let txt = context.activity.text;
         // remove the mention of this bot
         const removedMentionText = TurnContext.removeRecipientMention(
@@ -192,9 +249,21 @@ export class TeamsBot extends TeamsActivityHandler {
 
   async onSignInInvoke(context: TurnContext) {
     try {
-      // Your logic here for handling sign-in invoke
+      const userId = context.activity.from.id;
+      const userName = context.activity.from.name;
+      console.log(`User ID: ${userId}, User Name: ${userName}`);
+  
+      // Ensure the user has a wallet and get the wallet ID
+      const walletId = await ensureUserWallet(userId, userName);
+  
+      if (walletId) {
+        await context.sendActivity(`Wallet ID: ${walletId}`);
+      } else {
+        await context.sendActivity('Failed to ensure wallet.');
+      }
     } catch (error) {
-      console.error("Error in onSignInInvoke:", error);
+      console.error('Error in onSignInInvoke:', error);
+      await context.sendActivity('An error occurred during sign-in.');
     }
   }
 }
