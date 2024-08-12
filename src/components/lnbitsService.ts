@@ -260,47 +260,58 @@ const getPaymentsSince = async (apiKey: string, timestamp: number) => {
     return [];
   }
 };
-
-const createInvoice = async (apiKey: string) => {
-  console.log("createInvoice: Starting ...");
+const createInvoice = async (recipientWalletId: string, amount: number) => {
   try {
-    // Get the pay links for the wallet
-    // Get walletId using the provided apiKey
-    const walletId = await getWalletId(apiKey);
-
-    if (!walletId) {
-      console.error('createInvoice: No wallet found for this apiKey');
-      return null;
-    }
-
-    const payLinks = await getWalletPayLinks(apiKey, walletId);
-
-    // Check if there are any pay links
-    if (!payLinks || payLinks.length === 0) {
-      console.error('createInvoice: No pay links found for this wallet');
-      return null;
-    }
-
-    // Use the id of the first pay link for that wallet
-    const payLinkId = payLinks[0].id;
-
-    const response = await fetch(`${lnbiturl}/lnurlp/api/v1/links/${payLinkId}`, {
-      method: 'GET',
+    const apiKey = await getAccessToken(userName, password);
+    const response = await fetch(`${lnbiturl}/api/v1/payments`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Api-Key': apiKey,
       },
+      body: JSON.stringify({
+        out: false,
+        amount: amount * 1000,
+        memo: 'Sending zaps',
+        recipient_wallet_id: recipientWalletId,
+      }),
     });
 
     if (!response.ok) {
-      console.error(`createInvoice error: ${response.status}`);
-      return null;
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-    return data.lnurl;
+    return data.payment_request;
   } catch (error) {
-    console.error('createInvoice error:', error);
+    console.error('Error creating invoice:', error);
+    return null;
+  }
+};
+
+const payInvoice = async (paymentRequest: string) => {
+  try {
+    const apiKey = await getAccessToken(userName, password);
+    const response = await fetch(`${lnbiturl}/api/v1/payments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Key': apiKey,
+      },
+      body: JSON.stringify({
+        out: true,
+        bolt11: paymentRequest,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error paying invoice:', error);
     return null;
   }
 };
@@ -384,6 +395,27 @@ async function ensureUserWallet(objectID: string, displayName: string): Promise<
   }
 }
 
+const getWalletIdByUserId = async (userId: string) => {
+  try {
+    const response = await fetch(`${lnbiturl}/api/v1/wallets?user_id=${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Key': adminkey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.id;
+  } catch (error) {
+    console.error('Error in getWalletIdByUserId:', error);
+    return null;
+  }
+};
 
 export {
   getWallets,
@@ -399,5 +431,7 @@ export {
   createWallet,
   checkWalletExists,
   ensureUserWallet,
+  payInvoice,
+  getWalletIdByUserId,
   
 };

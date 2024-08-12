@@ -7,13 +7,17 @@ import {
   UserState,
   CardFactory,
   Middleware,
+  MessageFactory,
 } from "botbuilder";
 import { SSOCommand, SSOCommandMap } from "./commands/SSOCommandMap"; // Adjust the import path as necessary
-import { getWallets, ensureUserWallet} from './components/lnbitsService';
+import { getWallets, ensureUserWallet, payInvoice, getWalletIdByUserId, createInvoice } from './components/lnbitsService'; // Import the payInvoice function
 
 let globalWalletId: string | null = null;
 
-
+// Define global variables
+let globalZapAmount: number;
+let globalMentionedUserId: string;
+let globalMentionedUserName: string;
 
 export class EnsureWalletMiddleware implements Middleware {
   async onTurn(context: TurnContext, next: () => Promise<void>): Promise<void> {
@@ -49,10 +53,59 @@ export class EnsureWalletMiddleware implements Middleware {
 // Define specific commands
 class SendZapsCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
-    try {
-      await context.sendActivity("Sending zaps...");
-    } catch (error) {
-      console.error("Error in SendZapsCommand:", error);
+    const card = createZapCard();
+    const message = MessageFactory.attachment(CardFactory.adaptiveCard(card));
+    await context.sendActivity(message);
+    async function sendZaps(context, message) {
+      try {
+        // Extract the mentioned user from the message
+        const mentionedUser = message.entities.find(entity => entity.type === 'mention');
+        
+        if (!mentionedUser) {
+          await context.sendActivity("Please mention a user to send zaps to.");
+          return;
+        }
+    
+        const userId = mentionedUser.mentioned.id;
+        const userName = mentionedUser.mentioned.name;
+    
+        // Get the wallet ID by user ID
+        const recipientWalletId = await getWalletIdByUserId(userId);
+    
+        if (!recipientWalletId) {
+          await context.sendActivity(`Could not find a wallet for user ${userName}.`);
+          return;
+        }
+    
+        // Extract the amount from the message
+        const amount = extractAmountFromMessage(message.text);
+    
+        // Create an invoice for the amount in the recipient's wallet
+        const paymentRequest = await createInvoice(recipientWalletId, amount);
+    
+        if (!paymentRequest) {
+          await context.sendActivity("Failed to create an invoice.");
+          return;
+        }
+    
+        // Pay the invoice
+        const result = await payInvoice(paymentRequest);
+    
+        if (result && result.payment_hash) {
+          await context.sendActivity(`Successfully sent ${amount} zaps to ${userName}.`);
+        } else {
+          await context.sendActivity("Failed to pay the invoice.");
+        }
+      } catch (error) {
+        console.error("Error sending zaps:", error);
+        await context.sendActivity("Sorry, something went wrong while sending zaps.");
+      }
+    }
+    
+    // Helper function to extract the amount from the message text
+    function extractAmountFromMessage(text) {
+      const amountMatch = text.match(/(\d+)/);
+      return amountMatch ? parseInt(amountMatch[0], 10) : 0;
     }
   }
 }
@@ -82,23 +135,35 @@ class ShowLeaderboardCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
     try {
       await context.sendActivity("Showing leaderboard...");
-
+    
       // Call the getWallets function
       const wallets = await getWallets();
-
+    
       if (wallets) {
+        // Regular expression to match GUIDs
+        const guidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
+    
         // Sort wallets by balance_msat in descending order
         const sortedWallets = wallets.sort((a, b) => b.balance_msat - a.balance_msat);
-
+    
         // Format the sorted wallets into an actionable card response
         const cardResponse = {
           type: "AdaptiveCard",
-          body: sortedWallets.map(wallet => ({
-            type: "TextBlock",
-            text: `Name: ${wallet.name}\nTotal: ${wallet.balance_msat / 1000} Zaps`,
-            weight: "Bolder",
-            size: "Medium"
-          })),
+          body: sortedWallets.map(wallet => {
+            let walletName = wallet.name;
+            // Check if the wallet name contains a GUID
+            const match = walletName.match(guidRegex);
+            if (match) {
+              // Remove the GUID and the " - " separator
+              walletName = walletName.replace(`${match[0]} - `, '');
+            }
+            return {
+              type: "TextBlock",
+              text: `Name: ${walletName}\nTotal: ${wallet.balance_msat / 1000} Zaps`,
+              weight: "Bolder",
+              size: "Medium"
+            };
+          }),
           actions: [
             {
               type: "Action.OpenUrl",
@@ -109,17 +174,13 @@ class ShowLeaderboardCommand extends SSOCommand {
           $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
           version: "1.2"
         };
-
+    
         // Send the formatted card as an activity
-        await context.sendActivity({
-          attachments: [CardFactory.adaptiveCard(cardResponse)]
-        });
-      } else {
-        await context.sendActivity("No wallets found.");
+        await context.sendActivity({ attachments: [CardFactory.adaptiveCard(cardResponse)] });
       }
     } catch (error) {
-      console.error("Error in ShowLeaderboardCommand:", error);
-      await context.sendActivity("An error occurred while showing the leaderboard.");
+      console.error("Error showing leaderboard:", error);
+      await context.sendActivity("Sorry, something went wrong while showing the leaderboard.");
     }
   }
 }
@@ -138,7 +199,6 @@ export class TeamsBot extends TeamsActivityHandler {
     this.conversationState = new ConversationState(memoryStorage);
     this.userState = new UserState(memoryStorage);
     
-
     // Register commands
     SSOCommandMap.register("send zaps", new SendZapsCommand());
     SSOCommandMap.register("show my balance", new ShowMyBalanceCommand());
@@ -147,38 +207,34 @@ export class TeamsBot extends TeamsActivityHandler {
 
     this.onMessage(async (context, next) => {
       console.log("Running with Message Activity.");
-
+    
       try {
-
-                // Retrieve user information
-                const userId = context.activity.from.aadObjectId || context.activity.from.id;
-                const userName = context.activity.from.name;
-        
-                // Log user information
-                console.log(`User Object ID: ${userId}`);
-                console.log(`User Display Name: ${userName}`);
-                checkAndEnsureWallet(userId, userName);
-
-                async function checkAndEnsureWallet(objectID: string, displayName: string) {
-                  if (!globalWalletId) {
-                    globalWalletId = await ensureUserWallet(objectID, displayName);
-                    if (!globalWalletId) {
-                      console.error('Failed to ensure user wallet');
-                    }
-                  }
-                }
-
-        
+        // Retrieve user information
+        const userId = context.activity.from.aadObjectId || context.activity.from.id;
+        const userName = context.activity.from.name;
+    
+        // Log user information
+        console.log(`User Object ID: ${userId}`);
+        console.log(`User Display Name: ${userName}`);
+        checkAndEnsureWallet(userId, userName);
+    
+        async function checkAndEnsureWallet(objectID: string, displayName: string) {
+          if (!globalWalletId) {
+            globalWalletId = await ensureUserWallet(objectID, displayName);
+            if (!globalWalletId) {
+              console.error('Failed to ensure user wallet');
+            }
+          }
+        }
+    
         let txt = context.activity.text;
         // remove the mention of this bot
-        const removedMentionText = TurnContext.removeRecipientMention(
-          context.activity
-        );
+        const removedMentionText = TurnContext.removeRecipientMention(context.activity);
         if (removedMentionText) {
           // Remove the line break
           txt = removedMentionText.toLowerCase().replace(/\n|\r/g, "").trim();
         }
-
+    
         // Trigger command by IM text
         const command = SSOCommandMap.get(txt);
         if (command) {
@@ -189,9 +245,6 @@ export class TeamsBot extends TeamsActivityHandler {
       } catch (error) {
         console.error("Error in onMessage handler:", error);
       }
-
-      // By calling next() you ensure that the next BotHandler is run.
-      await next();
     });
 
     this.onMembersAdded(async (context, next) => {
@@ -266,4 +319,36 @@ export class TeamsBot extends TeamsActivityHandler {
       await context.sendActivity('An error occurred during sign-in.');
     }
   }
+}
+
+// Function to create an adaptive card
+function createZapCard() {
+  return {
+    type: "AdaptiveCard",
+    body: [
+      {
+        type: "TextBlock",
+        text: "How many zaps would you like to send?",
+        weight: "bolder",
+        size: "medium"
+      },
+      {
+        type: "Input.Number",
+        id: "zapAmount",
+        placeholder: "Enter the number of zaps",
+        min: 1
+      },
+      {
+        type: "ActionSet",
+        actions: [
+          {
+            type: "Action.Submit",
+            title: "Send Zaps"
+          }
+        ]
+      }
+    ],
+    $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+    version: "1.3"
+  };
 }
