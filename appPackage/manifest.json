@@ -19,8 +19,8 @@
         "full": "Zapp.ie the zapster"
     },
     "description": {
-        "short": "Send zaps to your colleagues for work well done",
-        "full": "Send zaps to your colleagues for work well done"
+        "short": "Zapp.ie: Integrate Bitcoin rewards and AI for enhanced collaboration in Teams",
+        "full": "Zapp.ie seamlessly integrates into Microsoft Teams, bringing a unique blend of Bitcoin micro-transactions and AI automation to enhance team collaboration and recognition. With Zapp.ie, you can effortlessly send Bitcoin-based rewards (Sats) to colleagues as a token of appreciation, automate recognition for positive behavior, and foster a more engaged and motivated workplace. Transform how your team acknowledges great work and builds a culture of gratitude directly within Teams."
     },
     "accentColor": "#002A5B",
     "bots": [
