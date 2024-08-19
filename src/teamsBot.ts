@@ -269,17 +269,9 @@ export class TeamsBot extends TeamsActivityHandler {
         // Log user information
         console.log(`User Object ID: ${userId}`);
         console.log(`User Display Name: ${userName}`);
-        checkAndEnsureWallet(userId, userName);
+        const { receivingWalletId, sendingWalletId } = await ensureUserWallet(userId, userName);
     
-        async function checkAndEnsureWallet(objectID: string, displayName: string) {
-          if (!globalWalletId) {
-            globalWalletId = await ensureUserWallet(objectID, displayName);
-            if (!globalWalletId) {
-              console.error('Failed to ensure user wallet');
-            }
-          }
-        }
-    
+   
         let txt = context.activity.text;
         // remove the mention of this bot
         const removedMentionText = TurnContext.removeRecipientMention(context.activity);
@@ -297,6 +289,8 @@ if (context.activity.value && context.activity.value.action === 'submitZaps') {
     return;
   }
 
+
+  
   try {
     // Assuming recipientWalletId is known or retrieved from context
     const recipientWalletId = 'recipient-wallet-id'; // Replace with actual recipient wallet ID
