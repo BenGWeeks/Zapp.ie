@@ -51,11 +51,11 @@
                         },
                         {
                             "title": "Show Leaderboard",
-                            "description": "Withdraw Zaps from the user's account"
+                            "description": "Show the leaderboard"
                         },
                         {
                             "title": "Withdraw my Zaps",
-                            "description": "Show the leaderboard"
+                            "description": "Withdraw Zaps from the user's account"
                         }
                     ]
                 }
@@ -64,35 +64,36 @@
     ],
     "composeExtensions": [],
     "configurableTabs": [],
-    "staticTabs": [ 
-    { 
-    "entityId": "feedTab", 
-    "scopes": [       
-      "team","personal"
-    ], 
-    "context": [ 
-      "personalTab",
-      "channelTab"
-
-    ], 
-    "name": "Feed", 
-    "contentUrl": "https://contoso.com/content (displayed in Teams canvas)", 
-    "websiteUrl": "https://contoso.com/content (displayed in web browser)" 
-    },    { 
-      "entityId": "rewardsTab", 
-      "scopes": [       
-        "team","personal"
-      ], 
-      "context": [ 
-        "personalTab",
-        "channelTab"
-  
-      ], 
-      "name": "Rewards", 
-      "contentUrl": "https://www.google.com (displayed in Teams canvas)", 
-      "websiteUrl": "https://www.google.com (displayed in web browser)" 
-      }
-  ],
+    "staticTabs": [
+        { 
+            "entityId": "feedTab", 
+            "scopes": [       
+                "team",
+                "personal"
+            ], 
+            "context": [ 
+                "personalTab",
+                "channelTab"
+            ], 
+            "name": "Feed", 
+            "contentUrl": "https://contoso.com/content", 
+            "websiteUrl": "https://contoso.com/content"
+        }, 
+        { 
+            "entityId": "rewardsTab", 
+            "scopes": [       
+                "team",
+                "personal"
+            ], 
+            "context": [ 
+                "personalTab",
+                "channelTab"
+            ], 
+            "name": "Rewards", 
+            "contentUrl": "https://www.google.com", 
+            "websiteUrl": "https://www.google.com"
+        }
+    ],
     "permissions": [
         "identity",
         "messageTeamMembers"
@@ -103,5 +104,19 @@
     "webApplicationInfo": {
         "id": "${{AAD_APP_CLIENT_ID}}",
         "resource": "api://botid-${{BOT_ID}}"
+    },
+    "authorization": {
+        "permissions": {
+            "resourceSpecific": [
+                {
+                    "type": "Application",
+                    "name": "ChannelSettings.Read.Group"
+                },
+                {
+                    "type": "Delegated",
+                    "name": "ChannelMeetingParticipant.Read.Group"
+                }
+            ]
+        }
     }
 }

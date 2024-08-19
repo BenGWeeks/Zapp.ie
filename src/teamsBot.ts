@@ -65,7 +65,7 @@ class SendZapsCommand extends SSOCommand {
           await context.sendActivity("Please mention a user to send zaps to.");
           return;
         }
-    
+
         const userId = mentionedUser.mentioned.id;
         const userName = mentionedUser.mentioned.name;
     
@@ -92,6 +92,15 @@ class SendZapsCommand extends SSOCommand {
         const result = await payInvoice(paymentRequest);
     
         if (result && result.payment_hash) {
+          const mention = {
+            mentioned: {
+              id: userId,
+              name: userName
+            },
+            text: `<at>${userName}</at>`,
+            type: 'mention'
+          };
+          
           await context.sendActivity(`Successfully sent ${amount} zaps to ${userName}.`);
         } else {
           await context.sendActivity("Failed to pay the invoice.");
@@ -207,6 +216,50 @@ export class TeamsBot extends TeamsActivityHandler {
 
     this.onMessage(async (context, next) => {
       console.log("Running with Message Activity.");
+      let mentions = TurnContext.getMentions(context.activity);
+      const text = context.activity.text.trim();
+      mentions = mentions.filter(mention => mention.mentioned.id !== context.activity.recipient.id);
+
+  // Print out the list of mentions
+  console.log("Mentions:", mentions);
+
+  // Log the text variable
+  console.log("Text:", text);
+
+  const uniqueMentions = [];
+  const mentionMap = new Map();
+  mentions.forEach(mention => {
+    if (!mentionMap.has(mention.mentioned.id)) {
+      mentionMap.set(mention.mentioned.id, mention);
+      uniqueMentions.push(mention);
+    }
+  });
+
+  // Log the unique mentions
+  console.log("Unique Mentions:", uniqueMentions);
+
+
+      if (text.toLowerCase().includes("send zaps") && uniqueMentions.length > 0) {
+        const mentionedUser = uniqueMentions[0].mentioned;
+        globalMentionedUserName = mentionedUser.name;
+
+        
+    
+        // Log the ObjectID of the mentioned user
+    console.log("Mentioned User ObjectID:", mentionedUser.id);
+
+        // Ensure the mentioned user is not the bot itself
+        if (mentionedUser.id !== context.activity.recipient.id) {
+          const sendZapsCommand = new SendZapsCommand();
+          await sendZapsCommand.execute(context);
+        } else {
+          await context.sendActivity(MessageFactory.text('You cannot send zaps to the bot itself.'));
+        }
+      } else  {
+        await context.sendActivity(MessageFactory.text('Invalid command or no valid mentions detected.'));
+      }
+        // Clear the mentions variable
+      mentions = [];
     
       try {
         // Retrieve user information
@@ -234,6 +287,41 @@ export class TeamsBot extends TeamsActivityHandler {
           // Remove the line break
           txt = removedMentionText.toLowerCase().replace(/\n|\r/g, "").trim();
         }
+
+        
+if (context.activity.value && context.activity.value.action === 'submitZaps') {
+  const amount = context.activity.value.zapAmount;
+
+  if (!amount || isNaN(amount)) {
+    await context.sendActivity(MessageFactory.text('Invalid amount specified.'));
+    return;
+  }
+
+  try {
+    // Assuming recipientWalletId is known or retrieved from context
+    const recipientWalletId = 'recipient-wallet-id'; // Replace with actual recipient wallet ID
+
+    // Create an invoice
+    const paymentRequest = await createInvoice(recipientWalletId, parseInt(amount));
+
+    if (!paymentRequest) {
+      await context.sendActivity(MessageFactory.text('Failed to create invoice.'));
+      return;
+    }
+
+    // Pay the invoice
+    const paymentResult = await payInvoice(paymentRequest);
+
+    if (paymentResult) {
+      await context.sendActivity(MessageFactory.text('Zaps submitted successfully!'));
+    } else {
+      await context.sendActivity(MessageFactory.text('Failed to submit zaps.'));
+    }
+  } catch (error) {
+    console.error('Error handling submit zaps:', error);
+    await context.sendActivity(MessageFactory.text('An error occurred while submitting zaps.'));
+  }
+}
     
         // Trigger command by IM text
         const command = SSOCommandMap.get(txt);
@@ -320,7 +408,6 @@ export class TeamsBot extends TeamsActivityHandler {
     }
   }
 }
-
 // Function to create an adaptive card
 function createZapCard() {
   return {
@@ -328,7 +415,7 @@ function createZapCard() {
     body: [
       {
         type: "TextBlock",
-        text: "How many zaps would you like to send?",
+        text: `How many Zaps would you like to send to ${globalMentionedUserName}?`,
         weight: "bolder",
         size: "medium"
       },
@@ -343,12 +430,18 @@ function createZapCard() {
         actions: [
           {
             type: "Action.Submit",
-            title: "Send Zaps"
+            title: "Send Zaps",
+            data: {
+              action: "submitZaps"
+            }
           }
         ]
       }
     ],
     $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
-    version: "1.3"
+    version: "1.2"
   };
 }
+
+// Assuming the message handler function is defined above
+// Add the code to handle the "Submit Zaps" action here

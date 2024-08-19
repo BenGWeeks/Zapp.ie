@@ -337,7 +337,7 @@ const createWallet = async (apiKey: string, objectID: string, displayName: strin
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: `${objectID} - ${displayName}`
+        name: `${displayName}- ${objectID} - Receiving`,
       }),
     });
 
@@ -353,45 +353,76 @@ const createWallet = async (apiKey: string, objectID: string, displayName: strin
   }
 };
 
-async function ensureUserWallet(objectID: string, displayName: string): Promise<string | null> {
+async function ensureUserWallet(objectID: string, displayName: string): Promise<{ receivingWalletId: string | null, sendingWalletId: string | null }> {
   try {
     const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
-    const walletName = `${objectID} - ${displayName}`;
-    const walletId = await checkWalletExists(apiKey, walletName);
+    const walletNameReceiving = `${displayName} - ${objectID} - Receiving`;
+    const walletNameSending = `${displayName} - ${objectID} - Sending`;
 
+    // Check if the Receiving wallet exists
+    const receivingWalletId = await checkWalletExists(apiKey, walletNameReceiving);
+    if (!receivingWalletId) {
+      const url = `${lnbiturl}/api/v1/wallet?api-key=${adminkey}`;
+      console.log(`Attempting to create Receiving wallet at URL: ${url}`);
 
-    if (walletId) {
-      return walletId;
+      const requestBody = {
+        name: walletNameReceiving
+      };
+
+      console.log(`Request Body:`, JSON.stringify(requestBody));
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': adminkey,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error creating wallet: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log(`Created Receiving wallet with ID: ${data.id}`);
+      return { receivingWalletId: data.id, sendingWalletId: null };
     }
 
-    const url = `${lnbiturl}/api/v1/wallet?api-key=${adminkey}`;
-    console.log(`Attempting to create wallet at URL: ${url}`);
+    // Check if the Sending wallet exists
+    const sendingWalletId = await checkWalletExists(apiKey, walletNameSending);
+    if (!sendingWalletId) {
+      const url = `${lnbiturl}/api/v1/wallet?api-key=${adminkey}`;
+      console.log(`Attempting to create Sending wallet at URL: ${url}`);
 
-    const requestBody = {
-      name: `${objectID} - ${displayName}`
-    };
+      const requestBody = {
+        name: walletNameSending
+      };
 
-    console.log(`Request Body:`, JSON.stringify(requestBody));
+      console.log(`Request Body:`, JSON.stringify(requestBody));
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'accept': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': adminkey,
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-    if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}, statusText: ${response.statusText}`);
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Error creating wallet: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log(`Created Sending wallet with ID: ${data.id}`);
+      return { receivingWalletId, sendingWalletId: data.id };
     }
 
-    const data = await response.json();
-    return data.id;
+    return { receivingWalletId, sendingWalletId };
   } catch (error) {
-    console.error('Error in ensureUserWallet:', error);
-    return null;
+    console.error('Error ensuring user wallets:', error);
+    throw error;
   }
 }
 

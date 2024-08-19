@@ -1,7 +1,7 @@
 {
     "id": "767587cf-9846-4730-9d61-b80523c4f45c",
     "appId": "6070a4e4-56eb-4c93-b889-56955b9d95d8",
-    "name": "bot-sso-aad",
+    "name": "Zapp.ie",
     "accessTokenAcceptedVersion": 2,
     "signInAudience": "AzureADMyOrg",
     "optionalClaims": {
@@ -94,7 +94,7 @@
     ],
     "replyUrlsWithType": [
         {
-            "url": "https://kvt4zcqx-3978.eun1.devtunnels.ms/auth-end.html",
+            "url": "https://r669jvgk-3978.eun1.devtunnels.ms/auth-end.html",
             "type": "Web"
         }
     ]
