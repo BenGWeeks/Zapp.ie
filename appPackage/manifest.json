@@ -76,8 +76,8 @@
                 "channelTab"
             ], 
             "name": "Feed", 
-            "contentUrl": "https://contoso.com/content", 
-            "websiteUrl": "https://contoso.com/content"
+            "contentUrl": "https://zappie-dev-esbrfvguadd5f2hu.northeurope-01.azurewebsites.net/", 
+            "websiteUrl": "https://zappie-dev-esbrfvguadd5f2hu.northeurope-01.azurewebsites.net/"
         }, 
         { 
             "entityId": "rewardsTab", 
@@ -90,8 +90,8 @@
                 "channelTab"
             ], 
             "name": "Rewards", 
-            "contentUrl": "https://www.google.com", 
-            "websiteUrl": "https://www.google.com"
+            "contentUrl": "https://zappie-dev-esbrfvguadd5f2hu.northeurope-01.azurewebsites.net/", 
+            "websiteUrl": "https://zappie-dev-esbrfvguadd5f2hu.northeurope-01.azurewebsites.net/"
         }
     ],
     "permissions": [
@@ -99,7 +99,8 @@
         "messageTeamMembers"
     ],
     "validDomains": [
-        "${{BOT_DOMAIN}}"
+        "${{BOT_DOMAIN}}",
+        "zappie-dev-esbrfvguadd5f2hu.northeurope-01.azurewebsites.net"
     ],
     "webApplicationInfo": {
         "id": "${{AAD_APP_CLIENT_ID}}",
