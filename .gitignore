@@ -6,7 +6,6 @@ appPackage/build
 
 # dependencies
 node_modules/
-tabs/node_modules/
 
 # misc
 .env
@@ -16,6 +15,6 @@ tabs/node_modules/
 # build
 lib/
 build/
-tabs/build/
 
 .fake
+/build

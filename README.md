@@ -1,31 +1,12 @@
----
-page_type: sample
-languages:
-- typescript
-products:
-- office-teams
-- office
-name: Bot App with SSO Enabled
-urlFragment: officedev-teamsfx-samples-bot-bot-sso
-description: A Hello World app of Microsoft Teams Bot app with SSO
-extensions:
-  createdDate: "2021-10-19"
----
-# Getting Started with Bot SSO
+# Overview
+Zapp.ie seamlessly integrates into Microsoft Teams, bringing a unique blend of Bitcoin micro-transactions and AI automation to enhance team collaboration and recognition. With Zapp.ie, you can effortlessly send Bitcoin-based rewards (Sats) to colleagues as a token of appreciation, automate recognition for positive behavior, and foster a more engaged and motivated workplace. Transform how your team acknowledges great work and builds a culture of gratitude directly within Teams.
 
-A bot, chatbot, or conversational bot is an app that responds to simple commands sent in chat and replies in meaningful ways. Examples of bots in everyday use include: bots that notify about build failures, bots that provide information about the weather or bus schedules, or provide travel information. A bot interaction can be a quick question and answer, or it can be a complex conversation. Being a cloud application, a bot can provide valuable and secure access to cloud services and corporate resources.
+# Getting Started with Zapp.ie
 
-This is a sample chatbot application demonstrating Single Sign-on using `botbuilder` and Teams Framework that can respond to a `show` message.
-
-![Bot SSO Overview](assets/sampleDemo.gif)
-
-## This sample illustrates
-- Use Teams Toolkit to create a Teams bot app.
-- Use Microsoft Graph to get User info and picture in Teams app.
-- Use TeamsFx SDK to implementing SSO for Teams bot.
+Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and recognition through Bitcoin micro-transactions and AI-powered automation. Here’s how you can get started and use Zapp.ie effectively with your team:
 
 ## Prerequisite to use this sample
-- [Node.js](https://nodejs.org/), supported versions: 16, 18
+- [Node.js](https://nodejs.org/), supported versions: 18
 - A Microsoft 365 tenant in which you have permission to upload Teams apps. You can get a free Microsoft 365 developer tenant by joining the [Microsoft 365 developer program](https://developer.microsoft.com/en-us/microsoft-365/dev-program).
 - [Teams Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [TeamsFx CLI](https://aka.ms/teams-toolkit-cli)
 
@@ -35,7 +16,7 @@ This is a sample chatbot application demonstrating Single Sign-on using `botbuil
   "@azure/msal-node": "^2.6.0"
 }
 ```
-## Minimal path to awesome
+## Running Zapp.ie bot
 
 ### Run the app locally
 - From VS Code:
@@ -69,12 +50,8 @@ This is a sample chatbot application demonstrating Single Sign-on using `botbuil
 - From TeamsFx CLI:
     1. Run command: `teamsapp preview --env dev`.
 
-## Version History
-|Date| Author| Comments|
-|---|---|---|
-|Apr 19, 2022| IvanJobs | update to support Teams Toolkit v4.0.0|
-|Dec 7, 2022| yukun-dong | update to support Teams Toolkit v5.0.0|
-|Feb 22, 2024| yukun-dong | update card to adaptive card|
+## Running Zapp.ie Web Service
 
-## Feedback
-We really appreciate your feedback! If you encounter any issue or error, please report issues to us following the [Supporting Guide](https://github.com/OfficeDev/TeamsFx-Samples/blob/dev/SUPPORT.md). Meanwhile you can make [recording](https://aka.ms/teamsfx-record) of your journey with our product, they really make the product better. Thank you!
+- From VS Code:
+    1. Navigate to the *Tabs* directory
+    2. Type `npm start` 
