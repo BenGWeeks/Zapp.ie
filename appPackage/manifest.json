@@ -76,8 +76,8 @@
                 "channelTab"
             ], 
             "name": "Feed", 
-            "contentUrl": "https://sharp-singers-dance.loca.lt", 
-            "websiteUrl": "https://sharp-singers-dance.loca.lt"
+            "contentUrl": "https://contoso.com/content", 
+            "websiteUrl": "https://contoso.com/content"
         }, 
         { 
             "entityId": "rewardsTab", 
@@ -90,8 +90,8 @@
                 "channelTab"
             ], 
             "name": "Rewards", 
-            "contentUrl": "https://sharp-singers-dance.loca.lt", 
-            "websiteUrl": "https://sharp-singers-dance.loca.lt"
+            "contentUrl": "https://www.google.com", 
+            "websiteUrl": "https://www.google.com"
         }
     ],
     "permissions": [
@@ -99,9 +99,7 @@
         "messageTeamMembers"
     ],
     "validDomains": [
-        "${{BOT_DOMAIN}}",
-        "localhost",
-        "every-regions-judge.loca.lt"
+        "${{BOT_DOMAIN}}"
     ],
     "webApplicationInfo": {
         "id": "${{AAD_APP_CLIENT_ID}}",
