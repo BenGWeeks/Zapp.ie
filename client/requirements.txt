@@ -1,4 +1,0 @@
-react
-react-dom
-react-router-dom
-react-responsive-carousel
