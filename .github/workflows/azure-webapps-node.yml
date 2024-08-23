@@ -64,4 +64,3 @@ jobs:
           app-name: 'zappie-dev'
           slot-name: 'Production'
           package: './tabs'
-Update launch.json · desousamario85/Zapp.ie@875fd21
