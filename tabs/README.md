@@ -2,6 +2,20 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Proxy
+
+To resolve the CORS blocking issue, we setup a proxy. This is done by `setupProxy.js` isn't running. This is dependent on running:
+
+```
+npm install http-proxy-middleware@2.0.6
+```
+
+NB We install version `2.0.6` because that is the version used by `webpack-dev-server` (a dependency of `react-scripts`). You can check you only have one version of `http-proxy-middle@2.0.6` is installed by running:
+
+```
+npm ls http-proxy-middleware
+```
+
 ## Available Scripts
 
 In the `/tabs` directory, you can run:
@@ -11,7 +25,7 @@ npm install
 npm start
 ```
 
-This runs the app in the development mode.
+This runs the app in the development mode and will create necessary symbolic links (to lnbitsService.ts)
 
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 

@@ -1,24 +1,37 @@
-import { FunctionComponent, useCallback } from "react";
-import styles from "./FeedComponent.module.css";
-import FeedList from "./FeedList";
-import React from "react";
+import { FunctionComponent, useCallback, useState } from 'react';
+import styles from './FeedComponent.module.css';
+import FeedList from './FeedList';
+import React from 'react';
 
 const FeedComponent: FunctionComponent = () => {
+  const [timestamp, setTimestamp] = useState<number>(0);
+  const [activePeriod, setActivePeriod] = useState<number | null>(null);
+
   const onTabContainerClick = useCallback(() => {
     // Add your code here
   }, []);
 
   const today = new Date();
-  const formattedDate = today.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
+  const formattedDate = today.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
   });
-  const formattedTime = today.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "numeric",
+  const formattedTime = today.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
     hour12: true,
   });
+
+  const handlePeriodClick = (days: number) => {
+    const currentDate = new Date();
+    const futureDate = new Date(
+      currentDate.getTime() + days * 24 * 60 * 60 * 1000,
+    ); // Corrected to milliseconds
+    const futureTimestamp = Math.floor(futureDate.getTime() / 1000); // Convert to seconds
+    setTimestamp(futureTimestamp);
+    console.log(`handlePeriodClick: futureTimestamp: ${futureTimestamp}`);
+  };
 
   return (
     <div className={styles.feedcomponent}>
@@ -26,7 +39,7 @@ const FeedComponent: FunctionComponent = () => {
         <div className={styles.tab}>
           <div className={styles.base}>
             <div className={styles.stringBadgeIconStack}>
-              <b className={styles.stringTabTitle}>Leaderboard</b>
+              <b className={styles.stringTabTitle}>Feed</b>
             </div>
             <div className={styles.borderPaddingStack}>
               <div className={styles.borderBottom} />
@@ -36,14 +49,7 @@ const FeedComponent: FunctionComponent = () => {
         <div className={styles.tab1} onClick={onTabContainerClick}>
           <div className={styles.base1}>
             <div className={styles.stringBadgeIconStack}>
-              <div className={styles.stringTabTitle}>Feed</div>
-            </div>
-          </div>
-        </div>
-        <div className={styles.tab1} onClick={onTabContainerClick}>
-          <div className={styles.base1}>
-            <div className={styles.stringBadgeIconStack}>
-              <div className={styles.stringTabTitle}>Zaps</div>
+              <div className={styles.stringTabTitle}>Leaderboard</div>
             </div>
           </div>
         </div>
@@ -66,11 +72,29 @@ const FeedComponent: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.pivotPointsdoubleFull60}>
-        <div className={styles.daysCopy}>60 days</div>
-        <b className={styles.daysCopy3}>30 days</b>
-        <div className={styles.daysCopy1}>7 days</div>
+        <div
+          className={styles.daysCopy}
+          onClick={() => handlePeriodClick(60)}
+          style={{ fontWeight: activePeriod === 60 ? 'bold' : 'normal' }}
+        >
+          60 days
+        </div>
+        <div
+          className={styles.daysCopy3}
+          onClick={() => handlePeriodClick(30)}
+          style={{ fontWeight: activePeriod === 30 ? 'bold' : 'normal' }}
+        >
+          30 days
+        </div>
+        <div
+          className={styles.daysCopy1}
+          onClick={() => handlePeriodClick(7)}
+          style={{ fontWeight: activePeriod === 7 ? 'bold' : 'normal' }}
+        >
+          7 days
+        </div>
       </div>
-      <FeedList />
+      <FeedList timestamp={timestamp} />
     </div>
   );
 };
