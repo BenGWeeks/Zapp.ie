@@ -15,7 +15,7 @@
         "outline": "outline.png"
     },
     "name": {
-        "short": "Zapp.ie${{APP_NAME_SUFFIX}}",
+        "short": "Zapp.ie (${{APP_NAME_SUFFIX}})",
         "full": "Zapp.ie the zapster"
     },
     "description": {
@@ -42,20 +42,20 @@
                     ],
                     "commands": [
                         {
-                            "title": "Send Zaps",
-                            "description": "Send Zaps to a user"
+                            "title": "Send Zap",
+                            "description": "Send a Zap to a user"
                         },
                         {
                             "title": "Show my balance",
-                            "description": "Show the user's balance"
+                            "description": "See your balance in your receiving and sending wallets"
                         },
                         {
                             "title": "Show Leaderboard",
-                            "description": "Show the leaderboard"
+                            "description": "Show the leaderboard of users receiving wallets"
                         },
                         {
                             "title": "Withdraw my Zaps",
-                            "description": "Withdraw Zaps from the user's account"
+                            "description": "Withdraw funds from your receiving wallet to your own personal wallet"
                         }
                     ]
                 }
@@ -66,7 +66,7 @@
     "configurableTabs": [],
     "staticTabs": [
         { 
-            "entityId": "feedTab", 
+            "entityId": "homeTab", 
             "scopes": [       
                 "team",
                 "personal"
@@ -75,12 +75,12 @@
                 "personalTab",
                 "channelTab"
             ], 
-            "name": "Feed", 
-            "contentUrl": "https://contoso.com/content", 
-            "websiteUrl": "https://contoso.com/content"
+            "name": "Home", 
+            "contentUrl": "http://localhost:3000/", 
+            "websiteUrl": "http://localhost:3000/"
         }, 
         { 
-            "entityId": "rewardsTab", 
+            "entityId": "usersTab", 
             "scopes": [       
                 "team",
                 "personal"
@@ -89,9 +89,9 @@
                 "personalTab",
                 "channelTab"
             ], 
-            "name": "Rewards", 
-            "contentUrl": "https://www.google.com", 
-            "websiteUrl": "https://www.google.com"
+            "name": "Users", 
+            "contentUrl": "http://localhost:3000/Users", 
+            "websiteUrl": "http://localhost:3000/Users"
         }
     ],
     "permissions": [
