@@ -74,8 +74,19 @@ export async function SendZap(
       throw new Error('Failed to create an invoice.');
     }
 
+    // Extra information to be logged for tracking from which wallet the zap is sent from and to whom
+    const extra = {
+      from: sendersWallet.name,
+      to: receiversWallet.name,
+      type: 'zap',
+    };
+
     // Pay the invoice
-    const result = await payInvoice(sendersWallet.adminkey, paymentRequest);
+    const result = await payInvoice(
+      sendersWallet.adminkey,
+      paymentRequest,
+      extra,
+    );
 
     /*
     if (result && result.payment_hash) {

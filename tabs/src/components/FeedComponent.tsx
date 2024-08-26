@@ -54,7 +54,7 @@ const FeedComponent: FunctionComponent = () => {
           </div>
         </div>
       </div>
-      <div className={styles.infoStrip}>
+      <div className={styles.infoStrip} style={{ display: 'none' }}>
         <b className={styles.jan12020}>Jan 1, 2020 - Jan 30, 2020</b>
         <div className={styles.dateRange}>Date range:</div>
         <div className={styles.div}>|</div>

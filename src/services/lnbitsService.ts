@@ -358,7 +358,11 @@ const createInvoice = async (
   }
 };
 
-const payInvoice = async (adminKey: string, paymentRequest: string) => {
+const payInvoice = async (
+  adminKey: string,
+  paymentRequest: string,
+  extra: object,
+) => {
   try {
     console.log('payInvoice: Starting ...');
 
@@ -371,6 +375,7 @@ const payInvoice = async (adminKey: string, paymentRequest: string) => {
       body: JSON.stringify({
         out: true,
         bolt11: paymentRequest,
+        extra: extra,
       }),
     });
 
@@ -441,7 +446,7 @@ async function ensureMatchingUserWallet(
   walletType: WalletType,
 ): Promise<Wallet | null> {
   try {
-    const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
+    //const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
 
     let walletName = null;
     if (walletType == 'Sending') {
