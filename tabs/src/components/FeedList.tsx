@@ -4,6 +4,7 @@ import { FunctionComponent, useEffect } from 'react';
 import styles from './FeedList.module.css';
 import React, { useState } from 'react';
 import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
+import { getUserName } from '../utils/walletUtilities';
 
 interface FeedListProps {
   timestamp?: number | null;
@@ -44,24 +45,13 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
           const zap: Zap = {
             id: payment.checking_id,
             bolt11: payment.bolt11,
-            from: null,
-            to: null,
+            from: getUserName(payment.extra?.from),
+            to: getUserName(payment.extra?.to),
             memo: payment.memo,
             amount: payment.amount / 1000,
             wallet_id: payment.wallet_id,
             time: payment.time,
           };
-
-          if (payment.extra?.from) {
-            const fromWallets = await getWallets(payment.extra.from, undefined);
-            zap.from =
-              fromWallets && fromWallets.length === 1 ? fromWallets[0] : null;
-          }
-
-          if (payment.extra?.to) {
-            const toWallets = await getWallets(payment.extra.to, undefined);
-            zap.to = toWallets && toWallets.length === 1 ? toWallets[0] : null;
-          }
 
           allZaps.push(zap);
         }
@@ -115,7 +105,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
                   src="avatar.png"
                   style={{ display: 'none' }}
                 />
-                <div className={styles.userName}>{zap.from?.name}</div>
+                <div className={styles.userName}>{zap.from}</div>
               </div>
               <div className={styles.personDetails}>
                 <img
@@ -124,7 +114,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
                   src="avatar.png"
                   style={{ display: 'none' }}
                 />
-                <div className={styles.userName}>{zap.to?.name}</div>
+                <div className={styles.userName}>{zap.to}</div>
               </div>
               <div className={styles.userName}>{zap.memo}</div>
             </div>

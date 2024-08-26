@@ -329,6 +329,7 @@ const createInvoice = async (
   recipientWalletId: string,
   amount: number,
   memo: string,
+  extra: object,
 ) => {
   try {
     const response = await fetch(`${lnbiturl}/api/v1/payments`, {
@@ -341,6 +342,7 @@ const createInvoice = async (
         out: false,
         amount: amount,
         memo: memo,
+        extra: extra,
       }),
     });
 
@@ -358,11 +360,7 @@ const createInvoice = async (
   }
 };
 
-const payInvoice = async (
-  adminKey: string,
-  paymentRequest: string,
-  extra: object,
-) => {
+const payInvoice = async (adminKey: string, paymentRequest: string) => {
   try {
     console.log('payInvoice: Starting ...');
 
@@ -375,7 +373,6 @@ const payInvoice = async (
       body: JSON.stringify({
         out: true,
         bolt11: paymentRequest,
-        extra: extra,
       }),
     });
 

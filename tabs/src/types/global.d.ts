@@ -2,8 +2,8 @@
 interface Zap {
   id: string;
   bolt11: string;
-  from: Wallet | null;
-  to: Wallet | null;
+  from: string | null;
+  to: string | null;
   memo: string;
   amount: number;
   wallet_id: string;
