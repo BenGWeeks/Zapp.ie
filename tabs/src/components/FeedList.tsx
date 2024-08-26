@@ -5,6 +5,7 @@ import styles from './FeedList.module.css';
 import React, { useState } from 'react';
 import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
 import { getUserName } from '../utils/walletUtilities';
+import ZapIcon from '../images/ZapIcon.svg';
 
 interface FeedListProps {
   timestamp?: number | null;
@@ -66,64 +67,57 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
     <div className={styles.feedlist}>
       <div className={styles.headercell}>
         <div className={styles.headerContents}>
+          <b className={styles.string}>Time</b>
           <b className={styles.string}>From</b>
           <b className={styles.string}>To</b>
           <b className={styles.string2}>Memo</b>
           <div className={styles.stringWrapper}>
-            <b className={styles.string3}>Zap amount</b>
-          </div>
-          <div className={styles.buttonsStack}>
-            <div className={styles.iconbutton}>
-              <div className={styles.base}>
-                <div className={styles.buttonsStack}>
-                  <img
-                    className={styles.iconContent}
-                    alt=""
-                    src="Icon-content.svg"
-                    style={{ display: 'none' }}
-                  />
-                </div>
-              </div>
-            </div>
+            <b className={styles.string3}>Amount</b>
           </div>
         </div>
       </div>
-      {zaps?.map((zap, index) => (
-        <div key={zap.id || index} className={styles.bodycell}>
-          <div className={styles.bodyContents}>
-            <div className={styles.mainContentStack}>
-              <div className={styles.personDetails}>
-                <img
-                  className={styles.avatarIcon}
-                  alt=""
-                  src="avatar.png"
-                  style={{ display: 'none' }}
-                />
-                <div className={styles.userName}>{zap.from}</div>
+      {zaps
+        ?.sort((a, b) => b.time - a.time)
+        .map((zap, index) => (
+          <div key={zap.id || index} className={styles.bodycell}>
+            <div className={styles.bodyContents}>
+              <div className={styles.mainContentStack}>
+                <div className={styles.personDetails}>
+                  <div className={styles.userName}>
+                    {new Date(zap.time * 1000).toLocaleDateString()}{' '}
+                    {new Date(zap.time * 1000).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </div>
+                </div>
+                <div className={styles.personDetails}>
+                  <img
+                    className={styles.avatarIcon}
+                    alt=""
+                    src="avatar.png"
+                    style={{ display: 'none' }}
+                  />
+                  <div className={styles.userName}>{zap.from}</div>
+                </div>
+                <div className={styles.personDetails}>
+                  <img
+                    className={styles.avatarIcon}
+                    alt=""
+                    src="avatar.png"
+                    style={{ display: 'none' }}
+                  />
+                  <div className={styles.userName}>{zap.to}</div>
+                </div>
+                <div className={styles.userName}>{zap.memo}</div>
               </div>
-              <div className={styles.personDetails}>
-                <img
-                  className={styles.avatarIcon}
-                  alt=""
-                  src="avatar.png"
-                  style={{ display: 'none' }}
-                />
-                <div className={styles.userName}>{zap.to}</div>
+              <div className={styles.transactionDetails}>
+                <b className={styles.b}>{zap.amount}</b>
+                <img className={styles.icon} alt="" src={ZapIcon} />
               </div>
-              <div className={styles.userName}>{zap.memo}</div>
-            </div>
-            <div className={styles.transactionDetails}>
-              <b className={styles.b}>{zap.amount}</b>
-              <img
-                className={styles.icon}
-                alt=""
-                src="Icon.svg"
-                style={{ display: 'none' }}
-              />
             </div>
           </div>
-        </div>
-      ))}
+        ))}
     </div>
   );
 };

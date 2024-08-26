@@ -27,3 +27,8 @@ interface Wallet {
 }
 
 type WalletType = 'Sending' | 'Receiving';
+
+declare module '*.svg' {
+  const content: any;
+  export default content;
+}
