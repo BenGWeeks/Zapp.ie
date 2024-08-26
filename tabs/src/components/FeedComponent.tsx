@@ -24,11 +24,7 @@ const FeedComponent: FunctionComponent = () => {
   });
 
   const handlePeriodClick = (days: number) => {
-    const currentDate = new Date();
-    const futureDate = new Date(
-      currentDate.getTime() / 1000 - days * 24 * 60 * 60 * 1000,
-    ); // Corrected to milliseconds
-    const futureTimestamp = Math.floor(futureDate.getTime() / 1000); // Convert to seconds
+    const futureTimestamp = Date.now() / 1000 - days * 24 * 60 * 60;
     setTimestamp(futureTimestamp);
     setActivePeriod(days);
     console.log(`handlePeriodClick: futureTimestamp: ${futureTimestamp}`);
