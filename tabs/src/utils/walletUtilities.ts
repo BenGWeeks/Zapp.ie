@@ -11,13 +11,11 @@ export function getUserName(wallet: Wallet | null): string {
 
     if (wallet.name.includes(' - ')) {
       userName = wallet.name.split(' - ')[0];
-      console.log('User name: ', userName);
       return userName;
     } else {
       return 'Unknown';
     }
   } catch (e) {
-    console.log('Error in getUserName: ', e);
     return 'Unknown';
   }
 }

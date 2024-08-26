@@ -14,7 +14,6 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const [zaps, setZaps] = useState<Zap[]>([]);
 
   // Calculate the timestamp for 7 days ago
-  console.log('Date.now(): ', Date.now());
   const sevenDaysAgo = Date.now() / 1000 - 7 * 24 * 60 * 60;
 
   // Use the provided timestamp or default to 7 days ago
@@ -23,23 +22,19 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
       ? sevenDaysAgo
       : timestamp;
 
-  console.log('Fetching payments since: ', paymentsSinceTimestamp);
-
   const fetchZaps = async () => {
-    console.log('Fetching transactions ...');
+    console.log('Fetching payments since: ', paymentsSinceTimestamp);
+
     const wallets = await getWallets('Receiving'); // We'll just look at the receiving wallets.
     let allZaps: Zap[] = [];
 
     // Loop through all the wallets
     if (wallets) {
       for (const wallet of wallets) {
-        console.log('Wallet name: ', wallet.name);
-        console.log('Wallet inkey: ', wallet.inkey);
         const payments = await getPaymentsSince(
           wallet.inkey,
           paymentsSinceTimestamp,
         );
-        console.log('Payments: ', payments.length);
 
         for (const payment of payments) {
           const zap: Zap = {
@@ -57,7 +52,6 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
         }
       }
     }
-    console.log('All Zaps: ', allZaps);
     //setZaps(zaps);
     setZaps(prevState => [...prevState, ...allZaps]);
   };
