@@ -61,7 +61,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
     // Clear the zaps
     setZaps([]);
     fetchZaps();
-  }, [timestamp]);
+  }, [paymentsSinceTimestamp]);
 
   return (
     <div className={styles.feedlist}>

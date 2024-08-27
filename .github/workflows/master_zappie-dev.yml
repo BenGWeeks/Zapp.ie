@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Changed from windows to linux
 
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
           path: release.zip
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Changed from windows to linux
     needs: build
     environment:
       name: 'Production'
@@ -65,7 +65,3 @@ jobs:
           app-name: 'zappie-dev'
           slot-name: 'Production'
           package: './tabs'
-
-      - name: Check Azure Web App Logs
-        run: |
-          az webapp log tail --name zappie-dev --resource-group rg-wa-zappie-ne
