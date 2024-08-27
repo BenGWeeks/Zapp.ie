@@ -1,6 +1,6 @@
 /// <reference path="../types/global.d.ts" />
 
-import { FunctionComponent, useEffect } from 'react';
+import { useEffect } from 'react';
 import styles from './FeedList.module.css';
 import React, { useState } from 'react';
 import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
