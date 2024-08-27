@@ -453,8 +453,8 @@ async function ensureMatchingUserWallet(
   try {
     //const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
 
-    let walletName = null;
-    if (walletType = 'Sending') {
+    let walletName =  null;
+    if (walletType === 'Sending') {
       walletName = `${displayName} - ${aadObjectId} - Sending`;
     } else {
       walletName = `${displayName} - ${aadObjectId} - Receiving`;
