@@ -17,4 +17,8 @@ lib/
 build/
 
 .fake
+<<<<<<< HEAD
 /build
+=======
+/build
+>>>>>>> cd1eab12335d5d2d108caf1408e1bdab79b73c50

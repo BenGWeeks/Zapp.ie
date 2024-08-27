@@ -10,5 +10,8 @@
     "tsBuildInfoFile": "./lib/.tsbuildinfo",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-  }
+    "typeRoots": ["./src/types"],
+    "noEmit": false,
+  },
+  "include": ["src/**/*.ts"]  // Ensure this covers your `global.d.ts`
 }
