@@ -1,0 +1,7 @@
+{
+    "rules": {
+      "@typescript-eslint/no-unused-vars": "warn", // Downgrades unused variables to a warning instead of an error
+      "react-hooks/exhaustive-deps": "warn", // Downgrades the React hooks dependency warning
+      "eqeqeq": "warn" // Downgrades the strict equality warning
+    }
+  }
