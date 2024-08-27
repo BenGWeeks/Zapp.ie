@@ -2,8 +2,8 @@
 interface Zap {
   id: string;
   bolt11: string;
-  from: Wallet | null;
-  to: Wallet | null;
+  from: string | null;
+  to: string | null;
   memo: string;
   amount: number;
   wallet_id: string;
@@ -27,3 +27,8 @@ interface Wallet {
 }
 
 type WalletType = 'Sending' | 'Receiving';
+
+declare module '*.svg' {
+  const content: any;
+  export default content;
+}

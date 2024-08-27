@@ -5,7 +5,7 @@ import React from 'react';
 
 const FeedComponent: FunctionComponent = () => {
   const [timestamp, setTimestamp] = useState<number>(0);
-  const [activePeriod, setActivePeriod] = useState<number | null>(null);
+  const [activePeriod, setActivePeriod] = useState<number | null>(7); // Set default to 7-days
 
   const onTabContainerClick = useCallback(() => {
     // Add your code here
@@ -24,12 +24,9 @@ const FeedComponent: FunctionComponent = () => {
   });
 
   const handlePeriodClick = (days: number) => {
-    const currentDate = new Date();
-    const futureDate = new Date(
-      currentDate.getTime() + days * 24 * 60 * 60 * 1000,
-    ); // Corrected to milliseconds
-    const futureTimestamp = Math.floor(futureDate.getTime() / 1000); // Convert to seconds
+    const futureTimestamp = Date.now() / 1000 - days * 24 * 60 * 60;
     setTimestamp(futureTimestamp);
+    setActivePeriod(days);
     console.log(`handlePeriodClick: futureTimestamp: ${futureTimestamp}`);
   };
 
@@ -73,25 +70,31 @@ const FeedComponent: FunctionComponent = () => {
       </div>
       <div className={styles.pivotPointsdoubleFull60}>
         <div
-          className={styles.daysCopy}
-          onClick={() => handlePeriodClick(60)}
-          style={{ fontWeight: activePeriod === 60 ? 'bold' : 'normal' }}
+          className={
+            activePeriod === 7 ? styles.daysActive : styles.daysInactive
+          }
+          onClick={() => handlePeriodClick(7)}
+          style={{ fontWeight: activePeriod === 7 ? 'bold' : 'normal' }}
         >
-          60 days
+          7 days
         </div>
         <div
-          className={styles.daysCopy3}
+          className={
+            activePeriod === 30 ? styles.daysActive : styles.daysInactive
+          }
           onClick={() => handlePeriodClick(30)}
           style={{ fontWeight: activePeriod === 30 ? 'bold' : 'normal' }}
         >
           30 days
         </div>
         <div
-          className={styles.daysCopy1}
-          onClick={() => handlePeriodClick(7)}
-          style={{ fontWeight: activePeriod === 7 ? 'bold' : 'normal' }}
+          className={
+            activePeriod === 60 ? styles.daysActive : styles.daysInactive
+          }
+          onClick={() => handlePeriodClick(60)}
+          style={{ fontWeight: activePeriod === 60 ? 'bold' : 'normal' }}
         >
-          7 days
+          60 days
         </div>
       </div>
       <FeedList timestamp={timestamp} />
