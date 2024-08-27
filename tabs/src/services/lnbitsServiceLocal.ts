@@ -393,7 +393,8 @@ const checkWalletExists = async (
 
     if (wallets && wallets.length > 0) {
       // Find the first wallet that matches the name
-      wallet = wallets.find((wallet: any) => wallet.name === walletName) || null;
+      const wallet =
+        wallets?.find((wallet: any) => wallet.name === walletName) || null;
     }
 
     return wallet;
@@ -453,7 +454,7 @@ async function ensureMatchingUserWallet(
     //const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
 
     let walletName = null;
-    if (walletType === 'Sending') {
+    if (walletType == 'Sending') {
       walletName = `${displayName} - ${aadObjectId} - Sending`;
     } else {
       walletName = `${displayName} - ${aadObjectId} - Receiving`;

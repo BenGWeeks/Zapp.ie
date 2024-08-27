@@ -1,6 +1,8 @@
 /// <reference path="../types/global.d.ts" />
-import React, { useState, useEffect, useCallback } from 'react';
+
+import { FunctionComponent, useEffect } from 'react';
 import styles from './FeedList.module.css';
+import React, { useState } from 'react';
 import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
 import { getUserName } from '../utils/walletUtilities';
 import ZapIcon from '../images/ZapIcon.svg';
@@ -21,7 +23,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
       ? sevenDaysAgo
       : timestamp;
 
-  const fetchZaps = useCallback(async () => {
+  const fetchZaps = async () => {
     console.log('Fetching payments since: ', paymentsSinceTimestamp);
 
     const wallets = await getWallets('Receiving'); // We'll just look at the receiving wallets.
@@ -51,14 +53,15 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
         }
       }
     }
+    //setZaps(zaps);
     setZaps(prevState => [...prevState, ...allZaps]);
-  }, [paymentsSinceTimestamp]);
+  };
 
   useEffect(() => {
     // Clear the zaps
     setZaps([]);
     fetchZaps();
-  }, [timestamp, fetchZaps]);
+  }, [timestamp]);
 
   return (
     <div className={styles.feedlist}>
