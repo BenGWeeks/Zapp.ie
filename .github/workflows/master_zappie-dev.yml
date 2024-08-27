@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -18,16 +18,14 @@ jobs:
         with:
           node-version: '18.x'
 
-      - name: npm install, build, and test
+      - name: npm install and build
         working-directory: ./tabs
         run: |
           npm install
           npm run build --if-present
-        shell: pwsh
 
       - name: Zip artifact for deployment
-        run: Compress-Archive -Path ./tabs -DestinationPath release.zip
-        shell: pwsh
+        run: zip -r release.zip ./tabs
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -36,7 +34,7 @@ jobs:
           path: release.zip
 
   deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: build
     environment:
       name: 'Production'
@@ -51,9 +49,8 @@ jobs:
           name: node-app
 
       - name: Unzip artifact for deployment
-        run: Expand-Archive -Path release.zip -DestinationPath .\tabs
-        shell: pwsh
-
+        run: unzip release.zip
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -68,3 +65,7 @@ jobs:
           app-name: 'zappie-dev'
           slot-name: 'Production'
           package: './tabs'
+
+      - name: Check Azure Web App Logs
+        run: |
+          az webapp log tail --name zappie-dev --resource-group rg-wa-zappie-ne
