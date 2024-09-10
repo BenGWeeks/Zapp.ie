@@ -1,22 +1,45 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Home from "./Home";
-import Users from "./Users";
-import "./App.css";
+import { Routes, Route, useNavigate } from "react-router-dom";
+// Material-UI imports
+import Grid from "@mui/material/Grid";
 
-const App: React.FC = () => {
-  return (
-    <Router>
-      <div className="App">
-        <header className="App-header">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/users" element={<Users />} />
-          </Routes>
-        </header>
-      </div>
-    </Router>
-  );
+// MSAL imports
+import { MsalProvider } from "@azure/msal-react";
+import { IPublicClientApplication } from "@azure/msal-browser";
+import { CustomNavigationClient } from "./utils/NavigationClient";
+
+// Sample app imports
+import { PageLayout } from "./ui-components/PageLayout";
+import { Home } from "./components/Home";
+import { Profile } from "./components/Profile";
+
+type AppProps = {
+    pca: IPublicClientApplication;
 };
+
+function App({ pca }: AppProps) {
+    // The next 3 lines are optional. This is how you configure MSAL to take advantage of the router's navigate functions when MSAL redirects between pages in your app
+    const navigate = useNavigate();
+    const navigationClient = new CustomNavigationClient(navigate);
+    pca.setNavigationClient(navigationClient);
+
+    return (
+        <MsalProvider instance={pca}>
+            <PageLayout>
+                <Grid container justifyContent="center">
+                    <Pages />
+                </Grid>
+            </PageLayout>
+        </MsalProvider>
+    );
+}
+
+function Pages() {
+    return (
+        <Routes>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/" element={<Home />} />
+        </Routes>
+    );
+}
 
 export default App;
