@@ -18,7 +18,7 @@ const NavBar = () => {
                             color="inherit"
                             variant="h6"
                         >
-                            MS Identity Platform
+                            Zapp.ie
                         </Link>
                     </Typography>
                     <WelcomeName />
