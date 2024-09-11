@@ -66,3 +66,8 @@ jobs:
           app-name: 'zappie-dev'
           slot-name: 'Production'
           package: './release.zip'
+          
+      - name: Start Node.js server
+        run: |
+          npm install
+          npm start
