@@ -1,8 +1,7 @@
 /// <reference path="../types/global.d.ts" />
 
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import styles from './FeedList.module.css';
-import React, { useState } from 'react';
 import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
 import { getUserName } from '../utils/walletUtilities';
 import ZapIcon from '../images/ZapIcon.svg';
@@ -26,7 +25,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const fetchZaps = async () => {
     console.log('Fetching payments since: ', paymentsSinceTimestamp);
 
-    const wallets = await getWallets('Receiving'); // We'll just look at the receiving wallets.
+    const wallets = await getWallets('Sending'); // We'll just look at the receiving wallets.
     let allZaps: Zap[] = [];
 
     // Loop through all the wallets
@@ -37,6 +36,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
           paymentsSinceTimestamp,
         );
 
+        // Loop through all the payments for the current wallet
         for (const payment of payments) {
           const zap: Zap = {
             id: payment.checking_id,
@@ -53,15 +53,24 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
         }
       }
     }
-    //setZaps(zaps);
-    setZaps(prevState => [...prevState, ...allZaps]);
+
+    setZaps(allZaps);
   };
 
+  // Debounce the fetchZaps function
+  const debouncedFetchZaps = useCallback(debounce(fetchZaps, 3000), [paymentsSinceTimestamp]);
+
   useEffect(() => {
-    // Clear the zaps
-    setZaps([]);
-    fetchZaps();
-  }, [paymentsSinceTimestamp]);
+    debouncedFetchZaps();
+  }, [debouncedFetchZaps]);
+
+  function debounce(func: (...args: any[]) => void, wait: number) {
+    let timeout: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  }
 
   return (
     <div className={styles.feedlist}>

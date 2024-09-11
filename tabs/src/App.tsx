@@ -10,7 +10,8 @@ import { CustomNavigationClient } from "./utils/NavigationClient";
 // Sample app imports
 import { PageLayout } from "./ui-components/PageLayout";
 import { Home } from "./components/Home";
-import { Profile } from "./components/Profile";
+import { Profile } from "./components/Profile"
+import FeedComponent from './components/test';;
 
 type AppProps = {
     pca: IPublicClientApplication;
@@ -37,6 +38,7 @@ function Pages() {
     return (
         <Routes>
             <Route path="/profile" element={<Profile />} />
+            <Route path="/test" element={<FeedComponent />} />
             <Route path="/" element={<Home />} />
         </Routes>
     );
