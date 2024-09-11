@@ -11,20 +11,20 @@ jobs:
           node-version: '14'
 
       - name: Install dependencies and build
-        working-directory: ./tabs
+        working-directory: ./tabs  # Specifies the ./tabs directory for npm commands
         run: |
-          npm install
+          npm install               # This will use the package.json in the ./tabs folder
           npm run build --if-present
 
       - name: Zip artifact for deployment
-        working-directory: ./tabs
+        working-directory: ./tabs  # Ensure the working directory is ./tabs
         run: zip -r release.zip .
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ./tabs/release.zip
+          path: ./tabs/release.zip  # Path to the release.zip in the ./tabs folder
 
   deploy:
     runs-on: ubuntu-latest
