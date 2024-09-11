@@ -41,7 +41,7 @@ export const SignInButton = () => {
         <div>
             <DefaultButton
                 text="Login"
-                onClick={(event) => setAnchorEl(event.currentTarget as HTMLElement)}
+                onClick={() => handleLogin("popup")}
             />
             {open && <ContextualMenu {...menuProps} />}
         </div>

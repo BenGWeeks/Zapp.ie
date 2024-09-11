@@ -26,7 +26,7 @@ export const SignOutButton = () => {
     return (
         <div>
             <IconButton
-                onClick={(event) => setAnchorEl(event.currentTarget)}
+                onClick={() => handleLogout("popup")}
                 color="inherit"
             >
                 <AccountCircle />
