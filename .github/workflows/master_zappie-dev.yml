@@ -1,39 +1,47 @@
+name: Build and deploy Node.js app to Azure Web App - zappie-dev
+
+on:
+  push:
+    branches:
+      - react-web-app
+  workflow_dispatch:
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
-
+          node-version: '18.x'
+          
       - name: Install dependencies and build
-        working-directory: ./tabs  # Specifies the ./tabs directory for npm commands
+        working-directory: ./tabs 
         run: |
-          npm install               # This will use the package.json in the ./tabs folder
+          npm install              
           npm run build --if-present
 
       - name: Zip artifact for deployment
-        working-directory: ./tabs  # Ensure the working directory is ./tabs
+        working-directory: ./tabs 
         run: zip -r release.zip .
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ./tabs/release.zip  # Path to the release.zip in the ./tabs folder
+          path: ./tabs/release.zip 
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Changed from windows to linux
     needs: build
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write
+      id-token: write # This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
@@ -43,7 +51,7 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -57,3 +65,4 @@ jobs:
         with:
           app-name: 'zappie-dev'
           slot-name: 'Production'
+          package: './tabs'
