@@ -31,7 +31,7 @@ export async function getAccessToken(
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`Error creating access token (status: ${response.status})`);
   }
 
   const data = await response.json();
@@ -43,11 +43,7 @@ const getWallets = async (
   filterById?: string,
 ): Promise<Wallet[] | null> => {
   console.log(
-    'Getting wallets ... (filter: ',
-    filterByName,
-    ', id: ',
-    filterById,
-    ')',
+    `getWallets starting ... (filterByName: ${filterByName}, filterById: ${filterById}))`,
   );
 
   try {
@@ -62,7 +58,9 @@ const getWallets = async (
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(
+        `Error getting wallets response (status: ${response.status})`,
+      );
     }
 
     const data: Wallet[] = await response.json();
@@ -86,7 +84,9 @@ const getWallets = async (
 };
 
 const getWalletDetails = async (inKey: string, walletId: string) => {
-  console.log('Getting wallet details ...');
+  console.log(
+    `getWalletDetails starting ... (inKey: ${inKey}, walletId: ${walletId}))`,
+  );
   try {
     const response = await fetch(`${lnbiturl}/api/v1/wallets/${walletId}`, {
       method: 'GET',
@@ -113,7 +113,7 @@ const getWalletDetails = async (inKey: string, walletId: string) => {
 };
 
 const getWalletBalance = async (inKey: string) => {
-  console.log('Getting balance ...');
+  console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
   try {
     const response = await fetch(`${lnbiturl}/api/v1/wallet`, {
       method: 'GET',
@@ -130,6 +130,7 @@ const getWalletBalance = async (inKey: string) => {
     }
 
     const data = await response.json();
+    
     console.log('Balance:', data.balance / 1000); // Convert to Sats
 
     return data.balance / 1000; // return in Sats (not millisatoshis)
@@ -140,7 +141,8 @@ const getWalletBalance = async (inKey: string) => {
 };
 
 const getWalletName = async (inKey: string) => {
-  console.log('Getting name ...');
+  console.log(`getWalletName starting ... (inKey: ${inKey})`);
+  
   try {
     const response = await fetch(`${lnbiturl}/api/v1/wallet`, {
       method: 'GET',
@@ -155,7 +157,6 @@ const getWalletName = async (inKey: string) => {
     }
 
     const data = await response.json();
-    console.log('Name:', data.name);
 
     return data.name;
   } catch (error) {
@@ -165,7 +166,8 @@ const getWalletName = async (inKey: string) => {
 };
 
 const getPayments = async (inKey: string) => {
-  console.log('Getting payments ...');
+  console.log(`getPayments starting ... (inKey: ${inKey})`);
+
   try {
     const response = await fetch(`${lnbiturl}/api/v1/payments?limit=100`, {
       method: 'GET',
@@ -176,7 +178,7 @@ const getPayments = async (inKey: string) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`Error getting payments (status: ${response.status})`);
     }
 
     const data = await response.json();
@@ -188,6 +190,10 @@ const getPayments = async (inKey: string) => {
 };
 
 const getWalletPayLinks = async (inKey: string, walletId: string) => {
+  console.log(
+    `getWalletPayLinks starting ... (inKey: ${inKey}, walletId: ${walletId})`,
+  );
+  
   try {
     const response = await fetch(
       `${lnbiturl}/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`,
@@ -208,7 +214,8 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
     }
 
     const data = await response.json();
-    console.log('Paylinks:', data);
+    
+    //console.log('Paylinks:', data);
 
     return data;
   } catch (error) {
@@ -219,7 +226,8 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
 
 // May need fixing!
 const getWalletId = async (inKey: string) => {
-  console.log('getWalletId: Starting ...');
+  console.log(`getWalletId starting ... (inKey: ${inKey})`);
+
   try {
     const response = await fetch(`${lnbiturl}/api/v1/wallets`, {
       method: 'GET',
@@ -230,7 +238,10 @@ const getWalletId = async (inKey: string) => {
     });
 
     if (!response.ok) {
-      console.error(`Error getting wallet ID (status: ${response.status})`);
+      console.error(
+        `Error getting wallet ID response (status: ${response.status})`,
+      );
+
       return null;
     }
 
@@ -244,8 +255,6 @@ const getWalletId = async (inKey: string) => {
       return null;
     }
 
-    console.log('Wallet ID:', wallet.id);
-
     // Return the id of the wallet
     return wallet.id;
   } catch (error) {
@@ -254,14 +263,14 @@ const getWalletId = async (inKey: string) => {
   }
 };
 
-const getInvoicePayment = async (lnKey: string, invoice: string) => {
+const getInvoicePayment = async (inKey: string, invoice: string) => {
   console.log('getInvoicePayment: Starting ...');
   try {
     const response = await fetch(`${lnbiturl}/api/v1/payments/${invoice}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': lnKey,
+        'Content-Type': 'application/json'
+        'X-Api-Key': inKey,
       },
     });
 
@@ -272,7 +281,6 @@ const getInvoicePayment = async (lnKey: string, invoice: string) => {
     }
 
     const data = await response.json();
-    console.log('Invoice payment:', data);
 
     return data;
   } catch (error) {
@@ -282,7 +290,10 @@ const getInvoicePayment = async (lnKey: string, invoice: string) => {
 };
 
 const getPaymentsSince = async (lnKey: string, timestamp: number) => {
-  console.log('getPaymentsSince: Starting ...');
+  console.log(
+    `getPaymentsSince starting ... (lnKey: ${lnKey}, timestamp: ${timestamp})`,
+  );
+
   // Note that the timestamp is in seconds, not milliseconds.
   try {
     // Get walletId using the provided apiKey
@@ -300,7 +311,9 @@ const getPaymentsSince = async (lnKey: string, timestamp: number) => {
     );
 
     if (!response.ok) {
-      throw new Error(`getPaymentsSince error: ${response.status}`);
+      throw new Error(
+        `Error getting payments since ${timestamp} (status: ${response.status})`,
+      );
     }
 
     const data = await response.json();
@@ -313,8 +326,6 @@ const getPaymentsSince = async (lnKey: string, timestamp: number) => {
     console.log(
       `getPaymentsSince count is ${paymentsSince.length} since ${timestamp}`,
     );
-
-    console.log('paymentsSince: ', paymentsSince);
 
     return paymentsSince;
   } catch (error) {
@@ -329,7 +340,12 @@ const createInvoice = async (
   recipientWalletId: string,
   amount: number,
   memo: string,
+  extra: object,
 ) => {
+  console.log(
+    `createInvoice starting ... (lnKey: ${lnKey}, recipientWalletId: ${recipientWalletId}, amount: ${amount}, memo: ${memo}, extra: ${extra})`,
+  );
+
   try {
     const response = await fetch(`${lnbiturl}/api/v1/payments`, {
       method: 'POST',
@@ -341,6 +357,7 @@ const createInvoice = async (
         out: false,
         amount: amount,
         memo: memo,
+        extra: extra,
       }),
     });
 
@@ -349,7 +366,7 @@ const createInvoice = async (
     }
 
     const data = await response.json();
-    console.log('createInvoice: data:', data);
+    //console.log('createInvoice: data:', data);
 
     return data.payment_request;
   } catch (error) {
@@ -359,9 +376,11 @@ const createInvoice = async (
 };
 
 const payInvoice = async (adminKey: string, paymentRequest: string) => {
-  try {
-    console.log('payInvoice: Starting ...');
+  console.log(
+    `payInvoice starting ... (adminKey: ${adminKey}, paymentRequest: ${paymentRequest})`,
+  );
 
+  try {
     const response = await fetch(`${lnbiturl}/api/v1/payments`, {
       method: 'POST',
       headers: {
@@ -379,7 +398,7 @@ const payInvoice = async (adminKey: string, paymentRequest: string) => {
     }
 
     const data = await response.json();
-    console.log('payInvoice: data:', data);
+    //console.log('payInvoice: data:', data);
 
     return data;
   } catch (error) {
@@ -391,6 +410,8 @@ const checkWalletExists = async (
   //apiKey: string,
   walletName: string,
 ): Promise<Wallet | null> => {
+  console.log(`checkWalletExists starting ... (walletName: ${walletName},)`);
+
   const wallets = await getWallets(walletName);
   let wallet = null;
   if (wallets) {
@@ -406,7 +427,10 @@ const createWallet = async (
   objectID: string,
   displayName: string,
 ) => {
-  console.log('createWallet: Starting ...');
+  console.log(
+    `createWallet starting ... (apiKey: ${apiKey}, objectID: ${objectID}, displayName: ${displayName})`,
+  );
+  
   try {
     const url = `${lnbiturl}/api/v1/wallet`;
     const response = await fetch(url, {
@@ -426,7 +450,7 @@ const createWallet = async (
     }
 
     const data = await response.json();
-    console.log('createWallet: data:', data);
+    //console.log('createWallet: data:', data);
 
     return data;
   } catch (error) {
@@ -440,8 +464,12 @@ async function ensureMatchingUserWallet(
   displayName: string,
   walletType: WalletType,
 ): Promise<Wallet | null> {
+  console.log(
+    `ensureMatchingUserWallet starting ... (aadObjectId: ${aadObjectId}, objectID: ${displayName}, walletType: ${walletType})`,
+  );
+
   try {
-    const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
+    //const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
 
     let walletName = null;
     if (walletType == 'Sending') {
@@ -455,13 +483,17 @@ async function ensureMatchingUserWallet(
 
     return wallet;
   } catch (error) {
-    console.error('Error ensuring user wallets:', error);
+    console.error(`Error ensuring user wallets (${error})`);
     throw error;
   }
 }
 
 // TODO: This method needs checking!
 const getWalletIdByUserId = async (adminKey: string, userId: string) => {
+  console.log(
+    `getWalletIdByUserId starting ... (adminKey: ${adminKey}, userId: ${userId})`,
+  );
+
   try {
     const response = await fetch(
       `${lnbiturl}/api/v1/wallets?user_id=${userId}`,
@@ -475,7 +507,9 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
     );
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(
+        `Error getting wallet ID from the user ID (status: ${response.status})`,
+      );
     }
 
     const data = await response.json();
