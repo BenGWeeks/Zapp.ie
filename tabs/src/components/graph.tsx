@@ -23,7 +23,8 @@ export const ProfileData = (props: any) => {
             <p><strong>Title: </strong> {props.graphData.jobTitle}</p>
             <p><strong>Mail: </strong> {props.graphData.mail}</p>
             <p><strong>Phone: </strong> {props.graphData.businessPhones[0]}</p>
-            <p><strong>Location: </strong> {props.graphData.officeLocation}</p>
-        </div>
+            <p><strong>Location: </strong> {props.graphData.displayName}</p>
+            <strong>ObjectID: </strong> {props.graphData.mail}
+                    </div>
     );
 };
