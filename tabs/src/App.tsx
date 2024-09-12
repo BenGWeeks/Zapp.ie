@@ -15,6 +15,8 @@ import { CustomNavigationClient } from "./utils/NavigationClient";
 import { PageLayout } from "./ui-components/PageLayout";
 import { Home } from "./components/Home";
 import FeedComponent from './components/test';
+import Natalia from "./Feed";
+
 
 type AppProps = {
     pca: IPublicClientApplication;
@@ -44,6 +46,7 @@ function Pages() {
         <Routes>
             <Route path="/test" element={<FeedComponent />} />
             <Route path="/" element={<Home />} />
+            <Route path="/feed" element={<Natalia />} />
         </Routes>
     );
 }

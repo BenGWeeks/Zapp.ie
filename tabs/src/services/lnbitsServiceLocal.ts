@@ -7,23 +7,27 @@ const password = process.env.REACT_APP_LNBITS_PASSWORD;
 // LNBits API is documented here:
 // https://demo.lnbits.com/docs/
 
-export async function getAccessToken(username: string, password: string) {
-  //try {
-  const response = await fetch(`/api/v1/auth`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ username, password }),
-  });
+const getAccessToken = async (username: string, password: string): Promise<string> => {
+  try {
+    const response = await fetch('/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`Error creating access token (status: ${response.status})`);
+    if (!response.ok) {
+      throw new Error(`Error creating access token (status: ${response.status})`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
+  } catch (error) {
+    console.error('Failed to fetch access token:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  return data.access_token;
-}
+};
 
 const getWallets = async (
   filterByName?: string,
@@ -45,28 +49,14 @@ const getWallets = async (
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Error getting wallets response (status: ${response.status})`,
-      );
+      throw new Error(`Error fetching wallets (status: ${response.status})`);
     }
 
-    const data: Wallet[] = (await response.json()) as Wallet[];
-
-    // If filter is provided, filter the wallets by name and/or id
-    let filteredData = data;
-    if (filterByName) {
-      filteredData = filteredData.filter(wallet =>
-        wallet.name.includes(filterByName),
-      );
-    }
-    if (filterById) {
-      filteredData = filteredData.filter(wallet => wallet.id === filterById);
-    }
-
-    return filteredData;
+    const data = await response.json();
+    return data.wallets;
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error('Failed to fetch wallets:', error);
+    return null;
   }
 };
 
