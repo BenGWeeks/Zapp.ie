@@ -5,6 +5,7 @@ import styles from './FeedList.module.css';
 import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
 import { getUserName } from '../utils/walletUtilities';
 import ZapIcon from '../images/ZapIcon.svg';
+import { debounce } from 'lodash';
 
 interface FeedListProps {
   timestamp?: number | null;
@@ -58,19 +59,14 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   };
 
   // Debounce the fetchZaps function
-  const debouncedFetchZaps = useCallback(debounce(fetchZaps, 3000), [paymentsSinceTimestamp]);
+  const debouncedFetchZaps = useCallback(debounce(fetchZaps, 300), [fetchZaps]);
 
   useEffect(() => {
     debouncedFetchZaps();
-  }, [debouncedFetchZaps]);
-
-  function debounce(func: (...args: any[]) => void, wait: number) {
-    let timeout: NodeJS.Timeout;
-    return (...args: any[]) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
+    return () => {
+      debouncedFetchZaps.cancel();
     };
-  }
+  }, [debouncedFetchZaps]);
 
   return (
     <div className={styles.feedlist}>
