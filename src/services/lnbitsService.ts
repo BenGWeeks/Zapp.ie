@@ -114,7 +114,6 @@ const getWalletDetails = async (inKey: string, walletId: string) => {
 
 const getWalletBalance = async (inKey: string) => {
   console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
-
   try {
     const response = await fetch(`${lnbiturl}/api/v1/wallet`, {
       method: 'GET',
@@ -131,6 +130,8 @@ const getWalletBalance = async (inKey: string) => {
     }
 
     const data = await response.json();
+    
+    console.log('Balance:', data.balance / 1000); // Convert to Sats
 
     return data.balance / 1000; // return in Sats (not millisatoshis)
   } catch (error) {
@@ -141,7 +142,7 @@ const getWalletBalance = async (inKey: string) => {
 
 const getWalletName = async (inKey: string) => {
   console.log(`getWalletName starting ... (inKey: ${inKey})`);
-
+  
   try {
     const response = await fetch(`${lnbiturl}/api/v1/wallet`, {
       method: 'GET',
@@ -166,6 +167,7 @@ const getWalletName = async (inKey: string) => {
 
 const getPayments = async (inKey: string) => {
   console.log(`getPayments starting ... (inKey: ${inKey})`);
+
   try {
     const response = await fetch(`${lnbiturl}/api/v1/payments?limit=100`, {
       method: 'GET',
@@ -191,7 +193,7 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
   console.log(
     `getWalletPayLinks starting ... (inKey: ${inKey}, walletId: ${walletId})`,
   );
-
+  
   try {
     const response = await fetch(
       `${lnbiturl}/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`,
@@ -212,6 +214,8 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
     }
 
     const data = await response.json();
+    
+    //console.log('Paylinks:', data);
 
     return data;
   } catch (error) {
@@ -237,6 +241,7 @@ const getWalletId = async (inKey: string) => {
       console.error(
         `Error getting wallet ID response (status: ${response.status})`,
       );
+
       return null;
     }
 
@@ -259,15 +264,12 @@ const getWalletId = async (inKey: string) => {
 };
 
 const getInvoicePayment = async (inKey: string, invoice: string) => {
-  console.log(
-    `getInvoicePayment starting ... (inKey: ${inKey}, invoice: ${invoice})`,
-  );
-
+  console.log('getInvoicePayment: Starting ...');
   try {
     const response = await fetch(`${lnbiturl}/api/v1/payments/${invoice}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
         'X-Api-Key': inKey,
       },
     });
@@ -321,6 +323,10 @@ const getPaymentsSince = async (lnKey: string, timestamp: number) => {
       (payment: { time: number }) => payment.time >= timestamp,
     );
 
+    console.log(
+      `getPaymentsSince count is ${paymentsSince.length} since ${timestamp}`,
+    );
+
     return paymentsSince;
   } catch (error) {
     console.error(error);
@@ -328,6 +334,7 @@ const getPaymentsSince = async (lnKey: string, timestamp: number) => {
   }
 };
 
+// TODO: This method needs checking!
 const createInvoice = async (
   lnKey: string,
   recipientWalletId: string,
@@ -359,6 +366,7 @@ const createInvoice = async (
     }
 
     const data = await response.json();
+    //console.log('createInvoice: data:', data);
 
     return data.payment_request;
   } catch (error) {
@@ -390,6 +398,7 @@ const payInvoice = async (adminKey: string, paymentRequest: string) => {
     }
 
     const data = await response.json();
+    //console.log('payInvoice: data:', data);
 
     return data;
   } catch (error) {
@@ -421,7 +430,7 @@ const createWallet = async (
   console.log(
     `createWallet starting ... (apiKey: ${apiKey}, objectID: ${objectID}, displayName: ${displayName})`,
   );
-
+  
   try {
     const url = `${lnbiturl}/api/v1/wallet`;
     const response = await fetch(url, {
@@ -441,6 +450,7 @@ const createWallet = async (
     }
 
     const data = await response.json();
+    //console.log('createWallet: data:', data);
 
     return data;
   } catch (error) {
