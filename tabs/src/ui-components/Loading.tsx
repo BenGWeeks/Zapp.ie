@@ -1,5 +1,5 @@
-import { Typography } from "@mui/material";
+import { Text } from '@fluentui/react';
 
 export const Loading = () => {
-    return <Typography variant="h6">Authentication in progress...</Typography>
-}
+    return <Text variant="large">Authentication in progress...</Text>;
+};

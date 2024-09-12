@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useMsal } from "@azure/msal-react";
-import Button from "@mui/material/Button";
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
+import { DefaultButton, ContextualMenu, IContextualMenuProps } from '@fluentui/react';
 import { loginRequest } from "../services/authConfig";
 
 export const SignInButton = () => {
@@ -19,34 +17,33 @@ export const SignInButton = () => {
         } else if (loginType === "redirect") {
             instance.loginRedirect(loginRequest);
         }
-    }
+    };
+
+    const menuProps: IContextualMenuProps = {
+        items: [
+            {
+                key: 'popup',
+                text: 'Login with Popup',
+                onClick: () => handleLogin('popup'),
+            },
+            {
+                key: 'redirect',
+                text: 'Login with Redirect',
+                onClick: () => handleLogin('redirect'),
+            },
+        ],
+        directionalHintFixed: true,
+        target: anchorEl,
+        onDismiss: () => setAnchorEl(null),
+    };
 
     return (
         <div>
-            <Button
-                onClick={(event) => setAnchorEl(event.currentTarget)}
-                color="inherit"
-            >
-                Login
-            </Button>
-            <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-                }}
-                open={open}
-                onClose={() => setAnchorEl(null)}
-            >
-                <MenuItem onClick={() => handleLogin("popup")} key="loginPopup">Sign in using Popup</MenuItem>
-                <MenuItem onClick={() => handleLogin("redirect")} key="loginRedirect">Sign in using Redirect</MenuItem>
-            </Menu>
+            <DefaultButton
+                text="Login"
+                onClick={() => handleLogin("popup")}
+            />
+            {open && <ContextualMenu {...menuProps} />}
         </div>
-    )
+    );
 };

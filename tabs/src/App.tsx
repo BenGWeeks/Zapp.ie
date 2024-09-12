@@ -1,4 +1,8 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
+// Fluent UI imports
+import { ThemeProvider } from '@fluentui/react';
+import { theme } from './styles/Theme'; // Adjust the import path as necessary
+
 // Material-UI imports
 import Grid from "@mui/material/Grid";
 
@@ -10,7 +14,7 @@ import { CustomNavigationClient } from "./utils/NavigationClient";
 // Sample app imports
 import { PageLayout } from "./ui-components/PageLayout";
 import { Home } from "./components/Home";
-import { Profile } from "./components/Profile";
+import FeedComponent from './components/test';
 
 type AppProps = {
     pca: IPublicClientApplication;
@@ -24,11 +28,13 @@ function App({ pca }: AppProps) {
 
     return (
         <MsalProvider instance={pca}>
-            <PageLayout>
-                <Grid container justifyContent="center">
-                    <Pages />
-                </Grid>
-            </PageLayout>
+            <ThemeProvider theme={theme}>
+                <PageLayout>
+                    <Grid container justifyContent="center">
+                        <Pages />
+                    </Grid>
+                </PageLayout>
+            </ThemeProvider>
         </MsalProvider>
     );
 }
@@ -36,7 +42,7 @@ function App({ pca }: AppProps) {
 function Pages() {
     return (
         <Routes>
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/test" element={<FeedComponent />} />
             <Route path="/" element={<Home />} />
         </Routes>
     );

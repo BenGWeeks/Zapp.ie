@@ -76,8 +76,8 @@
                 "channelTab"
             ], 
             "name": "Home", 
-            "contentUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/", 
-            "websiteUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/"
+            "contentUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/Profile", 
+            "websiteUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/Profile"
         }, 
         { 
             "entityId": "usersTab", 
@@ -90,7 +90,7 @@
                 "channelTab"
             ], 
             "name": "Users", 
-            "contentUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/", 
+            "contentUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/Users", 
             "websiteUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/Users"
         }
     ],
