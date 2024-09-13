@@ -1,13 +1,4 @@
 # Overview
-<<<<<<< HEAD
-Zapp.ie seamlessly integrates into Microsoft Teams, bringing a unique blend of Bitcoin micro-transactions and AI automation to enhance team collaboration and recognition. With Zapp.ie, you can effortlessly send Bitcoin-based rewards (Sats) to colleagues as a token of appreciation, automate recognition for positive behavior, and foster a more engaged and motivated workplace. Transform how your team acknowledges great work and builds a culture of gratitude directly within Teams.
-
-# Getting Started with Zapp.ie
-
-Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and recognition through Bitcoin micro-transactions and AI-powered automation. Here’s how you can get started and use Zapp.ie effectively with your team:
-
-## Prerequisite to use this sample
-=======
 
 Zapp.ie seamlessly integrates into Microsoft Teams, bringing a unique blend of Bitcoin micro-transactions and AI automation to enhance team collaboration and recognition. With Zapp.ie, you can effortlessly send Bitcoin-based rewards (Sats) to colleagues as a token of appreciation, automate recognition for positive behavior, and foster a more engaged and motivated workplace. Transform how your team acknowledges great work and builds a culture of gratitude directly within Teams.
 
@@ -17,7 +8,6 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
 
 ## Prerequisite to use this sample
 
->>>>>>> cd1eab12335d5d2d108caf1408e1bdab79b73c50
 - [Node.js](https://nodejs.org/), supported versions: 18
 - A Microsoft 365 tenant in which you have permission to upload Teams apps. You can get a free Microsoft 365 developer tenant by joining the [Microsoft 365 developer program](https://developer.microsoft.com/en-us/microsoft-365/dev-program).
 - [Teams Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [TeamsFx CLI](https://aka.ms/teams-toolkit-cli)
@@ -29,10 +19,7 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
   "@azure/msal-node": "^2.6.0"
 }
 ```
-<<<<<<< HEAD
-=======
 
->>>>>>> cd1eab12335d5d2d108caf1408e1bdab79b73c50
 ## Running Zapp.ie bot
 
 ### Run the app locally
@@ -70,16 +57,8 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
 - From TeamsFx CLI:
   1. Run command: `teamsapp preview --env dev`.
 
-<<<<<<< HEAD
-## Running Zapp.ie Web Service
-
-- From VS Code:
-    1. Navigate to the *Tabs* directory
-    2. Type `npm start` 
-=======
 ## Running Zapp.ie Web App (The Tabs in the bot)
 
 - From VS Code:
   1. Navigate to the _Tabs_ directory
   2. Type `npm start`
->>>>>>> cd1eab12335d5d2d108caf1408e1bdab79b73c50

@@ -35,7 +35,7 @@ const getWallets = async (
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
-    const response = await fetch(`/api/v1/wallets`, {
+    const response = await fetch(`/usermanager/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
