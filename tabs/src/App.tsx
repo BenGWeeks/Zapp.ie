@@ -1,22 +1,54 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Home from "./Home";
-import Users from "./Users";
-import "./App.css";
+import { Routes, Route, useNavigate } from "react-router-dom";
+// Fluent UI imports
+import { ThemeProvider } from '@fluentui/react';
+import { theme } from './styles/Theme'; // Adjust the import path as necessary
 
-const App: React.FC = () => {
-  return (
-    <Router>
-      <div className="App">
-        <header className="App-header">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/users" element={<Users />} />
-          </Routes>
-        </header>
-      </div>
-    </Router>
-  );
+// Material-UI imports
+import Grid from "@mui/material/Grid";
+
+// MSAL imports
+import { MsalProvider } from "@azure/msal-react";
+import { IPublicClientApplication } from "@azure/msal-browser";
+import { CustomNavigationClient } from "./utils/NavigationClient";
+
+// Sample app imports
+import { PageLayout } from "./ui-components/PageLayout";
+import { Home } from "./components/Home";
+import FeedComponent from './components/test';
+import Natalia from "./Feed";
+
+
+type AppProps = {
+    pca: IPublicClientApplication;
 };
+
+function App({ pca }: AppProps) {
+    // The next 3 lines are optional. This is how you configure MSAL to take advantage of the router's navigate functions when MSAL redirects between pages in your app
+    const navigate = useNavigate();
+    const navigationClient = new CustomNavigationClient(navigate);
+    pca.setNavigationClient(navigationClient);
+
+    return (
+        <MsalProvider instance={pca}>
+            <ThemeProvider theme={theme}>
+                <PageLayout>
+                    <Grid container justifyContent="center">
+                        <Pages />
+                    </Grid>
+                </PageLayout>
+            </ThemeProvider>
+        </MsalProvider>
+    );
+}
+
+function Pages() {
+    return (
+        <Routes>
+            <Route path="/test" element={<FeedComponent />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/feed" element={<Natalia />} />
+        </Routes>
+    );
+}
 
 export default App;

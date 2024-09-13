@@ -76,8 +76,8 @@
                 "channelTab"
             ], 
             "name": "Home", 
-            "contentUrl": "http://localhost:3000/", 
-            "websiteUrl": "http://localhost:3000/"
+            "contentUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/Profile", 
+            "websiteUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/Profile"
         }, 
         { 
             "entityId": "usersTab", 
@@ -90,8 +90,8 @@
                 "channelTab"
             ], 
             "name": "Users", 
-            "contentUrl": "http://localhost:3000/Users", 
-            "websiteUrl": "http://localhost:3000/Users"
+            "contentUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/Users", 
+            "websiteUrl": "https://zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net/Users"
         }
     ],
     "permissions": [
@@ -99,7 +99,8 @@
         "messageTeamMembers"
     ],
     "validDomains": [
-        "${{BOT_DOMAIN}}"
+        "${{BOT_DOMAIN}}",
+        "zappie-dev-esbrfvguadd5f2hu.scm.northeurope-01.azurewebsites.net"
     ],
     "webApplicationInfo": {
         "id": "${{AAD_APP_CLIENT_ID}}",

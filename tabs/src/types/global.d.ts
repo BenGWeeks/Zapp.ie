@@ -16,6 +16,7 @@ interface User {
   email: string;
   receivingWallet: Wallet;
   sendingWallet: Wallet;
+  userType: UserType;
 }
 
 interface Wallet {
@@ -26,9 +27,11 @@ interface Wallet {
   balance_msat: number;
 }
 
-type WalletType = 'Sending' | 'Receiving';
 
 declare module '*.svg' {
   const content: any;
   export default content;
 }
+
+type WalletType = 'Sending' | 'Receiving';
+type UserType = 'teammate'| 'admin' | 'copilot'| 'customer';

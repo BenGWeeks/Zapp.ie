@@ -3,7 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@fluentui/react": "^8.120.6",
+    "@azure/msal-browser": "^3.23.0",
+    "@azure/msal-react": "^2.0.22",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@fluentui/react": "^8.120.9",
+    "@fluentui/react-components": "^9.54.14",
+    "@mui/icons-material": "^6.0.2",
+    "@mui/material": "^6.0.2",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -42,11 +49,22 @@
   },
   "devDependencies": {
     "@types/css-modules": "^1.0.5",
+    "@types/isomorphic-fetch": "^0.0.39",
     "@types/jest": "^29.5.12",
-    "@types/node": "^22.5.0",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.9.5"
+  },
+  "Dependencies": {
+    "@types/css-modules": "^1.0.5",
+    "@types/isomorphic-fetch": "^0.0.39",
+    "@types/jest": "^29.5.12",
+    "@types/react": "^18.3.4",
+    "@types/react-dom": "^18.3.0",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^4.9.5"
   }
 }
