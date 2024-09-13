@@ -130,7 +130,7 @@ const getWalletBalance = async (inKey: string) => {
     }
 
     const data = await response.json();
-    
+
     console.log('Balance:', data.balance / 1000); // Convert to Sats
 
     return data.balance / 1000; // return in Sats (not millisatoshis)
@@ -142,7 +142,7 @@ const getWalletBalance = async (inKey: string) => {
 
 const getWalletName = async (inKey: string) => {
   console.log(`getWalletName starting ... (inKey: ${inKey})`);
-  
+
   try {
     const response = await fetch(`${lnbiturl}/api/v1/wallet`, {
       method: 'GET',
@@ -193,7 +193,7 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
   console.log(
     `getWalletPayLinks starting ... (inKey: ${inKey}, walletId: ${walletId})`,
   );
-  
+
   try {
     const response = await fetch(
       `${lnbiturl}/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`,
@@ -214,7 +214,7 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
     }
 
     const data = await response.json();
-    
+
     //console.log('Paylinks:', data);
 
     return data;
@@ -269,7 +269,7 @@ const getInvoicePayment = async (inKey: string, invoice: string) => {
     const response = await fetch(`${lnbiturl}/api/v1/payments/${invoice}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
         'X-Api-Key': inKey,
       },
     });
@@ -430,7 +430,7 @@ const createWallet = async (
   console.log(
     `createWallet starting ... (apiKey: ${apiKey}, objectID: ${objectID}, displayName: ${displayName})`,
   );
-  
+
   try {
     const url = `${lnbiturl}/api/v1/wallet`;
     const response = await fetch(url, {
