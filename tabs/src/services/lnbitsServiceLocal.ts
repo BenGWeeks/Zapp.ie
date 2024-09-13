@@ -7,23 +7,27 @@ const password = process.env.REACT_APP_LNBITS_PASSWORD;
 // LNBits API is documented here:
 // https://demo.lnbits.com/docs/
 
-export async function getAccessToken(username: string, password: string) {
-  //try {
-  const response = await fetch(`/api/v1/auth`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ username, password }),
-  });
+const getAccessToken = async (username: string, password: string): Promise<string> => {
+  try {
+    const response = await fetch('/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`Error creating access token (status: ${response.status})`);
+    if (!response.ok) {
+      throw new Error(`Error creating access token (status: ${response.status})`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
+  } catch (error) {
+    console.error('Failed to fetch access token:', error);
+    throw error;
   }
-
-  const data = await response.json();
-  return data.access_token;
-}
+};
 
 const getWallets = async (
   filterByName?: string,
@@ -45,28 +49,14 @@ const getWallets = async (
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Error getting wallets response (status: ${response.status})`,
-      );
+      throw new Error(`Error fetching wallets (status: ${response.status})`);
     }
 
-    const data: Wallet[] = (await response.json()) as Wallet[];
-
-    // If filter is provided, filter the wallets by name and/or id
-    let filteredData = data;
-    if (filterByName) {
-      filteredData = filteredData.filter(wallet =>
-        wallet.name.includes(filterByName),
-      );
-    }
-    if (filterById) {
-      filteredData = filteredData.filter(wallet => wallet.id === filterById);
-    }
-
-    return filteredData;
+    const data = await response.json();
+    return data.wallets;
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error('Failed to fetch wallets:', error);
+    return null;
   }
 };
 
@@ -393,7 +383,7 @@ const checkWalletExists = async (
 
     if (wallets && wallets.length > 0) {
       // Find the first wallet that matches the name
-      const wallet =
+      wallet =
         wallets?.find((wallet: any) => wallet.name === walletName) || null;
     }
 
@@ -453,8 +443,8 @@ async function ensureMatchingUserWallet(
   try {
     //const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
 
-    let walletName = null;
-    if (walletType == 'Sending') {
+    let walletName =  null;
+    if (walletType === 'Sending') {
       walletName = `${displayName} - ${aadObjectId} - Sending`;
     } else {
       walletName = `${displayName} - ${aadObjectId} - Receiving`;
@@ -500,6 +490,38 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   }
 };
 
+const getTotalSentAmount = async (inKey: string): Promise<number> => {
+  console.log(`getTotalSentAmount starting ... (inKey: ${inKey})`);
+
+  try {
+    const response = await fetch(`/api/v1/payments?limit=100`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Key': inKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error getting payments (status: ${response.status})`);
+    }
+
+    const data = await response.json();
+    console.log('API Response:', data);
+
+    // Calculate the total sent amount
+    const outgoingPayments = data.filter((payment: { amount: number; out: boolean }) => payment.out);
+    console.log('Outgoing Payments:', outgoingPayments);
+
+    const totalSentAmount = outgoingPayments.reduce((total: number, payment: { amount: number }) => total + payment.amount, 0);
+    console.log('Total Sent Amount (in millisatoshis):', totalSentAmount);
+
+    return totalSentAmount / 1000; // return in Sats (not millisatoshis)
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 export {
   getWallets,
   getWalletName,
@@ -516,4 +538,5 @@ export {
   ensureMatchingUserWallet,
   payInvoice,
   getWalletIdByUserId,
+  getTotalSentAmount
 };

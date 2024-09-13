@@ -1,5 +1,5 @@
 import React from 'react';
-import FeedComponent from './components/FeedComponent';
+import FeedComponent from './components/test';
 
 const Home: React.FC = () => {
   return (

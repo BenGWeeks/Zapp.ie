@@ -89,9 +89,9 @@
                 "personalTab",
                 "channelTab"
             ], 
-            "name": "Rewards", 
-            "contentUrl": "https://www.google.com", 
-            "websiteUrl": "https://www.google.com"
+            "name": "Users", 
+            "contentUrl": "http://localhost:3000/Users", 
+            "websiteUrl": "http://localhost:3000/Users"
         }
     ],
     "permissions": [
@@ -99,9 +99,7 @@
         "messageTeamMembers"
     ],
     "validDomains": [
-        "${{BOT_DOMAIN}}",
-        "zappie-dev-esbrfvguadd5f2hu.northeurope-01.azurewebsites.net",
-        "google.com"
+        "${{BOT_DOMAIN}}"
     ],
     "webApplicationInfo": {
         "id": "${{AAD_APP_CLIENT_ID}}",
