@@ -3,7 +3,7 @@ name: Build and deploy Node.js app to Azure Web App - zappie-dev
 on:
   push:
     branches:
-      - SSO
+      - master
   workflow_dispatch:
 
 jobs:
