@@ -10,13 +10,9 @@ import {
   Middleware,
   MessageFactory,
 } from 'botbuilder';
-import {
-  getWallets,
-  ensureMatchingUserWallet,
-  payInvoice,
-  getWalletIdByUserId,
-  createInvoice,
-} from '../services/lnbitsService';
+import { getWallets, getUser } from '../services/lnbitsService';
+
+const adminKey = process.env.LNBITS_ADMINKEY as string;
 
 // New command for showing leaderboard
 export class ShowLeaderboardCommand extends SSOCommand {
@@ -26,15 +22,11 @@ export class ShowLeaderboardCommand extends SSOCommand {
       console.log('Showing leaderboard...');
 
       // Call the getWallets function
-      const wallets = await getWallets();
+      const wallets = await getWallets(adminKey, 'Private');
 
       if (wallets) {
-        // Regular expression to match GUIDs
-        const guidRegex =
-          /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
-        // Filter wallets ending with "Receiving"
         const filteredWallets = wallets.filter(wallet =>
-          wallet.name.toLowerCase().endsWith('receiving'),
+          wallet.name.toLowerCase().includes('private'),
         );
         console.log('Filtered Wallets:', filteredWallets);
 
@@ -46,23 +38,19 @@ export class ShowLeaderboardCommand extends SSOCommand {
         // Format the sorted wallets into an actionable card response
         const cardResponse = {
           type: 'AdaptiveCard',
-          body: filteredWallets.map(wallet => {
-            let walletName = wallet.name;
-            // Check if the wallet name contains a GUID
-            const match = walletName.match(guidRegex);
-            if (match) {
-              // Remove the GUID and the " - " separator
-              walletName = walletName.replace(`${match[0]} - `, '');
-              // Remove the "- Receiving" suffix
-              walletName = walletName.replace(` - Receiving`, '');
-            }
-            return {
-              type: 'TextBlock',
-              text: `${walletName}\nTotal: ${wallet.balance_msat / 1000} Zaps`,
-              weight: 'Bolder',
-              size: 'Medium',
-            };
-          }),
+          body: await Promise.all(
+            filteredWallets.map(async wallet => {
+              let user = await getUser(adminKey, wallet.user);
+              return {
+                type: 'TextBlock',
+                text: `${user.displayName}\n: ${
+                  wallet.balance_msat / 1000
+                } Sats`,
+                weight: 'Bolder',
+                size: 'Medium',
+              };
+            }),
+          ),
           actions: [
             {
               type: 'Action.OpenUrl',

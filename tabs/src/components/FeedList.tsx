@@ -1,10 +1,9 @@
 /// <reference path="../types/global.d.ts" />
 
-import { FunctionComponent, useEffect } from 'react';
+import { useEffect } from 'react';
 import styles from './FeedList.module.css';
 import React, { useState } from 'react';
-import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
-import { getUserName } from '../utils/walletUtilities';
+import { getWallets, getWalletZapsSince } from '../services/lnbitsServiceLocal';
 import ZapIcon from '../images/ZapIcon.svg';
 
 interface FeedListProps {
@@ -26,35 +25,23 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const fetchZaps = async () => {
     console.log('Fetching payments since: ', paymentsSinceTimestamp);
 
-    const wallets = await getWallets('Receiving'); // We'll just look at the receiving wallets.
+    const wallets = await getWallets('Private'); // We'll just look at the private wallets.
     let allZaps: Zap[] = [];
 
     // Loop through all the wallets
     if (wallets) {
       for (const wallet of wallets) {
-        const payments = await getPaymentsSince(
+        const zaps = await getWalletZapsSince(
           wallet.inkey,
           paymentsSinceTimestamp,
         );
 
-        for (const payment of payments) {
-          const zap: Zap = {
-            id: payment.checking_id,
-            bolt11: payment.bolt11,
-            from: getUserName(payment.extra?.from),
-            to: getUserName(payment.extra?.to),
-            memo: payment.memo,
-            amount: payment.amount / 1000,
-            wallet_id: payment.wallet_id,
-            time: payment.time,
-          };
-
-          allZaps.push(zap);
-        }
+        allZaps = allZaps.concat(zaps);
       }
     }
     //setZaps(zaps);
     setZaps(prevState => [...prevState, ...allZaps]);
+    //setZaps(allZaps);
   };
 
   useEffect(() => {

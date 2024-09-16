@@ -10,23 +10,27 @@ interface Zap {
   time: number;
 }
 
-interface User {
-  displayName: string;
-  aadObjectId: string;
-  email: string;
-  receivingWallet: Wallet;
-  sendingWallet: Wallet;
-}
-
 interface Wallet {
   id: string;
+  admin: string;
   name: string;
+  user: string;
   adminkey: string;
   inkey: string;
   balance_msat: number;
 }
 
-type WalletType = 'Sending' | 'Receiving';
+interface User {
+  id: string;
+  displayName: string;
+  profileImg: string;
+  aadObjectId: string;
+  email: string;
+  privateWallet: Wallet;
+  allowanceWallet: Wallet;
+}
+
+type WalletType = 'Allowance' | 'Private';
 
 declare module '*.svg' {
   const content: any;

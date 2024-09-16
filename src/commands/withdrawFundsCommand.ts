@@ -10,13 +10,6 @@ import {
   Middleware,
   MessageFactory,
 } from 'botbuilder';
-import {
-  getWallets,
-  ensureMatchingUserWallet,
-  payInvoice,
-  getWalletIdByUserId,
-  createInvoice,
-} from '../services/lnbitsService';
 
 export class WithdrawFundsCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {

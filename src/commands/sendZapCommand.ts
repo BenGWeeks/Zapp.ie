@@ -11,13 +11,14 @@ import {
   MessageFactory,
 } from 'botbuilder';
 import {
-  getWallets,
-  ensureMatchingUserWallet,
+  getUsers,
   payInvoice,
   getWalletIdByUserId,
   createInvoice,
 } from '../services/lnbitsService';
 import { error } from 'console';
+
+const adminKey = process.env.LNBITS_ADMINKEY as string;
 
 export class SendZapCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
@@ -181,7 +182,7 @@ async function createZapCard() {
 // Function to populate choices
 async function populateWalletChoices() {
   console.log('Populating wallet choices ...');
-  const wallets = await getWallets('Receiving');
+  const wallets = await getUsers(adminKey, null);
   if (wallets) {
     return wallets.map((wallet: any) => ({
       title: wallet.name,
