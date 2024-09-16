@@ -500,6 +500,32 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   }
 };
 
+const getRewards = async (apiKey: string) => {
+  console.log('Getting products ...');
+  try {
+    const response = await fetch('https://demo.lnbits.com/market/api/v1/products?all_stalls=false', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        // 'X-Api-Key': apiKey,  // Pass the API key here
+        'X-Api-Key': apiKey,  // Pass the API key here
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error getting products (status: ${response.status})`);
+    }
+
+    const data = await response.json();
+    console.log('Products:', data);
+
+    return data;  // This will return the list of products
+  } catch (error) {
+    console.error('Error getting products:', error);
+    return null;
+  }
+};
+
 export {
   getWallets,
   getWalletName,
@@ -516,4 +542,5 @@ export {
   ensureMatchingUserWallet,
   payInvoice,
   getWalletIdByUserId,
+  getRewards,
 };
