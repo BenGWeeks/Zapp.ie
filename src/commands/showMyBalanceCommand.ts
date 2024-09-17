@@ -11,12 +11,13 @@ import {
   MessageFactory,
 } from 'botbuilder';
 import {
-  getWallets,
-  ensureMatchingUserWallet,
   payInvoice,
   getWalletIdByUserId,
   createInvoice,
+  getUserWallets,
 } from '../services/lnbitsService';
+
+const adminKey = process.env.LNBITS_ADMINKEY as string;
 
 export class ShowMyBalanceCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
@@ -24,51 +25,40 @@ export class ShowMyBalanceCommand extends SSOCommand {
       //await context.sendActivity('Showing your balance...');
       console.log('Showing your balance...');
 
-      // Retrieve the user's GUID
-      const userId =
-        context.activity.from.aadObjectId || context.activity.from.id;
+      // Retrieve the user object from the turn state
+      const user = context.turnState.get('user') as User;
 
-      // Call the getWallets function
-      const wallets = await getWallets();
+      if (!user) {
+        await context.sendActivity('User not found.');
+        return;
+      }
 
-      if (wallets) {
-        // Filter wallets containing the user's GUID in the name
-        const filteredWallets = wallets.filter(wallet =>
-          wallet.name.includes(userId),
+      console.log('User:', user);
+
+      // Get the user's wallets
+      const usersWallets = await getUserWallets(adminKey, user.id);
+
+      if (!usersWallets || usersWallets.length === 0) {
+        await context.sendActivity('No wallets found for the user.');
+        return;
+      }
+
+      console.log('User Wallets:', usersWallets);
+
+      // Loop through all wallets and send their balances
+      for (const wallet of usersWallets) {
+        const balanceMsat = wallet.balance_msat;
+        if (balanceMsat === undefined) {
+          await context.sendActivity(
+            `Balance information not available for wallet ${wallet.id}.`,
+          );
+          continue;
+        }
+
+        const balanceSat = balanceMsat / 1000; // Convert from msat to sat
+        await context.sendActivity(
+          `Your ${wallet.name} wallet has a balance of ${balanceSat} satoshis.`,
         );
-        console.log('Filtered Wallets:', filteredWallets);
-
-        // Format the filtered wallets into an actionable card response
-        const cardResponse = {
-          type: 'AdaptiveCard',
-          body: filteredWallets.map(wallet => {
-            let walletName = wallet.name;
-            // Remove the GUID and the " - " separator
-            walletName = walletName.replace(`${userId} - `, '');
-            return {
-              type: 'TextBlock',
-              text: `Name: ${walletName}\nBalance: ${
-                wallet.balance_msat / 1000
-              } Sats`,
-              weight: 'Bolder',
-              size: 'Medium',
-            };
-          }),
-          actions: [
-            {
-              type: 'Action.OpenUrl',
-              title: 'View Wallets',
-              url: 'http://localhost:3000/users',
-            },
-          ],
-          $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-          version: '1.2',
-        };
-
-        // Send the formatted card as an activity
-        await context.sendActivity({
-          attachments: [CardFactory.adaptiveCard(cardResponse)],
-        });
       }
     } catch (error) {
       console.error('Error in ShowMyBalanceCommand:', error);
