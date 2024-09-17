@@ -12,10 +12,10 @@ import { IPublicClientApplication } from "@azure/msal-browser";
 import { CustomNavigationClient } from "./utils/NavigationClient";
 
 // Sample app imports
-import { PageLayout } from "./ui-components/PageLayout";
-import { Home } from "./components/Home";
-import FeedComponent from './components/test';
-import Natalia from "./Feed";
+import { PageLayout } from "./components/PageLayout";
+import { Home } from "./Home";
+import FeedComponent from './components/FeedComponent';
+
 
 
 type AppProps = {
@@ -44,9 +44,8 @@ function App({ pca }: AppProps) {
 function Pages() {
     return (
         <Routes>
-            <Route path="/test" element={<FeedComponent />} />
+            <Route path="/feed" element={<FeedComponent />} />
             <Route path="/" element={<Home />} />
-            <Route path="/feed" element={<Natalia />} />
         </Routes>
     );
 }

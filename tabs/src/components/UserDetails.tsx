@@ -1,5 +1,5 @@
 import React from "react";
-import { graphConfig } from "./services/authConfig";
+import { graphConfig } from "../services/authConfig";
 
 export async function callMsGraph(accessToken: string) {
     const headers = new Headers();
