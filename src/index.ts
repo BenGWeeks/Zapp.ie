@@ -14,7 +14,7 @@ import {
 // This bot's main dialog.
 import { TeamsBot } from './teamsBot';
 import config from './config';
-
+import { UserService } from './services/userService';
 import { FetchUserMiddleware } from './services/fetchUserMiddleware';
 
 // Create adapter.
@@ -33,7 +33,11 @@ const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
 const adapter = new CloudAdapter(botFrameworkAuthentication);
 
 // Add EnsureUserSetupMiddleware to the adapter's middleware pipeline
-adapter.use(new FetchUserMiddleware());
+// Create UserService instance (using the singleton pattern)
+const userService = UserService.getInstance();
+
+// Add FetchUserMiddleware and pass the userService instance
+adapter.use(new FetchUserMiddleware(userService));
 
 // Catch-all for errors.
 const onTurnErrorHandler = async (context: TurnContext, error: Error) => {

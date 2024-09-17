@@ -1,22 +1,18 @@
 import { Middleware, TurnContext } from 'botbuilder';
 import { UserService } from './userService';
 
-export class FetchUserMiddleware implements Middleware {
+export class FetchUserMiddleware {
   private userService: UserService;
 
-  constructor() {
-    this.userService = UserService.getInstance();
+  constructor(userService: UserService) {
+    this.userService = userService;
   }
 
   async onTurn(context: TurnContext, next: () => Promise<void>): Promise<void> {
-    console.log('FetchUserMiddleware: onTurn called'); // Logging
-
-    if (
-      context.activity.type === 'message' ||
-      context.activity.type === 'conversationUpdate'
-    ) {
+    // Check if user is already stored in the turn state (for the current turn)
+    if (!context.turnState.get('user')) {
       const user = await this.userService.getUser(context);
-      context.turnState.set('user', user);
+      context.turnState.set('user', user); // Store user in turn state for this turn
     }
 
     // Continue with the next middleware or bot logic

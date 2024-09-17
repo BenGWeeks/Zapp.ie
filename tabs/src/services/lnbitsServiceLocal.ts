@@ -128,7 +128,7 @@ const getUsers = async (
     // URL encode the extra filter
     //const encodedExtra = encodeURIComponent(JSON.stringify(filterByExtra));
     const encodedExtra = JSON.stringify(filterByExtra);
-    console.log('encodedExtra:', encodedExtra);
+    //console.log('encodedExtra:', encodedExtra);
 
     const response = await fetch(
       `/usermanager/api/v1/users?extra=${encodedExtra}`,

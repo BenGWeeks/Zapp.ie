@@ -19,7 +19,7 @@ import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
 import { error } from 'console';
-import { getWalletById } from './services/lnbitsService';
+import { getUser, getWalletById } from './services/lnbitsService';
 
 let globalWalletId: string | null = null;
 
@@ -65,55 +65,40 @@ export class TeamsBot extends TeamsActivityHandler {
 
       try {
         let mentions = TurnContext.getMentions(context.activity);
-        console.log('context.activity:', context.activity);
+        //console.log('context.activity:', context.activity);
 
         if (
           context.activity.value &&
           context.activity.value.action === 'submitZaps'
         ) {
-          const userAadObjectId = context.activity.from.aadObjectId;
-          const userName = context.activity.from.name;
-
           const currentUser = context.turnState.get('user');
 
-          const zapReceiverWalletId =
-            context.activity.value.zapReceiverWalletId;
-          /*const senderWallet = await ensureMatchingUserWallet(
-            userAadObjectId,
-            userName,
-            'Sending',
-          );*/
-          const zapMessage = context.activity.value.zapMessage;
-          const zapAmount = context.activity.value.zapAmount;
+          const receiverId = context.activity.value.zapReceiverId;
+          const receiver = await getUser(adminKey, receiverId);
 
-          if (!currentUser.senderWallet) {
+          if (!currentUser.allowanceWallet.id) {
             throw new error('No sending wallet found.');
           }
 
-          const receiverWallet = await getWalletById(
-            currentUser.id,
-            zapReceiverWalletId,
-          );
-
-          if (!receiverWallet) {
+          if (!receiver.privateWallet) {
             throw new Error('Receiver wallet not found.');
           }
 
           await SendZap(
-            currentUser.senderWallet,
-            receiverWallet,
-            zapMessage,
-            zapAmount,
+            currentUser.allowanceWallet,
+            receiver.privateWallet,
+            context.activity.value.zapMessage,
+            context.activity.value.zapAmount,
           );
 
           await context.sendActivity(
-            `Awesome! You sent ${zapAmount} Sats to your colleague with a zap!`,
+            `Awesome! You sent ${context.activity.value.zapAmount} Sats to your colleague with a zap!`,
           );
         }
       } catch (error) {
         console.error('Error in onMessage handler:', error.message);
         await context.sendActivity(
-          `Oops! Unable to send zap (${error.message}`,
+          `Oops! Unable to send zap (${error.message})`,
         );
       }
 

@@ -64,7 +64,7 @@ const getWallets = async (
       );
     }
 
-    const data: Wallet[] = await response.json();
+    const data = await response.json();
 
     // If filter is provided, filter the wallets by name and/or id
     let filteredData = data;
@@ -78,7 +78,7 @@ const getWallets = async (
     }
 
     // Map the wallets to match the Wallet interface
-    const walletData: Wallet[] = await Promise.all(
+    let walletData: Wallet[] = await Promise.all(
       data.map(async (filteredData: any) => ({
         id: filteredData.id,
         admin: filteredData.admin,
@@ -86,11 +86,17 @@ const getWallets = async (
         adminkey: filteredData.adminkey,
         user: filteredData.user,
         inkey: filteredData.inkey,
+        deleted: (
+          await getWalletById(filteredData.user, filteredData.id)
+        )?.deleted,
         balance_msat: (
           await getWalletById(filteredData.user, filteredData.id)
         )?.balance_msat,
       })),
     );
+
+    // Now remove the deleted wallets.
+    walletData = walletData.filter(wallet => wallet.deleted != true);
 
     return walletData;
   } catch (error) {
@@ -130,20 +136,26 @@ const getUserWallets = async (
     const data: Wallet[] = await response.json();
 
     // Map the wallets to match the Wallet interface
-    const walletData: Wallet[] = data.map((wallet: any) => ({
+    let walletData: Wallet[] = data.map((wallet: any) => ({
       id: wallet.id,
-      admin: wallet.admin, // TODO: To be implemented. Ref: https://t.me/lnbits/90188
+      admin: null, // TODO: To be implemented. Ref: https://t.me/lnbits/90188
       name: wallet.name,
       adminkey: wallet.adminkey,
       user: wallet.user,
       inkey: wallet.inkey,
       balance_msat: wallet.balance_msat, // TODO: To be implemented. Ref: https://t.me/lnbits/90188
+      deleted: wallet.deleted,
     }));
 
-    return walletData;
+    // Now remove the deleted wallets.
+    const filteredWallets = walletData.filter(
+      wallet => wallet.deleted !== true,
+    );
+
+    return filteredWallets;
   } catch (error) {
     console.error(error);
-    return error;
+    throw error;
   }
 };
 
@@ -161,7 +173,7 @@ const getUsers = async (
     // URL encode the extra filter
     //const encodedExtra = encodeURIComponent(JSON.stringify(filterByExtra));
     const encodedExtra = JSON.stringify(filterByExtra);
-    console.log('encodedExtra:', encodedExtra);
+    //console.log('encodedExtra:', encodedExtra);
 
     const response = await fetch(
       `${lnbiturl}/usermanager/api/v1/users?extra=${encodedExtra}`,
@@ -182,16 +194,18 @@ const getUsers = async (
 
     const data = await response.json();
 
+    console.log('getUsers data:', data);
+
     // Map the users to match the User interface
     const usersData: User[] = await Promise.all(
       data.map(async (user: any) => {
         let privateWallet = await getWalletById(
-          adminKey,
+          user.id,
           user.extra?.privateWalletId,
         );
 
         let allowanceWallet = await getWalletById(
-          adminKey,
+          user.id,
           user.extra?.allowanceWalletId,
         );
 
@@ -295,7 +309,7 @@ const getUser = async (
   userId: string,
 ): Promise<User | null> => {
   console.log(
-    `createUser starting ... (adminKey: ${adminKey}, userName: ${userName})`,
+    `createUser starting ... (adminKey: ${adminKey}, userId: ${userId})`,
   );
 
   try {
@@ -354,7 +368,9 @@ const updateUser = async (
   extra: { [key: string]: string }, // Ensure extra is an object, not a string
 ): Promise<User | null> => {
   console.log(
-    `updateUser starting ... (adminKey: ${adminKey}, userId: ${userName}, extra: ${extra}))`,
+    `updateUser starting ... (adminKey: ${adminKey}, userId: ${userId}, extra: ${JSON.stringify(
+      extra,
+    )}))`,
   );
 
   try {
@@ -392,6 +408,9 @@ const updateUser = async (
       adminKey,
       data.extra?.allowanceWalletId,
     );
+
+    console.log('privateWallet 111:', privateWallet);
+    console.log('allowanceWallet 111:', allowanceWallet);
 
     // Map the user to match the User interface
     const userData: User = {
@@ -450,7 +469,7 @@ const createWallet = async (
     const walletWithBalance = await getWalletById(data.user, data.id);
 
     // Map the wallet to match the Wallet interface
-    const walletData: Wallet = {
+    let walletData: Wallet = {
       id: data.id,
       admin: data.admin,
       name: data.name,
@@ -458,6 +477,7 @@ const createWallet = async (
       user: data.user,
       inkey: data.inkey,
       balance_msat: walletWithBalance?.balance_msat,
+      deleted: walletWithBalance?.deleted,
     };
 
     console.log('createWallet data:', walletData);
@@ -641,24 +661,36 @@ const getWalletById = async (
 
     const data = await response.json();
 
-    // Find the wallet with a matching inkey
-    const filterWallets = data.find((wallet: any) => wallet.id === id);
+    // Find the wallet with a matching inkey that are not deleted.
+    const filteredWallets = data.filter(
+      (wallet: any) => wallet.deleted !== true,
+    );
+    const matchingWallet = filteredWallets.find(
+      (wallet: any) => wallet.id === id,
+    );
+    //console.log('matchingWallet: ', matchingWallet);
+
+    if (!matchingWallet) {
+      console.error(`Wallet with ID ${id} not found.`);
+      return null;
+    }
 
     // Map the filterWallets to match the Wallets interface
-    const walletsData: Wallet[] = data.map((filterWallets: any) => ({
-      id: filterWallets.id,
-      admin: filterWallets.admin, // TODO: Coming back as undefined.
-      name: filterWallets.name,
-      user: filterWallets.user,
-      adminkey: filterWallets.adminkey,
-      inkey: filterWallets.inkey,
-      balance_msat: filterWallets.balance_msat,
-    }));
+    const walletData: Wallet = {
+      id: matchingWallet.id,
+      admin: matchingWallet.admin, // TODO: Coming back as undefined.
+      name: matchingWallet.name,
+      user: matchingWallet.user,
+      adminkey: matchingWallet.adminkey,
+      inkey: matchingWallet.inkey,
+      balance_msat: matchingWallet.balance_msat,
+      deleted: matchingWallet.deleted,
+    };
 
-    return walletsData[0];
+    return walletData;
   } catch (error) {
     console.error(error);
-    return error;
+    throw error;
   }
 };
 
@@ -840,7 +872,7 @@ const payInvoice = async (adminKey: string, paymentRequest: string) => {
 
     return data;
   } catch (error) {
-    return error;
+    throw error;
   }
 };
 

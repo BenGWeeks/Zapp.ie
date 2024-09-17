@@ -84,7 +84,14 @@ export async function SendZap(
     }
 
     // Pay the invoice
+
+    console.log('sendersWallet: ', sendersWallet);
+
     const result = await payInvoice(sendersWallet.adminkey, paymentRequest);
+
+    console.log('Payment Result:', result);
+
+    // TODO: Errors here are not being caught for some reason. Need to fix this. Mario.
 
     /*
     if (result && result.payment_hash) {
@@ -120,7 +127,7 @@ async function createZapCard() {
     {
       type: 'Input.ChoiceSet',
       label: 'Receiver',
-      id: 'zapReceiverWalletId',
+      id: 'zapReceiverId',
       placeholder: 'Select a recipient wallet',
       choices: walletChoices,
       isRequired: true,
@@ -182,11 +189,11 @@ async function createZapCard() {
 // Function to populate choices
 async function populateWalletChoices() {
   console.log('Populating wallet choices ...');
-  const wallets = await getUsers(adminKey, null);
-  if (wallets) {
-    return wallets.map((wallet: any) => ({
-      title: wallet.name,
-      value: wallet.id,
+  const users = await getUsers(adminKey, null);
+  if (users) {
+    return users.map((user: any) => ({
+      title: user.displayName,
+      value: user.id,
     }));
   }
   return [];
