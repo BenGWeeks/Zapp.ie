@@ -97,17 +97,23 @@ const getUserWallets = async (
     const data: Wallet[] = await response.json();
 
     // Map the wallets to match the Wallet interface
-    const walletData: Wallet[] = data.map((wallet: any) => ({
+    let walletData: Wallet[] = data.map((wallet: any) => ({
       id: wallet.id,
-      admin: wallet.admin, // TODO: To be implemented. Ref: https://t.me/lnbits/90188
+      admin: wallet.admin || '', // TODO: To be implemented. Ref: https://t.me/lnbits/90188
       name: wallet.name,
       adminkey: wallet.adminkey,
       user: wallet.user,
       inkey: wallet.inkey,
       balance_msat: wallet.balance_msat, // TODO: To be implemented. Ref: https://t.me/lnbits/90188
+      deleted: wallet.deleted,
     }));
 
-    return walletData;
+    // Now remove the deleted wallets.
+    const filteredWallets = walletData.filter(
+      wallet => wallet.deleted !== true,
+    );
+
+    return filteredWallets;
   } catch (error) {
     console.error(error);
     throw error;
@@ -116,7 +122,7 @@ const getUserWallets = async (
 
 const getUsers = async (
   adminKey: string,
-  filterByExtra: { [key: string]: string }, // Pass the extra field as an object
+  filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
 ): Promise<User[] | null> => {
   console.log(
     `getUsers starting ... (adminKey: ${adminKey}, filterByExtra: ${JSON.stringify(
@@ -128,7 +134,7 @@ const getUsers = async (
     // URL encode the extra filter
     //const encodedExtra = encodeURIComponent(JSON.stringify(filterByExtra));
     const encodedExtra = JSON.stringify(filterByExtra);
-    //console.log('encodedExtra:', encodedExtra);
+    console.log('encodedExtra:', encodedExtra);
 
     const response = await fetch(
       `/usermanager/api/v1/users?extra=${encodedExtra}`,
@@ -149,17 +155,36 @@ const getUsers = async (
 
     const data = await response.json();
 
-    // Map the users to match the User interface
-    const usersData: User[] = data.map((user: any) => ({
-      id: user.id,
-      displayName: user.name,
-      aadObjectId: user.extra?.aadObjectId || null,
-      email: user.email,
-      privateWallet: getWalletById(adminKey, user.extra?.privateWalletId),
-      allowanceWallet: getWalletById(adminKey, user.extra?.allowanceWalletId),
-    }));
+    console.log('getUsers data:', data);
 
-    console.log('usersData:', usersData);
+    // Map the users to match the User interface
+    const usersData: User[] = await Promise.all(
+      data.map(async (user: any) => {
+        const extra = user.extra || {}; // Provide a default empty object if user.extra is null
+
+        let privateWallet = null;
+        let allowanceWallet = null;
+
+        if (user.extra) {
+          privateWallet = await getWalletById(user.id, extra.privateWalletId);
+          allowanceWallet = await getWalletById(
+            user.id,
+            extra.allowanceWalletId,
+          );
+        }
+
+        return {
+          id: user.id,
+          displayName: user.name,
+          aadObjectId: extra.aadObjectId || null,
+          email: user.email,
+          privateWallet: privateWallet,
+          allowanceWallet: allowanceWallet,
+        };
+      }),
+    );
+
+    console.log('getUsers usersData:', usersData);
 
     return usersData;
   } catch (error) {
@@ -306,19 +331,20 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
   }
 };
 
-// May need fixing!
 const getWalletById = async (
-  adminKey: string,
+  userId: string,
   id: string,
 ): Promise<Wallet | null> => {
-  console.log(`getWalletById starting ... (inKey: ${adminKey}, id: ${id})`);
+  console.log(`getWalletById starting ... (userId: ${userId}, id: ${id})`);
 
   try {
-    const response = await fetch(`/api/v1/wallets`, {
+    const accessToken = await getAccessToken(`${userName}`, `${password}`);
+    const response = await fetch(`/users/api/v1/user/${userId}/wallet`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-Api-Key': adminKey,
+        //'X-Api-Key': adminKey,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
@@ -332,21 +358,32 @@ const getWalletById = async (
 
     const data = await response.json();
 
-    // Find the wallet with a matching inkey
-    const filterWallet = data.find((wallet: any) => wallet.id === id);
+    // Find the wallet with a matching inkey that are not deleted.
+    const filteredWallets = data.filter(
+      (wallet: any) => wallet.deleted !== true,
+    );
+    const matchingWallet = filteredWallets.find(
+      (wallet: any) => wallet.id === id,
+    );
+    //console.log('matchingWallet: ', matchingWallet);
 
-    // Map the user to match the User interface
+    if (!matchingWallet) {
+      console.error(`Wallet with ID ${id} not found.`);
+      return null;
+    }
+
+    // Map the filterWallets to match the Wallets interface
     const walletData: Wallet = {
-      id: filterWallet.id,
-      admin: filterWallet.admin,
-      name: filterWallet.name,
-      user: filterWallet.user,
-      adminkey: filterWallet.adminkey,
-      inkey: filterWallet.inkey,
-      balance_msat: filterWallet.balance_msat,
+      id: matchingWallet.id,
+      admin: matchingWallet.admin, // TODO: Coming back as undefined.
+      name: matchingWallet.name,
+      user: matchingWallet.user,
+      adminkey: matchingWallet.adminkey,
+      inkey: matchingWallet.inkey,
+      balance_msat: matchingWallet.balance_msat,
+      deleted: matchingWallet.deleted,
     };
 
-    // Return the id of the wallet
     return walletData;
   } catch (error) {
     console.error(error);
@@ -611,6 +648,7 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
 };
 
 export {
+  getUsers,
   getWallets,
   getWalletName,
   getWalletId,
@@ -624,4 +662,5 @@ export {
   createWallet,
   payInvoice,
   getWalletIdByUserId,
+  getUserWallets,
 };

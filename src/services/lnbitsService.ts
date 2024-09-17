@@ -161,7 +161,7 @@ const getUserWallets = async (
 
 const getUsers = async (
   adminKey: string,
-  filterByExtra: { [key: string]: string }, // Pass the extra field as an object
+  filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
 ): Promise<User[] | null> => {
   console.log(
     `getUsers starting ... (adminKey: ${adminKey}, filterByExtra: ${JSON.stringify(
@@ -199,20 +199,23 @@ const getUsers = async (
     // Map the users to match the User interface
     const usersData: User[] = await Promise.all(
       data.map(async (user: any) => {
-        let privateWallet = await getWalletById(
-          user.id,
-          user.extra?.privateWalletId,
-        );
+        const extra = user.extra || {}; // Provide a default empty object if user.extra is null
 
-        let allowanceWallet = await getWalletById(
-          user.id,
-          user.extra?.allowanceWalletId,
-        );
+        let privateWallet = null;
+        let allowanceWallet = null;
+
+        if (user.extra) {
+          privateWallet = await getWalletById(user.id, extra.privateWalletId);
+          allowanceWallet = await getWalletById(
+            user.id,
+            extra.allowanceWalletId,
+          );
+        }
 
         return {
           id: user.id,
           displayName: user.name,
-          aadObjectId: user.extra?.aadObjectId || null,
+          aadObjectId: extra.aadObjectId || null,
           email: user.email,
           privateWallet: privateWallet,
           allowanceWallet: allowanceWallet,
@@ -225,7 +228,7 @@ const getUsers = async (
     return usersData;
   } catch (error) {
     console.error(error);
-    return error;
+    throw error;
   }
 };
 
@@ -630,7 +633,6 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
   }
 };
 
-// May need fixing!
 const getWalletById = async (
   userId: string,
   id: string,

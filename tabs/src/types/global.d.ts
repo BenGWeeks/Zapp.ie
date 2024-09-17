@@ -18,6 +18,7 @@ interface Wallet {
   adminkey: string;
   inkey: string;
   balance_msat: number;
+  deleted: boolean;
 }
 
 interface User {

@@ -3,12 +3,19 @@
 import { useEffect } from 'react';
 import styles from './FeedList.module.css';
 import React, { useState } from 'react';
-import { getWallets, getWalletZapsSince } from '../services/lnbitsServiceLocal';
+import {
+  getUsers,
+  getWallets,
+  getUserWallets,
+  getWalletZapsSince,
+} from '../services/lnbitsServiceLocal';
 import ZapIcon from '../images/ZapIcon.svg';
 
 interface FeedListProps {
   timestamp?: number | null;
 }
+
+const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
 const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const [zaps, setZaps] = useState<Zap[]>([]);
@@ -25,20 +32,32 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const fetchZaps = async () => {
     console.log('Fetching payments since: ', paymentsSinceTimestamp);
 
-    const wallets = await getWallets('Private'); // We'll just look at the private wallets.
     let allZaps: Zap[] = [];
 
-    // Loop through all the wallets
-    if (wallets) {
-      for (const wallet of wallets) {
-        const zaps = await getWalletZapsSince(
-          wallet.inkey,
-          paymentsSinceTimestamp,
-        );
+    const users = await getUsers(adminKey, {});
 
-        allZaps = allZaps.concat(zaps);
+    if (users) {
+      for (const user of users) {
+        const wallets = await getUserWallets(adminKey, user.id); // We'll just look at the private wallets.
+
+        // Loop through all the wallets
+        if (wallets) {
+          const allowanceWallets = wallets.filter(
+            wallet => wallet.name === 'Allowance',
+          );
+
+          for (const wallet of allowanceWallets) {
+            const zaps = await getWalletZapsSince(
+              wallet.inkey,
+              paymentsSinceTimestamp,
+            );
+
+            allZaps = allZaps.concat(zaps);
+          }
+        }
       }
     }
+
     //setZaps(zaps);
     setZaps(prevState => [...prevState, ...allZaps]);
     //setZaps(allZaps);
