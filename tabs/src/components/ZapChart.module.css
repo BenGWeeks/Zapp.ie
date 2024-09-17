@@ -1,0 +1,38 @@
+.zapsChartContainer {
+    width: 68%;
+    position: relative;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    background-color: #2d2b2c;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 20px;
+    box-sizing: border-box;
+    gap: 20px;
+    text-align: left;
+    font-size: 12px;
+    color: #d6d6d6;
+    font-family: Inter;
+    padding-top: 7px;
+    padding-bottom: 17px;
+    padding-right: 15px;
+    height: 240px;
+}
+
+.title {
+    width: 278px;
+    height: 17px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    color: #FFFFFF;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+    z-index: 0;
+}
