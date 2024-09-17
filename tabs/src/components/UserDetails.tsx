@@ -20,11 +20,13 @@ export async function callMsGraph(accessToken: string) {
 export const ProfileData = (props: any) => {
     return (
         <div id="profile-div">
+
             <p><strong>Name: </strong> {props.graphData.displayName}</p>
             <p><strong>Mail: </strong> {props.graphData.mail}</p>
             <p><strong>Phone: </strong> {props.graphData.businessPhones[0]}</p>
             <p><strong>Location: </strong> {props.graphData.officeLocation}</p>
             <p><strong>Object: </strong> {props.graphData.id}</p>
+
         </div>
     );
 };

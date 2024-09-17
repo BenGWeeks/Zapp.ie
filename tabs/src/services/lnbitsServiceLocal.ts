@@ -383,8 +383,7 @@ const checkWalletExists = async (
 
     if (wallets && wallets.length > 0) {
       // Find the first wallet that matches the name
-      wallet =
-        wallets?.find((wallet: any) => wallet.name === walletName) || null;
+      wallet = wallets?.find((wallet: any) => wallet.name === walletName) || null;
     }
 
     return wallet;
