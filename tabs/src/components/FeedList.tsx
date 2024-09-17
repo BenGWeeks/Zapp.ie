@@ -26,7 +26,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const fetchZaps = async () => {
     console.log('Fetching payments since: ', paymentsSinceTimestamp);
 
-    const wallets = await getWallets('Receiving'); // We'll just look at the receiving wallets.
+    const wallets = await getWallets('Allowance'); // We'll just look at the allowance wallets.
     let allZaps: Zap[] = [];
 
     // Loop through all the wallets

@@ -3,7 +3,11 @@
 import { FunctionComponent, useEffect } from 'react';
 import styles from './Leaderboard.module.css';
 import React, { useState } from 'react';
-import { getWallets, getPaymentsSince, getWalletBalance } from '../services/lnbitsServiceLocal';
+import {
+  getWallets,
+  getPaymentsSince,
+  getWalletBalance,
+} from '../services/lnbitsServiceLocal';
 import ZapIcon from '../images/ZapIcon.svg';
 import circleFirstPlace from '../images/circleFirstPlace.svg';
 import CircleSecondPlace from '../images/circleSecondPlace.svg';
@@ -30,7 +34,7 @@ const Leaderboard: React.FC<FeedListProps> = ({ timestamp }) => {
   const fetchZaps = async () => {
     console.log('Fetching payments since: ', paymentsSinceTimestamp);
 
-    const wallets = await getWallets('Receiving'); // We'll just look at the receiving wallets.
+    const wallets = await getWallets('Allowance'); // We'll just look at the allowance wallets.
     let allZaps: Zap[] = [];
 
     // Loop through all the wallets
@@ -48,7 +52,7 @@ const Leaderboard: React.FC<FeedListProps> = ({ timestamp }) => {
         Array.from(uniqueWalletsMap.values()).map(async wallet => {
           const balance = await getWalletBalance(wallet.inkey);
           return { ...wallet, balance_msat: balance };
-        })
+        }),
       );
 
       // Sort unique wallets by balance_msat
@@ -74,7 +78,9 @@ const Leaderboard: React.FC<FeedListProps> = ({ timestamp }) => {
 
   const handleSort = () => {
     const sortedWallets = [...uniqueWallets].sort((a, b) =>
-      isAscending ? a.balance_msat - b.balance_msat : b.balance_msat - a.balance_msat
+      isAscending
+        ? a.balance_msat - b.balance_msat
+        : b.balance_msat - a.balance_msat,
     );
     setUniqueWallets(sortedWallets);
     setIsAscending(!isAscending);
@@ -91,7 +97,9 @@ const Leaderboard: React.FC<FeedListProps> = ({ timestamp }) => {
   }, {});
 
   // Convert the grouped data to an array and sort by total zap amount
-  const sortedZaps = Object.values(groupedZaps).sort((a, b) => b.amount - a.amount);
+  const sortedZaps = Object.values(groupedZaps).sort(
+    (a, b) => b.amount - a.amount,
+  );
 
   return (
     <div className={styles.feedlist}>
@@ -99,14 +107,17 @@ const Leaderboard: React.FC<FeedListProps> = ({ timestamp }) => {
         <div className={styles.headerContents}>
           <b className={styles.string}>Rank</b>
           <b className={styles.userName}>User</b>
-          <div className={styles.stringWrapper} onClick={handleSort} style={{ cursor: 'pointer' }}>
+          <div
+            className={styles.stringWrapper}
+            onClick={handleSort}
+            style={{ cursor: 'pointer' }}
+          >
             <b className={`${styles.string3} ${styles.b}`}>Zap amount</b>
             <img
               src={isAscending ? AscendingIcon : DescendingIcon}
               alt={isAscending ? 'Ascending' : 'Descending'}
               className={styles.sortIcon} // Add CSS class to style the icon
             />
-
           </div>
         </div>
       </div>
@@ -119,23 +130,53 @@ const Leaderboard: React.FC<FeedListProps> = ({ timestamp }) => {
                   <div className={styles.userName}>
                     {wallet.rank === 1 ? (
                       <div className={styles.firstPlace}>
-                        <img src={circleFirstPlace} alt="First Place" className={styles.circleFirstPlace} />
-                        <span className={`${styles.rankNumber} ${styles.blackRank}`}>{wallet.rank}</span>
+                        <img
+                          src={circleFirstPlace}
+                          alt="First Place"
+                          className={styles.circleFirstPlace}
+                        />
+                        <span
+                          className={`${styles.rankNumber} ${styles.blackRank}`}
+                        >
+                          {wallet.rank}
+                        </span>
                       </div>
                     ) : wallet.rank === 2 ? (
                       <div className={styles.secondPlace}>
-                        <img src={CircleSecondPlace} alt="Second Place" className={styles.circleSecondPlace} />
-                        <span className={`${styles.rankNumber} ${styles.blackRank}`}>{wallet.rank}</span>
+                        <img
+                          src={CircleSecondPlace}
+                          alt="Second Place"
+                          className={styles.circleSecondPlace}
+                        />
+                        <span
+                          className={`${styles.rankNumber} ${styles.blackRank}`}
+                        >
+                          {wallet.rank}
+                        </span>
                       </div>
                     ) : wallet.rank === 3 ? (
                       <div className={styles.thirdPlace}>
-                        <img src={circleThirdPlace} alt="Third Place" className={styles.circleThirdPlace} />
-                        <span className={`${styles.rankNumber} ${styles.blackRank}`}>{wallet.rank}</span>
+                        <img
+                          src={circleThirdPlace}
+                          alt="Third Place"
+                          className={styles.circleThirdPlace}
+                        />
+                        <span
+                          className={`${styles.rankNumber} ${styles.blackRank}`}
+                        >
+                          {wallet.rank}
+                        </span>
                       </div>
                     ) : (
                       <div className={styles.defaultPlace}>
-                        <img src={circleDefaultPlace} alt="Place" className={styles.circleDefaultPlace} />
-                        <span className={`${styles.rankNumber}`}>{wallet.rank}</span>
+                        <img
+                          src={circleDefaultPlace}
+                          alt="Place"
+                          className={styles.circleDefaultPlace}
+                        />
+                        <span className={`${styles.rankNumber}`}>
+                          {wallet.rank}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -146,11 +187,17 @@ const Leaderboard: React.FC<FeedListProps> = ({ timestamp }) => {
                       src="avatar.png"
                       style={{ display: 'none' }} // Optionally show avatar
                     />
-                    <div className={styles.userName}>{wallet.name.split('-')[0]}</div>
+                    <div className={styles.userName}>
+                      {wallet.name.split('-')[0]}
+                    </div>
                   </div>
                 </div>
               </div>
-              <b className={`${styles.b} ${wallet.rank <= 3 ? styles.yellowAmount : ''}`}>
+              <b
+                className={`${styles.b} ${
+                  wallet.rank <= 3 ? styles.yellowAmount : ''
+                }`}
+              >
                 {wallet.balance_msat}
               </b>
               <img className={styles.icon} alt="" src={ZapIcon} />
@@ -158,11 +205,8 @@ const Leaderboard: React.FC<FeedListProps> = ({ timestamp }) => {
           ))}
         </ul>
       </div>
-
-
     </div>
   );
 };
 
 export default Leaderboard;
-

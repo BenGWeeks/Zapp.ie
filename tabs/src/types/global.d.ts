@@ -26,7 +26,7 @@ interface Wallet {
   balance_msat: number;
 }
 
-type WalletType = 'Sending' | 'Receiving';
+type WalletType = 'Allowance' | 'Private';
 
 declare module '*.svg' {
   const content: any;

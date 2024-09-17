@@ -441,35 +441,6 @@ const createWallet = async (
   }
 };
 
-async function ensureMatchingUserWallet(
-  aadObjectId: string,
-  displayName: string,
-  walletType: WalletType,
-): Promise<Wallet | null> {
-  console.log(
-    `ensureMatchingUserWallet starting ... (aadObjectId: ${aadObjectId}, objectID: ${displayName}, walletType: ${walletType})`,
-  );
-
-  try {
-    //const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
-
-    let walletName = null;
-    if (walletType == 'Sending') {
-      walletName = `${displayName} - ${aadObjectId} - Sending`;
-    } else {
-      walletName = `${displayName} - ${aadObjectId} - Receiving`;
-    }
-
-    // Check if the Receiving wallet exists
-    const wallet = await checkWalletExists(walletName);
-
-    return wallet || null; // Explicitly handle undefined case and return null
-  } catch (error) {
-    console.error(`Error ensuring user wallets (${error})`);
-    throw error;
-  }
-}
-
 // TODO: This method needs checking!
 const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   console.log(
@@ -513,7 +484,6 @@ export {
   createInvoice,
   createWallet,
   checkWalletExists,
-  ensureMatchingUserWallet,
   payInvoice,
   getWalletIdByUserId,
 };
