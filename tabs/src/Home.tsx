@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useMsal } from "@azure/msal-react";
-import { callMsGraph, ProfileData } from "./components/UserDetails";
+import { useMsal } from '@azure/msal-react';
+import { callMsGraph, ProfileData } from './components/UserDetails';
 import { Stack, PrimaryButton, Image, Text } from '@fluentui/react';
-import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
+import {
+  AuthenticatedTemplate,
+  UnauthenticatedTemplate,
+} from '@azure/msal-react';
 import { IRawStyle } from '@fluentui/react';
 import SignInSignOutButton from './components/SignInSignOutButton';
-import './styles/Home.css';
+import styles from './styles/Home.module.css';
 
 const centeredImageStyle: IRawStyle = {
   display: 'block',
   margin: '0 auto',
   maxHeight: 'auto', // Maintain aspect ratio
-  top: "100px",
+  top: '100px',
 };
 
 export function Home() {
@@ -21,53 +24,73 @@ export function Home() {
   useEffect(() => {
     if (accounts.length > 0) {
       const request = {
-        scopes: ["User.Read"],
-        account: accounts[0]
+        scopes: ['User.Read'],
+        account: accounts[0],
       };
 
-      instance.acquireTokenSilent(request).then(response => {
-        callMsGraph(response.accessToken).then(response => {
-          setGraphData(response);
-          if (response.id) {
-            const User = response; console.log(User);
-          }
-        });
-      }).catch(error => {
-        instance.acquireTokenPopup(request).then(response => {
+      instance
+        .acquireTokenSilent(request)
+        .then(response => {
           callMsGraph(response.accessToken).then(response => {
             setGraphData(response);
             if (response.id) {
               const User = response;
+              console.log(User);
             }
           });
+        })
+        .catch(error => {
+          instance.acquireTokenPopup(request).then(response => {
+            callMsGraph(response.accessToken).then(response => {
+              setGraphData(response);
+              if (response.id) {
+                const User = response;
+              }
+            });
+          });
         });
-      });
     }
   }, [accounts, instance]);
 
   return (
-    <div className="home-container">
-      <div className="overlay"></div>
-      <div className="content">
-        <Image src="eirevo.png" styles={{ root: centeredImageStyle }} alt="Eirevo" width="5%" />
+    <div className={styles.container}>
+      <div className={styles.bg}>
+        <img className={styles.imageIcon} alt="" src="CircuitBackground.png" />
+        <div className={styles.shadow} />
+      </div>
+      <div className={styles.content}>
         <AuthenticatedTemplate>
-          <Text styles={{ root: { color: 'white', fontSize: '4vw', fontWeight: 'bold' } }}>
-            Zapp.ie
-          </Text>
-          <Stack tokens={{ childrenGap: 10 }} styles={{ root: { marginTop: '100px' } }}>
+          <img className={styles.headerLogoIcon} alt="" src="eirevo.png" />
+          <Stack
+            tokens={{ childrenGap: 10 }}
+            styles={{ root: { marginTop: '100px' } }}
+          >
             {graphData && <ProfileData graphData={graphData} />}
           </Stack>
         </AuthenticatedTemplate>
         <UnauthenticatedTemplate>
-          <Text styles={{ root: { color: 'white', fontSize: '4vw', fontWeight: 'bold' } }}>
-            Zapp.ie
-          </Text>
-          <Text styles={{ root: { textAlign: 'center', display: 'block', marginTop: '100px', color: 'white', fontSize: '1vw' } }}>
-         <p>Boost collaboration, reward achievements, incentivize improvement, and drive real value with Zaps.</p>
-<p>To get started, please log in to access your dashboard, manage your rewards, and start recognizing your teammates' efforts.</p>
-<p><b>Log in now to power up your workplace!</b></p>
-          </Text>
-          <SignInSignOutButton />
+          <img className={styles.headerLogoIcon} alt="" src="eirevo.png" />
+          <div className={styles.description}>
+            <b className={styles.zappie}>Zapp.ie</b>
+            <div className={styles.seamlessMicrosoftTeamsContainer}>
+              <p className={styles.seamlessMicrosoftTeams}>
+                Boost collaboration, reward achievements, incentivize
+                improvement, and drive real value with Zaps.
+              </p>
+              <p className={styles.seamlessMicrosoftTeams}>&nbsp;</p>
+              <p className={styles.seamlessMicrosoftTeams}>
+                To get started, please log in to access your dashboard, manage
+                your rewards, and start recognizing your teammates' efforts.
+              </p>
+              <p className={styles.seamlessMicrosoftTeams}>&nbsp;</p>
+              <p className={styles.seamlessMicrosoftTeams}>
+                <b>Log in now to power up your workplace!</b>
+              </p>
+            </div>
+          </div>
+          <div className={styles.buttons}>
+            <SignInSignOutButton />
+          </div>
         </UnauthenticatedTemplate>
       </div>
     </div>
