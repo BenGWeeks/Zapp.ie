@@ -13,8 +13,8 @@ import { CustomNavigationClient } from "./utils/NavigationClient";
 
 // Sample app imports
 import { PageLayout } from "./components/PageLayout";
-import { Home } from "./components/Home";
-import FeedComponent from './components/test';
+import { Home } from "./Home";
+
 
 type AppProps = {
     pca: IPublicClientApplication;
