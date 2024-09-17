@@ -12,7 +12,7 @@ import { IPublicClientApplication } from "@azure/msal-browser";
 import { CustomNavigationClient } from "./utils/NavigationClient";
 
 // Sample app imports
-import { PageLayout } from "./ui-components/PageLayout";
+import { PageLayout } from "./components/PageLayout";
 import { Home } from "./components/Home";
 import FeedComponent from './components/test';
 

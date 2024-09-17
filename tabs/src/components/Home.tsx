@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { IRawStyle, Stack, Image, PrimaryButton, Text } from '@fluentui/react';
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from '@azure/msal-react';
 import { theme } from '../styles/Theme'; // Adjust the import path as necessary
-import SignInSignOutButton from '../ui-components/SignInSignOutButton'; // Adjust the import path as necessary
+import SignInSignOutButton from './SignInSignOutButton'; // Adjust the import path as necessary
 
 const backgroundImageStyle: IRawStyle = {
   backgroundImage: 'url(HomeImage.png)',
