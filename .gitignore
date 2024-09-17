@@ -6,6 +6,7 @@ appPackage/build
 
 # dependencies
 node_modules/
+.github/workflows
 
 # misc
 .env

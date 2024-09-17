@@ -14,8 +14,6 @@ import { CustomNavigationClient } from "./utils/NavigationClient";
 // Sample app imports
 import { PageLayout } from "./components/PageLayout";
 import { Home } from "./Home";
-import FeedComponent from './components/FeedComponent';
-
 
 
 type AppProps = {

@@ -1,6 +1,8 @@
+
 import React from "react";
 import { useLocation } from "react-router-dom";
 import NavBar from "./NavBar";
+
 
 type Props = {
     children?: React.ReactNode;
@@ -14,6 +16,7 @@ export const PageLayout: React.FC<Props> = ({ children }) => {
     return (
         <>
             <NavBar hidden={hideNavBar} />
+
             {children}
         </>
     );
