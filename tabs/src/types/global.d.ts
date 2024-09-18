@@ -18,6 +18,18 @@ interface User {
   sendingWallet: Wallet;
 }
 
+interface UserAccount {
+  id: string;
+  is_super_user: boolean;
+  is_admin: boolean;
+  username: string;
+  email: string;
+  balance_msat: number;
+  transaction_count: number;
+  wallet_count: number;
+  last_payment: string;
+}
+
 interface Wallet {
   id: string;
   name: string;

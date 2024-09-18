@@ -2,27 +2,58 @@
 
 const userName = process.env.REACT_APP_LNBITS_USERNAME;
 const password = process.env.REACT_APP_LNBITS_PASSWORD;
-//const adminkey = process.env.LNBITS_ADMINKEY as string; // This changes per wallet!
 
-// LNBits API is documented here:
-// https://demo.lnbits.com/docs/
+// Store token in localStorage (persists between page reloads)
+let accessToken = localStorage.getItem('accessToken');
 
 export async function getAccessToken(username: string, password: string) {
-  //try {
-  const response = await fetch(`/api/v1/auth`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ username, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error creating access token (status: ${response.status})`);
+  if (accessToken) {
+    console.log('Using cached access token: ' + accessToken);
+    return accessToken;
   }
+  try {
+    const response = await fetch(`/api/v1/auth`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+      credentials: 'omit', // No cookies sent or accepted
+    });
 
-  const data = await response.json();
-  return data.access_token;
+    if (!response.ok) {
+      throw new Error(
+        `Error creating access token (status: ${response.status}): ${response.statusText}`,
+      );
+    }
+
+    // Check if response has content
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Response is not in JSON format');
+    }
+
+    // Parse the response as JSON
+    const data = await response.json();
+
+    // Check if the expected data is available
+    if (!data || !data.access_token) {
+      throw new Error('Access token is missing in the response');
+    }
+
+    // Store the access token in memory (string type)
+    accessToken = data.access_token;
+    console.log('Access token fetched and stored');
+
+    return accessToken;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error in getAccessToken:', error.message);
+    } else {
+      console.error('Unexpected error in getAccessToken:', error);
+    }
+    throw error; // Re-throw the error to handle it elsewhere
+  }
 }
 
 const getWallets = async (
@@ -64,6 +95,40 @@ const getWallets = async (
     }
 
     return filteredData;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const getUserAccounts = async (
+  sortBy?: string,
+  direction?: string,
+): Promise<UserAccount[] | null> => {
+  console.log(`getUserAccounts starting ...`);
+
+  try {
+    const accessToken = await getAccessToken(`${userName}`, `${password}`);
+    const response = await fetch(
+      `/users/api/v1/user?sortby=${sortBy}&direction=${direction}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Error getting user accounts response (status: ${response.status})`,
+      );
+    }
+
+    const data: UserAccount[] = (await response.json()) as UserAccount[];
+
+    return data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -476,6 +541,7 @@ export {
   getWalletName,
   getWalletId,
   getWalletBalance,
+  getUserAccounts,
   getPayments,
   getWalletDetails,
   getWalletPayLinks,
