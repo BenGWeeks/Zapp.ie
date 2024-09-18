@@ -20,7 +20,6 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
   timestamp
 }) => {
 
-  const [payments, setPayments] = useState<number | null>(null);
   const [batteryPercentage, setBatteryPercentage] = useState<number>(0);
   const [balance, setBalance] = useState<number>();
 
@@ -33,44 +32,34 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
       ? sevenDaysAgo
       : timestamp;
 
-      const fetchAmountReceived = async () => {
-        console.log('Fetching your wallet ...');
-        const walletForUser = await getUserWallets(adminKey,'2984e3ac627e4fea9fd6dde9c4df83b5');
-    
-        console.log('Wallets: ', walletForUser);
-    
-        if (walletForUser && walletForUser.length > 0) {
-          setBalance((walletForUser.filter((wallet: { name: string; }) => wallet.name === 'Allowance')[0].balance_msat)/1000);
-        }
-      }
-  // const fetchZaps = async () => {
-  //   console.log('Fetching transactions ...');
-    
-  
-  //   setPayments(10000);
-  //   console.log('%: ', (spentSats / availableSats) * 100);
-  //   setBatteryPercentage((spentSats / availableSats) * 100);
+  const fetchAmountReceived = async () => {
+    console.log('Fetching your wallet ...');
+    const walletForUser = await getUserWallets(adminKey, '2984e3ac627e4fea9fd6dde9c4df83b5');
 
-  
-  // };
+    console.log('Wallets: ', walletForUser);
+
+    if (walletForUser && walletForUser.length > 0) {
+      const bal = walletForUser.filter((wallet: { name: string; }) => wallet.name === 'Allowance')[0].balance_msat / 1000;
+      setBalance(bal);
+      setBatteryPercentage((spentSats / bal) * 100);
+    }
+  }
 
   useEffect(() => {
     fetchAmountReceived();
   });
 
   return (
-
     <div className="wallet-container">
       <div className="wallet-header">
         <h2>Allowance</h2>
         <p>Amount available to send to your teammates:</p>
       </div>
       <div className='mainContent'>
-
         <div className="row" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
           <div className="col-md-4">
             <div className='amountDisplayContainer'>
-              <div className='amountDisplay'>{balance?.toLocaleString()?? '0'}</div>
+              <div className='amountDisplay'>{balance?.toLocaleString() ?? '0'}</div>
               <div >Sats</div>
               <div style={{ width: 12, height: 12, position: 'relative' }}>
                 <div style={{ width: 10, height: 10, left: 1, top: 1, position: 'absolute', background: '#5B5FC7' }}></div>
@@ -78,28 +67,20 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
             </div>
           </div>
           <div className="col-md-1" style={{ paddingTop: '20px' }}>
-
             <button className='refreshImageIcon'>
               <img src={ArrowClockwise} alt="icon" style={{ width: 30, height: 30 }} />
             </button>
-
-
           </div>
           <div className="col-md-2" >
-
           </div>
-
-
           <div className="col-md-3">
             <BatteryImageDisplay value={batteryPercentage} />
           </div>
         </div>
         <div className="row" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
-
           <div className="col-md-7">
             <div className='nextAllwanceContainer'>
               <img src={Calendar} alt="" />
-
               <div className="remaining smallTextFont">
                 Next allowance
               </div>
@@ -121,9 +102,8 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
           </div>
           <div className="col-md-2">
             <div className="spent smallTextFont">
-              <b>{balance?.toLocaleString()?? '0'}</b> Sats
+              <b>{balance?.toLocaleString() ?? '0'}</b> Sats
             </div>
-
             <div className="spent smallTextFont">
               <b>{spentSats.toLocaleString()}</b> Sats
             </div>

@@ -5,15 +5,14 @@ import WalletTransactionHistory from "./components/WalletTransactionHistory";
 import WalletTransactionLog from "./components/WalletTransactionLog";
 
 const YourWallet: React.FC = () => {
- 
-  
+
+
   return (
     <div className="app-container">
-    <WalletYourWalletInfoCard />
-    <WalletTransactionHistory />
-    <WalletTransactionLog />
-   
-  </div>
+      <WalletYourWalletInfoCard />
+      <WalletTransactionHistory />
+      <WalletTransactionLog />
+    </div>
   );
 };
 
