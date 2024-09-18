@@ -16,6 +16,25 @@ NB We install version `2.0.6` because that is the version used by `webpack-dev-s
 npm ls http-proxy-middleware
 ```
 
+## SSO Authentication
+
+For the SSO authentication function to work, obtain the MS Bot Framework ID saved in the Environment variables.
+Navigate to https:portal.azure.com and search for App Registrartion
+Search for the Bot App regristation using the client ID
+![alt text](image.png)
+
+Under Manage, select Authentication.
+Under Platform configurations , click **Add a platform**
+Select Single-page application
+in the URL Redirect add http://localhost:{portnumber} in this instance it was 3000
+![alt text](image-1.png)
+Under Advance setting on the same page, **Allow public client flows**
+![alt text](image-2.png)
+Now save the changes
+
+
+
+
 ## Available Scripts
 
 In the `/tabs` directory, you can run:

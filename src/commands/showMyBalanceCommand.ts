@@ -27,17 +27,17 @@ export class ShowMyBalanceCommand extends SSOCommand {
 
       // Retrieve the user object from the turn state
       const user = context.turnState.get('user') as User;
-      const userid = context.activity.from.aadObjectId;
+      
 
       if (!user) {
         await context.sendActivity('User not found.');
         return;
       }
 
-      console.log('User:', userid);
+      console.log('User:', user);
 
       // Get the user's wallets
-      const usersWallets = await getUserWallets(adminKey, userid);
+      const usersWallets = await getUserWallets(adminKey, user.id);
 
       if (!usersWallets || usersWallets.length === 0) {
         await context.sendActivity('No wallets found for the user.');

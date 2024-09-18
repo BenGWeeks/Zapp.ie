@@ -10,28 +10,35 @@ interface Zap {
   time: number;
 }
 
-interface User {
-  displayName: string;
-  aadObjectId: string;
-  email: string;
-  receivingWallet: Wallet;
-  sendingWallet: Wallet;
-  userType: UserType;
-}
-
 interface Wallet {
   id: string;
+  admin: string;
   name: string;
+  user: string;
   adminkey: string;
   inkey: string;
   balance_msat: number;
+  deleted: boolean;
 }
 
+interface User {
+  id: string;
+  displayName: string;
+  profileImg: string;
+  aadObjectId: string;
+  email: string;
+  privateWallet: Wallet;
+  allowanceWallet: Wallet;
+}
+
+type WalletType = 'Allowance' | 'Private';
 
 declare module '*.svg' {
   const content: any;
   export default content;
 }
 
-type WalletType = 'Sending' | 'Receiving';
-type UserType = 'teammate'| 'admin' | 'copilot'| 'customer';
+declare module '*.module.css' {
+  const classes: { [key: string]: string };
+  export default classes;
+}

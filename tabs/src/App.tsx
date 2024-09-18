@@ -42,7 +42,6 @@ function App({ pca }: AppProps) {
 function Pages() {
     return (
         <Routes>
-            <Route path="/feed" element={<FeedComponent />} />
             <Route path="/" element={<Home />} />
         </Routes>
     );

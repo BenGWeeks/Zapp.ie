@@ -1,21 +1,27 @@
 /// <reference path="../types/global.d.ts" />
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect } from 'react';
 import styles from './FeedList.module.css';
-import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
-import { getUserName } from '../utils/walletUtilities';
+import React, { useState } from 'react';
+import {
+  getUsers,
+  getWallets,
+  getUserWallets,
+  getWalletZapsSince,
+} from '../services/lnbitsServiceLocal';
 import ZapIcon from '../images/ZapIcon.svg';
-import { debounce } from 'lodash';
 
 interface FeedListProps {
   timestamp?: number | null;
 }
 
+const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
+
 const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const [zaps, setZaps] = useState<Zap[]>([]);
 
   // Calculate the timestamp for 7 days ago
-  const sevenDaysAgo = Date.now() / 1000 - 7 * 24 * 60 * 60;
+  const sevenDaysAgo = Math.floor(Date.now() / 1000 - 7 * 24 * 60 * 60);
 
   // Use the provided timestamp or default to 7 days ago
   const paymentsSinceTimestamp =
@@ -26,47 +32,42 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const fetchZaps = async () => {
     console.log('Fetching payments since: ', paymentsSinceTimestamp);
 
-    const wallets = await getWallets('Receiving'); // We'll just look at the receiving wallets.
     let allZaps: Zap[] = [];
 
-    // Loop through all the wallets
-    if (wallets) {
-      for (const wallet of wallets) {
-        const payments = await getPaymentsSince(
-          wallet.inkey,
-          paymentsSinceTimestamp,
-        );
+    const users = await getUsers(adminKey, {});
 
-        // Loop through all the payments for the current wallet
-        for (const payment of payments) {
-          const zap: Zap = {
-            id: payment.checking_id,
-            bolt11: payment.bolt11,
-            from: getUserName(payment.extra?.from),
-            to: getUserName(payment.extra?.to),
-            memo: payment.memo,
-            amount: payment.amount / 1000,
-            wallet_id: payment.wallet_id,
-            time: payment.time,
-          };
+    if (users) {
+      for (const user of users) {
+        const wallets = await getUserWallets(adminKey, user.id); // We'll just look at the private wallets.
 
-          allZaps.push(zap);
+        // Loop through all the wallets
+        if (wallets) {
+          const allowanceWallets = wallets.filter(
+            wallet => wallet.name === 'Allowance',
+          );
+
+          for (const wallet of allowanceWallets) {
+            const zaps = await getWalletZapsSince(
+              wallet.inkey,
+              paymentsSinceTimestamp,
+            );
+
+            allZaps = allZaps.concat(zaps);
+          }
         }
       }
     }
 
-    setZaps(allZaps);
+    //setZaps(zaps);
+    setZaps(prevState => [...prevState, ...allZaps]);
+    //setZaps(allZaps);
   };
 
-  // Debounce the fetchZaps function
-  const debouncedFetchZaps = useCallback(debounce(fetchZaps, 300), [fetchZaps]);
-
   useEffect(() => {
-    debouncedFetchZaps();
-    return () => {
-      debouncedFetchZaps.cancel();
-    };
-  }, [debouncedFetchZaps]);
+    // Clear the zaps
+    setZaps([]);
+    fetchZaps();
+  }, [timestamp]);
 
   return (
     <div className={styles.feedlist}>
