@@ -9,7 +9,7 @@ const YourWallet: React.FC = () => {
   
   return (
     <div className="app-container">
-    <WalletYourWalletInfoCard totalSats={125000} />
+    <WalletYourWalletInfoCard />
     <WalletTransactionHistory />
     <WalletTransactionLog />
    

@@ -3,6 +3,7 @@ import './WalletAllowanceCard.css'; // Assuming you'll use CSS for styling
 import BatteryImageDisplay from './BatteryImageDisplay';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import Calendar from '../images/Calendar.svg';
+import { getUserWallets } from '../services/lnbitsServiceLocal';
 
 interface AllowanceCardProps {
   availableSats: number;
@@ -12,16 +13,16 @@ interface AllowanceCardProps {
   timestamp?: number | null;
 }
 
+const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
+
 const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
-  availableSats,
-  availableAmountUSD,
-  remainingSats,
   spentSats,
   timestamp
 }) => {
 
   const [payments, setPayments] = useState<number | null>(null);
   const [batteryPercentage, setBatteryPercentage] = useState<number>(0);
+  const [balance, setBalance] = useState<number>();
 
   // Calculate the timestamp for 7 days ago
   const sevenDaysAgo = Date.now() / 1000 - 7 * 24 * 60 * 60;
@@ -32,42 +33,30 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
       ? sevenDaysAgo
       : timestamp;
 
-
-  const fetchZaps = async () => {
-    console.log('Fetching transactions ...');
+      const fetchAmountReceived = async () => {
+        console.log('Fetching your wallet ...');
+        const walletForUser = await getUserWallets(adminKey,'2984e3ac627e4fea9fd6dde9c4df83b5');
     
-    //const c = new ShowMyBalanceCommand();
+        console.log('Wallets: ', walletForUser);
+    
+        if (walletForUser && walletForUser.length > 0) {
+          setBalance((walletForUser.filter((wallet: { name: string; }) => wallet.name === 'Allowance')[0].balance_msat)/1000);
+        }
+      }
+  // const fetchZaps = async () => {
+  //   console.log('Fetching transactions ...');
+    
+  
+  //   setPayments(10000);
+  //   console.log('%: ', (spentSats / availableSats) * 100);
+  //   setBatteryPercentage((spentSats / availableSats) * 100);
 
-    //console.log(wallets.Length);
-
-    //const inKeyObj = wallets.filter((wallet: { inkey: string | string[]; }) => wallet.inkey.includes('ff7d54cb-e3ca-4a62-9011-887bbf15f7df'));
-
-    // for (const wallet of wallets) {
-    //   const walletInKey = wallet.inkey;
-    //   //const zaps = await lnbitsService.getPayments(walletInKey);
-
-    //   const payments = await lnbitsService.getWalletBalance(
-    //     walletInKey            
-    //   );
-
-    //console.log('InKeyObj: ', inKeyObj);
-    //const payments = await lnbitsService.getWalletBalance(inKeyObj.inkey);
-
-    //console.log('Payments: ', payments);
-    setPayments(10000);
-    console.log('%: ', (spentSats / availableSats) * 100);
-    setBatteryPercentage((spentSats / availableSats) * 100);
-
-    //}
-    //if (walletInKey) {
-    // else {
-    //  console.error('WalletInKey is null');
-    //}
-  };
+  
+  // };
 
   useEffect(() => {
-    fetchZaps();
-  }, [timestamp]);
+    fetchAmountReceived();
+  });
 
   return (
 
@@ -81,7 +70,7 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
         <div className="row" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
           <div className="col-md-4">
             <div className='amountDisplayContainer'>
-              <div className='amountDisplay'>{availableSats.toLocaleString()}</div>
+              <div className='amountDisplay'>{balance?.toLocaleString()?? '0'}</div>
               <div >Sats</div>
               <div style={{ width: 12, height: 12, position: 'relative' }}>
                 <div style={{ width: 10, height: 10, left: 1, top: 1, position: 'absolute', background: '#5B5FC7' }}></div>
@@ -132,7 +121,7 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
           </div>
           <div className="col-md-2">
             <div className="spent smallTextFont">
-              <b>{availableSats.toLocaleString()}</b> Sats
+              <b>{balance?.toLocaleString()?? '0'}</b> Sats
             </div>
 
             <div className="spent smallTextFont">

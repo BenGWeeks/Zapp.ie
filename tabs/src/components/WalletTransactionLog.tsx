@@ -7,6 +7,7 @@ import {
   getWalletZapsSince,
 } from '../services/lnbitsServiceLocal';
 import ArrowIncoming from '../images/ArrowIncoming.svg';
+import moment from 'moment';
 
 interface WalletTransaction {
   description: string;
@@ -35,79 +36,51 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({ timestamp }
       : timestamp;
 
   const fetchZaps = async () => {
-    console.log('Fetching payments since: ', paymentsSinceTimestamp);
+    console.log('Fetching payments since Akash: ', paymentsSinceTimestamp);
 
     let allZaps: Zap[] = [];
-
-    const users = await getUsers(adminKey, {});
-
-    if (users) {
-      for (const user of users) {
-        const wallets = await getUserWallets(adminKey, user.id); // We'll just look at the private wallets.
+        
+        const wallets = await getUserWallets(adminKey, '2984e3ac627e4fea9fd6dde9c4df83b5'); // We'll just look at the private wallets.
 
         // Loop through all the wallets
         if (wallets) {
           const allowanceWallets = wallets.filter(
-            wallet => wallet.name === 'Allowance',
+            wallet => wallet.name === 'Private',
           );
 
-          for (const wallet of allowanceWallets) {
+          // for (const wallet of allowanceWallets) {
+          //   const zaps = await getWalletZapsSince(
+          //     wallet.inkey,
+          //     paymentsSinceTimestamp,
+          //   );
+          for (const wallet of wallets) {
             const zaps = await getWalletZapsSince(
               wallet.inkey,
               paymentsSinceTimestamp,
             );
 
             allZaps = allZaps.concat(zaps);
+
+            console.log('Zaps Akash: ', allZaps);
           }
         }
-      }
-    }
 
-    //setZaps(zaps);
     setZaps(prevState => [...prevState, ...allZaps]);
-    //setZaps(allZaps);
+
+    console.log('Zaps Akash123: ', zaps);
+
   };
 
+  
+function getDate() {
+  return new Date();
+
+}
+
   useEffect(() => {
-    // Clear the zaps
     setZaps([]);
     fetchZaps();
-  }, [timestamp]);
-  
-  //const [payments, setPayments] = useState([]);
-  
-  // Calculate the timestamp for 7 days ago
-    // //const sevenDaysAgo = Date.now() / 1000 - 7 * 24 * 60 * 60;
-    
-    // // Use the provided timestamp or default to 7 days ago
-    // const paymentsSinceTimestamp =
-    //   timestamp === null || timestamp === undefined || timestamp === 0
-    //     ? sevenDaysAgo
-    //     : timestamp;
-    
-    // const fetchZaps = async () => {
-      
-    //   console.log('Fetching transactions ...');
-    //   const wallets = await lnbitsService.getWallets();
-    //   for (const wallet of wallets) {
-    //     const walletInKey = wallet.inkey;
-    //     //const zaps = await lnbitsService.getPayments(walletInKey);
-    //     const payments = await lnbitsService.getPaymentsSince(
-    //       walletInKey,
-    //       paymentsSinceTimestamp,
-    //     );
-    //     console.log('Payments: ', payments.length);
-    //     setPayments(payments);
-    //   }
-    //   //if (walletInKey) {
-    //   // else {
-    //   //  console.error('WalletInKey is null');
-    //   //}
-    // };
-    
-    // useEffect(() => {
-    //   fetchZaps();
-    // }, [timestamp]);
+  },[timestamp]);
   
     return (
     <div className={styles.feedlist}>
@@ -134,14 +107,78 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({ timestamp }
           </div>
         </div>
       </div> */}
-      {zaps?.map((payment, index) => (
+
+      {zaps
+        ?.sort((a, b) => b.time - a.time)
+        .map((zap, index) => (
+
+          <div key={zap.id || index} className={styles.bodycell}>
+          <div className={styles.bodyContents}>
+            <div className={styles.mainContentStack}>
+                <img className={styles.avatarIcon} alt="" src={ArrowIncoming} />
+              
+              <div className={styles.userName}>
+                <p className={styles.lightHelightInItems}> <b>Zap! </b></p>
+                <div className={styles.lightHelightInItems}> { moment(moment.now()).diff(zap.time * 1000,'days')  } days ago from {zap.from} </div>
+                <p className={styles.lightHelightInItems}>{zap.memo}</p>
+                
+              </div>
+            </div>
+            <div className={styles.transactionDetailsAllowance}>
+              
+              <div className={styles.lightHelightInItems}> <b className={styles.b}>+ {zap.amount/1000}</b> Sats </div>
+              <div className={styles.lightHelightInItems}> about $0.11 </div>
+        
+
+            </div>
+          </div>
+        </div>
+
+          
+          //   <div className={styles.bodyContents}>
+          //     <div className={styles.mainContentStack}>
+          //       <div className={styles.personDetails}>
+          //         <div className={styles.userName}>
+          //           {new Date(zap.time * 1000).toLocaleDateString()}{' '}
+          //           {new Date(zap.time * 1000).toLocaleTimeString([], {
+          //             hour: '2-digit',
+          //             minute: '2-digit',
+          //           })}
+          //         </div>
+          //       </div>
+          //       <div className={styles.personDetails}>
+          //         <img
+          //           className={styles.avatarIcon}
+          //           alt=""
+          //           src="avatar.png"
+          //           style={{ display: 'none' }}
+          //         />
+                  
+          //       </div>
+          //       <div className={styles.personDetails}>
+          //         <img
+          //           className={styles.avatarIcon}
+          //           alt=""
+          //           src="avatar.png"
+          //           style={{ display: 'none' }}
+          //         />
+                
+          //       </div>
+          //       <div className={styles.userName}>{zap.memo}</div>
+          //     </div>
+          //     <div className={styles.transactionDetails}>
+          //       <b className={styles.b}>{zap.amount}</b>
+          //     </div>
+          //   </div>
+          // </div>
+        ))}
+
+      {/* {zaps?.map((payment, index) => (
         <div className={styles.bodycell}>
           <div className={styles.bodyContents}>
             <div className={styles.mainContentStack}>
                 <img className={styles.avatarIcon} alt="" src={ArrowIncoming} />
-              {/* <div className={styles.personDetails}>
-                <div className={styles.userName}>Ben Weeks</div>
-              </div> */}
+              
               <div className={styles.userName}>
                 <p className={styles.lightHelightInItems}> <b>Zap!</b></p>
                 <div className={styles.lightHelightInItems}>2 days ago from Ben Weeks </div>
@@ -159,7 +196,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({ timestamp }
             </div>
           </div>
         </div>
-      ))}
+      ))} */}
     </div>
     );
 };
