@@ -52,7 +52,6 @@ export class TeamsBot extends TeamsActivityHandler {
 
     this.onMessage(async (context, next) => {
       console.log('Running onMessage ...');
-
       const botId = context.activity.recipient.id; // Bot's ID
       const senderId = context.activity.from.id; // Sender's ID
 
