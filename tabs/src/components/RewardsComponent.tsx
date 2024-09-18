@@ -1,4 +1,4 @@
-import { FunctionComponent, useState, useEffect, useRef } from 'react';
+import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
 import styles from './RewardsComponent.module.css';
 import { getNostrRewards } from '../services/lnbitsServiceLocal';
 
