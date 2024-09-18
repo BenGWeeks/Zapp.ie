@@ -1,41 +1,49 @@
-import { FunctionComponent, useCallback, useState, useEffect, useRef } from 'react';
+import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
 import styles from './RewardsComponent.module.css';
-import { ZapRewards } from '../interfaces/DataModel';
-import { getRewards } from '../services/lnbitsServiceLocal';
+import { getNostrRewards } from '../services/lnbitsServiceLocal';
+
+const stallID = process.env.REACT_APP_LNBITS_STORE_ID as string;
 
 /// <reference path = "../global.d.ts" />
-
 /// <reference types="react-scripts" />
 
-const RewardsComponent: FunctionComponent = () => {
-    const [rewards, setRewards] = useState<ZapRewards[]>([]); // Initialize as an empty array
+const RewardsComponent: FunctionComponent<{ adminKey: string }> = ({ adminKey }) => {
+    const [rewards, setRewards] = useState<NostrZapRewards[]>([]); // Initialize as an empty array
     const [isDragging, setIsDragging] = useState(false);
     const [startPosition, setStartPosition] = useState(0);
     const [scrollPosition, setScrollPosition] = useState(0);
-    const [visibleDescriptions, setVisibleDescriptions] = useState<{ [key: string]: boolean }>({});
-    const [expandedImages, setExpandedImages] = useState<{ [key: string]: boolean }>({});
     const carouselRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchRewards = async () => {
-            const apiKey = '3ce76a5ab0a34ca5a670f1d8a02c3677'; // API key
 
-            const rewardsData = await getRewards(apiKey);
+            const stallId = stallID;
 
-            // Map API data to ZapRewards format
-            const transformedRewards = rewardsData.map((product: any) => ({
-                Image: product.image,
-                Title: product.product,
-                ShortDescription: product.description,
-                LongDescription: product.categories, // Can be a different field if available
-                Price: product.price,
-            }));
+            try {
+                const rewardsData = await getNostrRewards(adminKey, stallId);
 
-            setRewards(transformedRewards);  // Update state with transformed rewards
+                if (!rewardsData) {
+                    throw new Error('No data returned from API');
+                }
+
+                // Map API data to NostrZapRewards format
+                const transformedRewards = rewardsData.map((product: any) => ({
+                    Image: product.images[0],
+                    Name: product.name,
+                    ShortDescription: product.config.description,
+                    Link: product.categories,
+                    Price: product.price,
+                }));
+
+                setRewards(transformedRewards); // Update state with transformed rewards
+            } catch (error) {
+                console.error('Error fetching rewards:', error);
+            }
         };
 
         fetchRewards();
-    }, []);
+    }, [adminKey]);
+
     const handleMouseDown = (e: React.MouseEvent) => {
         if (carouselRef.current) {
             setIsDragging(true);
@@ -56,15 +64,8 @@ const RewardsComponent: FunctionComponent = () => {
         setIsDragging(false);
     };
 
-    const toggleDescription = (key: string) => {
-        setVisibleDescriptions(prevState => ({
-            ...prevState,
-            [key]: !prevState[key],
-        }));
-        setExpandedImages(prevState => ({
-            ...prevState,
-            [key]: !prevState[key],
-        }));
+    const handleProductDetailsClick = (url: string) => {
+        window.open(url, '_blank');
     };
 
     const formatPrice = (price: number) => {
@@ -89,21 +90,18 @@ const RewardsComponent: FunctionComponent = () => {
                         <div key={reward.Image} className={styles.card}>
                             <img
                                 src={reward.Image}
-                                alt={reward.Title}
+                                alt={reward.Name}
                                 className={styles.rewardImage}
-                                style={{ height: expandedImages[reward.Image] ? '300px' : '160px' }} // Toggle height
+                                style={{ height: '160px' }} // Fixed height
                             />
-                            <h3 className={styles.cardTitle}>{reward.Title}</h3>
+                            <h3 className={styles.cardTitle}>{reward.Name}</h3>
                             <p className={styles.cardDescription}>{reward.ShortDescription}</p>
-                            <p className={styles.productDetails} onClick={() => toggleDescription(reward.Image)}>Product details</p>
-                            {visibleDescriptions[reward.Image] && (
-                                <p className={styles.longDescription}>{reward.LongDescription}</p>
-                            )}
+                            <p className={styles.productDetails} onClick={() => handleProductDetailsClick(reward.Link)}>Product details</p>
                             <div className={styles.priceContainer}>
                                 <p className={styles.price}>{formatPrice(reward.Price)}</p>
                                 <p className={styles.sats}>Sats</p>
                             </div>
-                            <button className={styles.redeemButton}>Redeem</button>
+                            <button className={styles.buyButton}>Buy</button>
                         </div>
                     ))
                 ) : (

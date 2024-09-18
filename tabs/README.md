@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Proxy
 
-To resolve the CORS blocking issue, we setup a proxy. This is done by `setupProxy.js` isn't running. This is dependent on running:
+To resolve the CORS blocking issue, we setup a proxy. This is done by `setupProxy.js` which is dependent on running:
 
 ```
 npm install http-proxy-middleware@2.0.6

@@ -97,6 +97,7 @@
     user-select: none;
 }
 
+
 .cardImage {
     width: 100%;
     height: 130px;
@@ -167,7 +168,7 @@
     align-items: center;
 }
 
-.redeemButton {
+.buyButton {
     display: flex;
     flex-direction: column;
     justify-content: center;
