@@ -1,4 +1,5 @@
 /// <reference path="./types/global.d.ts" />
+import { setAadObjectId } from './globalstate';
 
 import {
   TeamsActivityHandler,
@@ -14,7 +15,7 @@ import {
 import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { OnBehalfOfUserCredential } from '@microsoft/teamsfx';
-import { SendZapCommand, SendZap } from './commands/sendZapCommand';
+import { SendZapCommand, SendZap} from './commands/sendZapCommand';
 import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
@@ -63,6 +64,11 @@ export class TeamsBot extends TeamsActivityHandler {
       }
 
       try {
+
+                // Retrieve the aadObjectId of the user who initiated the function
+                const aadObjectId = context.activity.from.aadObjectId;
+                setAadObjectId(aadObjectId);
+
         let mentions = TurnContext.getMentions(context.activity);
         //console.log('context.activity:', context.activity);
 

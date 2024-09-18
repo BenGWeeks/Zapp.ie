@@ -27,7 +27,6 @@ export class ShowMyBalanceCommand extends SSOCommand {
 
       // Retrieve the user object from the turn state
       const user = context.turnState.get('user') as User;
-      
 
       if (!user) {
         await context.sendActivity('User not found.');

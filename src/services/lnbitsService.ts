@@ -161,22 +161,19 @@ const getUserWallets = async (
 
 const getUsers = async (
   adminKey: string,
-  filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
+ currentuserid
 ): Promise<User[] | null> => {
   console.log(
-    `getUsers starting ... (adminKey: ${adminKey}, filterByExtra: ${JSON.stringify(
-      filterByExtra,
-    )})`,
+    `getUsers starting ... (adminKey: ${adminKey}, filterByExtra: ${currentuserid})`,
   );
 
   try {
     // URL encode the extra filter
     //const encodedExtra = encodeURIComponent(JSON.stringify(filterByExtra));
-    const encodedExtra = JSON.stringify(filterByExtra);
     //console.log('encodedExtra:', encodedExtra);
 
     const response = await fetch(
-      `${lnbiturl}/usermanager/api/v1/users?extra=${encodedExtra}`,
+      `${lnbiturl}/usermanager/api/v1/users`,
       {
         method: 'GET',
         headers: {
@@ -193,12 +190,21 @@ const getUsers = async (
     }
 
     const data = await response.json();
+    const trimmedCurrentUserId = currentuserid.trim();
+    console.log('Trimmed currentuserId:', trimmedCurrentUserId);
 
-    console.log('getUsers data:', data);
+// Filter the data where trimmedCurrentUserId is not in the aadObjectId field within the extra object
+    const filteredData = data.filter((user: any) => {
+      const aadObjectId = user.extra?.aadObjectId || '';
+      return aadObjectId !== trimmedCurrentUserId;
+    });
+
+    console.log('getUsers data:', filteredData);
+  
 
     // Map the users to match the User interface
     const usersData: User[] = await Promise.all(
-      data.map(async (user: any) => {
+      filteredData.map(async (user: any) => {
         const extra = user.extra || {}; // Provide a default empty object if user.extra is null
 
         let privateWallet = null;
