@@ -647,6 +647,40 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   }
 };
 
+const getNostrRewards = async (adminKey: string, stallId: string): Promise<NostrZapRewards[]> => {
+  console.log('Getting products ...');
+  try {
+    const response = await fetch(`/nostrmarket/api/v1/stall/product/${stallId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Key': adminKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error getting products (status: ${response.status})`);
+    }
+
+    // Check if the response is JSON
+    const contentType = response.headers.get('content-type');
+    console.log('Content-Type:', contentType);
+
+    if (contentType && contentType.includes('application/json')) {
+      const data: NostrZapRewards[] = await response.json();
+      console.log('Products:', data);
+      return data;
+    } else {
+      const text = await response.text(); // Capture non-JSON responses
+      console.log('Non-JSON response:', text);
+      throw new Error(`Expected JSON, but got: ${text}`);
+    }
+  } catch (error) {
+    console.error('Error fetching rewards:', error);
+    throw error;
+  }
+};
+
 export {
   getUsers,
   getWallets,
@@ -663,4 +697,5 @@ export {
   payInvoice,
   getWalletIdByUserId,
   getUserWallets,
+  getNostrRewards,
 };
