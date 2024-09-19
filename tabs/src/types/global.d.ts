@@ -10,6 +10,14 @@ interface Zap {
   time: number;
 }
 
+interface ZapRewards {
+  image: string;
+  title: string;
+  shortDescription: string;
+  longDescription: string;
+  price: number;
+}
+
 interface Wallet {
   id: string;
   admin: string;
@@ -38,15 +46,15 @@ declare module '*.module.css' {
   export default classes;
 }
 
-declare module '*.module.css' {
-  const classes: { [key: string]: string };
-  export default classes;
+declare module '*.svg' {
+  const content: any;
+  export default content;
 }
 
 type NostrZapRewards = {
-  Image: string,
-  Name: string,
-  ShortDescription: string,
-  Link: string,
-  Price: number,
+  image: string,
+  name: string,
+  shortDescription: string,
+  link: string,
+  price: number,
 };
