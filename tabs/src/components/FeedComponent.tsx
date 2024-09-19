@@ -1,6 +1,7 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import styles from './FeedComponent.module.css';
 import FeedList from './FeedList';
+import Leaderboard from './Leaderboard';
 import React from 'react';
 
 const FeedComponent: FunctionComponent = () => {
@@ -8,6 +9,17 @@ const FeedComponent: FunctionComponent = () => {
     Math.floor(Date.now() / 1000 - 7 * 24 * 60 * 60),
   );
   const [activePeriod, setActivePeriod] = useState(7); // Set default to 7-days
+  const [showFeed, setShowFeed] = useState(true);
+  
+  const handleShowFeed = () => {
+    setShowFeed(true);
+    setTimestamp(Math.floor(Date.now() / 1000)); // Update timestamp when showing leaderboard
+  };
+
+  const handleShowLeaderboard = () => {
+    setShowFeed(false);
+    setTimestamp(Math.floor(Date.now() / 1000)); // Update timestamp when showing leaderboard
+  };
 
   const handlePeriodClick = (days: number) => {
     setTimestamp(Math.floor(Date.now() / 1000 - days * 24 * 60 * 60));
@@ -20,17 +32,28 @@ const FeedComponent: FunctionComponent = () => {
         <div className={styles.tab}>
           <div className={styles.base}>
             <div className={styles.stringBadgeIconStack}>
-              <b className={styles.stringTabTitle}>Feed</b>
-            </div>
-            <div className={styles.borderPaddingStack}>
-              <div className={styles.borderBottom} />
+              <div
+                className={`${styles.stringTabTitle} ${
+                  showFeed ? styles.active : ''
+                }`}
+                onClick={handleShowFeed}
+              >
+                Feed
+              </div>
             </div>
           </div>
         </div>
         <div className={styles.tab1}>
           <div className={styles.base1}>
             <div className={styles.stringBadgeIconStack}>
-              <div className={styles.stringTabTitle}>Leaderboard</div>
+              <div
+                className={`${styles.stringTabTitle} ${
+                  !showFeed ? styles.active : ''
+                }`}
+                onClick={handleShowLeaderboard}
+              >
+                Leaderboard
+              </div>
             </div>
           </div>
         </div>
@@ -64,7 +87,11 @@ const FeedComponent: FunctionComponent = () => {
           60 days
         </div>
       </div>
-      <FeedList timestamp={timestamp} />
+      {showFeed ? (
+        <FeedList timestamp={timestamp} />
+      ) : (
+        <Leaderboard timestamp={timestamp} />
+      )}
     </div>
   );
 };

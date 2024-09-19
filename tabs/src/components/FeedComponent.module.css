@@ -483,3 +483,6 @@
     font-family: Inter;
 }
 
+.stringTabTitle.active {
+    border-bottom: 2px solid #000; /* or any color to indicate active tab */
+  }

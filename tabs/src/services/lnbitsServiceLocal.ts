@@ -570,6 +570,29 @@ const getWalletZapsSince = async (
   }
 };
 
+const checkWalletExists = async (
+  //apiKey: string,
+  walletName: string,
+): Promise<Wallet | null> => {
+  console.log(`checkWalletExists starting ... (walletName: ${walletName},)`);
+
+  try {
+    const wallets = await getWallets(walletName);
+    let wallet = null;
+
+    if (wallets && wallets.length > 0) {
+      // Find the first wallet that matches the name
+      const wallet =
+        wallets?.find((wallet: any) => wallet.name === walletName) || null;
+    }
+
+    return wallet;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 // TODO: This method needs checking!
 const createInvoice = async (
   lnKey: string,
@@ -753,6 +776,7 @@ export {
   getWalletZapsSince,
   createInvoice,
   createWallet,
+  checkWalletExists,
   payInvoice,
   getWalletIdByUserId,
   getUserWallets,

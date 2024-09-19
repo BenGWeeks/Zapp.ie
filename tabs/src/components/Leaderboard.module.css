@@ -1,0 +1,294 @@
+.string {
+    width: 58px;
+    position: relative;
+    line-height: 16px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding-left: 6px;
+}
+
+.string2 {
+    flex: 1;
+    position: relative;
+    line-height: 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0px;
+}
+
+.string3 {
+    position: relative;
+    line-height: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.sortIcon {
+    margin-left: 0px;
+    width: 17px;
+    height: 17px;
+    margin-right: 0px;
+}
+
+.stringWrapper {
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    font-family: 'Segoe UI';
+}
+
+.iconContent {
+    width: 20px;
+    position: relative;
+    height: 20px;
+}
+
+.base {
+    border-radius: 100px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2px;
+}
+
+.iconbutton {
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.buttonsStack {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.headerContents {
+    flex: 1;
+    height: 32px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+
+    box-sizing: border-box;
+    gap: 20px;
+    padding-right: 10px;
+    padding-left: 5px;
+}
+
+.headercell {
+    align-self: stretch;
+    background-color: #1f1f1f;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    color: #d8d8d8;
+}
+
+.avatarIcon {
+    width: 24px;
+    position: relative;
+    height: 24px;
+    object-fit: cover;
+}
+
+.userName {
+    flex: content;
+    position: relative;
+}
+
+.personDetails {
+    width: content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 50px;
+}
+
+.mainContentStack {
+    flex: 1;
+    height: 32px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+.b {
+    position: relative;
+}
+
+.icon {
+    width: 10px;
+    position: relative;
+    height: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.transactionDetails {
+    align-self: stretch;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0px 28px 0px 20px;
+    gap: 10px;
+    text-align: right;
+}
+
+.bodyContents {
+    flex: 1;
+    background-color: #1f1f1f;
+    height: 44px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 10px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #2D2B2C;
+}
+
+.bodycell {
+    align-self: stretch;
+    height: 44px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 20px;
+
+}
+
+.feedlist {
+    width: auto;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1px;
+    text-align: left;
+    font-size: 12px;
+    color: #fff;
+    font-family: Inter;
+    padding: 20px;
+    background-color: #2d2b2c;
+}
+
+
+.leaderboardContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+}
+
+.bodyContents {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid #2D2B2C;
+    /* Optional: Add a bottom border for separation */
+}
+
+.mainContentStack {
+    display: flex;
+    align-items: center;
+}
+
+.personDetails {
+    display: flex;
+    align-items: center;
+}
+
+.userName {
+    margin-left: 10px;
+}
+
+.avatarIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.b {
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
+    padding-right: 25px;
+}
+
+.horizontalContainer {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.yellowAmount {
+    color: #F2A900;
+    ;
+}
+
+
+
+.circleFirstPlace,
+.circleSecondPlace,
+.circleThirdPlace,
+.circleDefaultPlace {
+    width: 24px;
+    height: 24px;
+
+}
+
+.table {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rankNumber {
+    position: absolute;
+    left: 49%;
+    top: 18%;
+    transform: translateX(-50%);
+    color: white;
+    font-weight: 700;
+
+}
+
+.blackRank {
+    color: black;
+    font-weight: 700;
+    font-size: 12px;
+}
