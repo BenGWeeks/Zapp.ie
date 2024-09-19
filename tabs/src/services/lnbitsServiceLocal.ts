@@ -1,27 +1,62 @@
 // lnbitsService.ts
 
-const userName = process.env.REACT_APP_LNBITS_USERNAME;
-const password = process.env.REACT_APP_LNBITS_PASSWORD;
-
 // LNBits API is documented here:
 // https://demo.lnbits.com/docs/
 
+const userName = process.env.REACT_APP_LNBITS_USERNAME;
+const password = process.env.REACT_APP_LNBITS_PASSWORD;
+
+// Store token in localStorage (persists between page reloads)
+let accessToken = localStorage.getItem('accessToken');
+
 export async function getAccessToken(username: string, password: string) {
-  //try {
-  const response = await fetch(`/api/v1/auth`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ username, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error creating access token (status: ${response.status})`);
+  if (accessToken) {
+    console.log('Using cached access token');
+    return accessToken;
   }
+  try {
+    const response = await fetch(`/api/v1/auth`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+      credentials: 'omit', // No cookies sent or accepted
+    });
 
-  const data = await response.json();
-  return data.access_token;
+    if (!response.ok) {
+      throw new Error(
+        `Error creating access token (status: ${response.status}): ${response.statusText}`,
+      );
+    }
+
+    // Check if response has content
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Response is not in JSON format');
+    }
+
+    // Parse the response as JSON
+    const data = await response.json();
+
+    // Check if the expected data is available
+    if (!data || !data.access_token) {
+      throw new Error('Access token is missing in the response');
+    }
+
+    // Store the access token in memory (string type)
+    accessToken = data.access_token;
+    console.log('Access token fetched and stored');
+
+    return accessToken;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error in getAccessToken:', error.message);
+    } else {
+      console.error('Unexpected error in getAccessToken:', error);
+    }
+    throw error; // Re-throw the error to handle it elsewhere
+  }
 }
 
 const getWallets = async (
@@ -339,6 +374,7 @@ const getWalletById = async (
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
+
     const response = await fetch(`/users/api/v1/user/${userId}/wallet`, {
       method: 'GET',
       headers: {
@@ -350,10 +386,16 @@ const getWalletById = async (
 
     if (!response.ok) {
       console.error(
-        `Error getting wallet by ID response (status: ${response.status})`,
+        `Error getting wallet by ID (status: ${response.status}): ${response.statusText}`,
       );
 
       return null;
+    }
+
+    // Check if response has content and is in JSON format
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Response is not in JSON format');
     }
 
     const data = await response.json();
@@ -375,7 +417,7 @@ const getWalletById = async (
     // Map the filterWallets to match the Wallets interface
     const walletData: Wallet = {
       id: matchingWallet.id,
-      admin: matchingWallet.admin, // TODO: Coming back as undefined.
+      admin: matchingWallet.admin ?? null, // TODO: Coming back as undefined.
       name: matchingWallet.name,
       user: matchingWallet.user,
       adminkey: matchingWallet.adminkey,
@@ -386,7 +428,11 @@ const getWalletById = async (
 
     return walletData;
   } catch (error) {
-    console.error(error);
+    if (error instanceof Error) {
+      console.error('Error in getWalletById:', error.message);
+    } else {
+      console.error('Unexpected error in getWalletById:', error);
+    }
     throw error;
   }
 };
@@ -647,6 +693,40 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   }
 };
 
+const getNostrRewards = async (adminKey: string, stallId: string): Promise<NostrZapRewards[]> => {
+  console.log('Getting products ...');
+  try {
+    const response = await fetch(`/nostrmarket/api/v1/stall/product/${stallId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Key': adminKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error getting products (status: ${response.status})`);
+    }
+
+    // Check if the response is JSON
+    const contentType = response.headers.get('content-type');
+    console.log('Content-Type:', contentType);
+
+    if (contentType && contentType.includes('application/json')) {
+      const data: NostrZapRewards[] = await response.json();
+      console.log('Products:', data);
+      return data;
+    } else {
+      const text = await response.text(); // Capture non-JSON responses
+      console.log('Non-JSON response:', text);
+      throw new Error(`Expected JSON, but got: ${text}`);
+    }
+  } catch (error) {
+    console.error('Error fetching rewards:', error);
+    throw error;
+  }
+};
+
 export {
   getUsers,
   getWallets,
@@ -663,4 +743,5 @@ export {
   payInvoice,
   getWalletIdByUserId,
   getUserWallets,
+  getNostrRewards,
 };

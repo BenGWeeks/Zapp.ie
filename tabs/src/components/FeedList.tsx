@@ -21,7 +21,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const [zaps, setZaps] = useState<Zap[]>([]);
 
   // Calculate the timestamp for 7 days ago
-  const sevenDaysAgo = Date.now() / 1000 - 7 * 24 * 60 * 60;
+  const sevenDaysAgo = Math.floor(Date.now() / 1000 - 7 * 24 * 60 * 60);
 
   // Use the provided timestamp or default to 7 days ago
   const paymentsSinceTimestamp =
