@@ -546,6 +546,7 @@ const getWalletZapsSince = async (
       amount: payment.amount,
       wallet_id: payment.wallet_id,
       time: payment.time,
+      extra: payment.extra,
     }));
 
     console.log('Zaps:', zapsData);

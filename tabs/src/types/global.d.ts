@@ -8,6 +8,7 @@ interface Zap {
   amount: number;
   wallet_id: string;
   time: number;
+  extra: [];
 }
 
 interface Wallet {
@@ -34,6 +35,11 @@ interface User {
 type WalletType = 'Allowance' | 'Private';
 
 declare module '*.svg' {
+  const content: any;
+  export default content;
+}
+
+declare module '*.png' {
   const content: any;
   export default content;
 }
