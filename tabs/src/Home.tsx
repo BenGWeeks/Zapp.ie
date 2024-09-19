@@ -1,18 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import FeedComponent from './components/FeedComponent';
+import ZapActivityChartComponent from './components/ZapActivityChartComponent';
 import Leaderboard from './components/Leaderboard';
 import styles from './components/Leaderboard.module.css';
 
 const Home: React.FC = () => {
+  const inKey = 'ca04dc4dbc114b298f6d121b1d4ffc8e'; // Hardcoded to my wallet for now.
+  const [timestamp] = useState(() => {
+    return Math.floor(Date.now() / 1000) - 60 * 60 * 24 * 365 * (9 / 12); // Last 9 months
+  });
+
   return (
-    <div className={styles.feedcomponent}>
-      <div className={styles.horizontalContainer}>
-        {/* <ZapsSentComponent /> */}
-        {/* <ZapChartComponent /> */}
-      </div>
-      <div style={{ margin: '7px 0', height: '20%' }} />
+    <div>
+      <ZapActivityChartComponent lnKey={inKey} timestamp={timestamp} />
+      <br />
       <FeedComponent />
     </div>
+    
   );
 };
 
