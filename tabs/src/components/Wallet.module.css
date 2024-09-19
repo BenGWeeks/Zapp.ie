@@ -1,0 +1,41 @@
+.yourWallet{
+color: '#D8D8D8';
+ fontSize: 14;
+ fontFamily: 'Inter';
+ fontWeight: '700';
+ lineHeight: 20;
+ wordWrap: 'break-word'
+}
+
+.yourAllowance{
+color: '#D8D8D8';
+ fontSize: 14;
+ fontFamily: 'Inter';
+ fontWeight: '400';
+ lineHeight: 20;
+ wordWrap: 'break-word'
+}
+
+.yourWalleSmalltHeader{
+color: 'white';
+ fontSize: 14;
+ fontFamily: 'Inter';
+ fontWeight: '700';
+ wordWrap: 'break-word'
+}
+
+.descriptionInCard{
+color: '#D8D8D8';
+ fontSize: 14;
+ fontFamily: 'Inter';
+ fontWeight: '400';
+ wordWrap: 'break-word'
+}
+
+.displayAmountInCard{
+color: '#F2A900';
+ fontSize: 48;
+ fontFamily: 'Inter';
+ fontWeight: '500';
+ wordWrap: 'break-word'
+}

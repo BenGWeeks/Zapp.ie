@@ -5,6 +5,9 @@ import Users from './Users';
 import FooterComponent from './components/FooterComponent';
 import './App.css';
 import Rewards from './Rewards';
+import Wallet from './Wallet';
+import YourWallet from './YourWallet';
+
 
 const App: React.FC = () => {
   return (
@@ -15,6 +18,8 @@ const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/users" element={<Users />} />
             <Route path="/Rewards" element={<Rewards />} />
+            <Route path="/Wallet" element={<Wallet />} />
+            <Route path="/YourWallet" element={<YourWallet />} />
           </Routes>
         </header>
         <FooterComponent />

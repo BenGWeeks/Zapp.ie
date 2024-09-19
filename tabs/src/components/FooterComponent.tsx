@@ -5,7 +5,11 @@ import styles from './FooterComponent.module.css';
 const FooterComponent: React.FC = () => {
   return (
     <footer className={styles.footer}>
-      <Link to="/">Home</Link> | <Link to="/users">Users</Link> | <Link to="/rewards">Rewards</Link>
+      <Link to="/">Home</Link>&nbsp;|&nbsp;
+      <Link to="/users">Users</Link>&nbsp;|&nbsp; 
+      <Link to="/rewards">Rewards</Link>&nbsp;|&nbsp;
+      <Link to="/wallet">Wallet</Link>&nbsp;|&nbsp;
+      <Link to="/yourwallet">Your Wallet</Link>
     </footer>
   );
 };

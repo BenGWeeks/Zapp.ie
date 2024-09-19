@@ -8,6 +8,7 @@ interface Zap {
   amount: number;
   wallet_id: string;
   time: number;
+  extra: [];
 }
 
 interface ZapRewards {
@@ -58,3 +59,12 @@ type NostrZapRewards = {
   link: string,
   price: number,
 };
+declare module '*.png' {
+  const content: any;
+  export default content;
+}
+
+declare module '*.module.css' {
+  const classes: { [key: string]: string };
+  export default classes;
+}
