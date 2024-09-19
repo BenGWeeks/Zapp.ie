@@ -5,6 +5,7 @@ import {
   getWalletZapsSince,
 } from '../services/lnbitsServiceLocal';
 import ArrowIncoming from '../images/ArrowIncoming.svg';
+import ArrowOutgoing from '../images/ArrowOutcoming.svg';
 import moment from 'moment';
 
 interface WalletTransactionLogProps {
@@ -41,8 +42,9 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({ timestamp, 
       // const allowanceWallets = wallets.filter(
       //   wallet => wallet.name === 'Private',
       // );
-
+      console.log('Wallets1');
       for (const wallet of wallets) {
+        
         const zaps = await getWalletZapsSince(
           wallet.inkey,
           paymentsSinceTimestamp,
@@ -68,15 +70,15 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({ timestamp, 
           <div key={zap.id || index} className={styles.bodycell}>
             <div className={styles.bodyContents}>
               <div className={styles.mainContentStack}>
-                <img className={styles.avatarIcon} alt="" src={ArrowIncoming} />
+                <img className={styles.avatarIcon} alt="" src={ zap.extra && Object.keys(zap.extra).length > 0 ? ArrowOutgoing: ArrowIncoming } />
                 <div className={styles.userName}>
                   <p className={styles.lightHelightInItems}> <b>Zap! </b></p>
                   <div className={styles.lightHelightInItems}> {moment(moment.now()).diff(zap.time * 1000, 'days')} days ago from {zap.from} </div>
                   <p className={styles.lightHelightInItems}>{zap.memo}</p>
                 </div>
               </div>
-              <div className={styles.transactionDetailsAllowance}>
-                <div className={styles.lightHelightInItems}> <b className={styles.b}>+ {zap.amount / 1000}</b> Sats </div>
+              <div className={styles.transactionDetailsAllowance} style={{ color: zap.extra && Object.keys(zap.extra).length > 0 ? '#E75858': '#00A14B' }} >
+                <div className={styles.lightHelightInItems}> <b className={styles.b}>{ zap.extra && Object.keys(zap.extra).length > 0 ? '-': '+' } {zap.amount / 1000}</b> Sats </div>
                 <div className={styles.lightHelightInItems}> about $0.11 </div>
               </div>
             </div>

@@ -8,6 +8,7 @@ interface Zap {
   amount: number;
   wallet_id: string;
   time: number;
+  extra: [];
 }
 
 interface Wallet {
