@@ -5,24 +5,36 @@
 
 const userName = process.env.REACT_APP_LNBITS_USERNAME;
 const password = process.env.REACT_APP_LNBITS_PASSWORD;
+const nodeUrl = process.env.REACT_APP_LNBITS_NODE_URL;
 
 // Store token in localStorage (persists between page reloads)
 let accessToken = localStorage.getItem('accessToken');
 
 export async function getAccessToken(username: string, password: string) {
+  console.log(
+    `getAccessToken starting ... (username: ${username}, filterById: ${password}))`,
+  );
   if (accessToken) {
     console.log('Using cached access token');
     return accessToken;
+  } else {
+    console.log('No cached access token found');
   }
+
   try {
-    const response = await fetch(`/api/v1/auth`, {
+    const response = await fetch(`${nodeUrl}/api/v1/auth`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'accept': 'application/json',
       },
       body: JSON.stringify({ username, password }),
-      credentials: 'omit', // No cookies sent or accepted
+      //credentials: 'omit', // No cookies sent or accepted
     });
+
+    console.log('Request URL:', response.url);
+    console.log('Request Status:', response.status);
+    console.log('Request Headers:', response.headers);
 
     if (!response.ok) {
       throw new Error(
@@ -546,6 +558,7 @@ const getWalletZapsSince = async (
       amount: payment.amount,
       wallet_id: payment.wallet_id,
       time: payment.time,
+      extra: payment.extra,
     }));
 
     console.log('Zaps:', zapsData);
