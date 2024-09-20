@@ -750,6 +750,68 @@ const getNostrRewards = async (adminKey: string, stallId: string): Promise<Nostr
   }
 };
 
+interface Transaction {
+  checking_id: string;
+  pending: boolean;
+  amount: number; // in millisatoshis (msats)
+  fee: number;
+  memo: string;
+  time: number; // Unix timestamp
+}
+
+interface WalletTransaction {
+  wallet_id: string;
+  transactions: Transaction[];
+}
+
+const fetchWalletTransactions = async (walletId: string, apiKey: string): Promise<Transaction[]> => {
+  try {
+    console.log(`Fetching transactions for wallet: ${walletId}`); // Log wallet ID
+    const response = await fetch(`/usermanager/api/v1/transactions/${walletId}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'X-Api-Key': apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      const errorMessage = `Failed to fetch transactions for wallet ${walletId}: ${response.status} - ${response.statusText}`;
+      console.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    console.log(`Transactions fetched for wallet: ${walletId}`, data); // Log fetched data
+    return data; // Assuming data is an array of transactions
+  } catch (error) {
+    console.error(`Error fetching transactions for wallet ${walletId}:`, error);
+    throw error; // Re-throw the error to handle it in the parent function
+  }
+};
+
+
+// Function to get transactions for all users
+const fetchAllUsersTransactions = async (users: { wallet_id: string }[], apiKey: string): Promise<WalletTransaction[]> => {
+  const usersTransactions: WalletTransaction[] = [];
+
+  // Iterate over each user and fetch transactions for their wallet
+  for (const user of users) {
+    try {
+      const transactions = await fetchWalletTransactions(user.wallet_id, apiKey);
+      usersTransactions.push({
+        wallet_id: user.wallet_id,
+        transactions: transactions
+      });
+    } catch (error) {
+      console.error(`Error fetching transactions for wallet ${user.wallet_id}:`, error);
+    }
+  }
+
+  return usersTransactions; // Returns an array of all users' wallet transactions
+};
+
+
 export {
   getUsers,
   getWallets,
@@ -768,4 +830,6 @@ export {
   getWalletIdByUserId,
   getUserWallets,
   getNostrRewards,
+  fetchWalletTransactions,
+  fetchAllUsersTransactions
 };

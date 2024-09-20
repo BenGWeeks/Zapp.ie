@@ -54,6 +54,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
             );
 
             allZaps = allZaps.concat(zaps);
+            console.log('Timestamp changed: ', zaps);
           }
         }
       }
@@ -68,6 +69,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
     // Clear the zaps
     setZaps([]);
     fetchZaps();
+    
   }, [timestamp]);
 
   return (

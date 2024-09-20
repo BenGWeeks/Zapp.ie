@@ -11,6 +11,7 @@ interface Zap {
 }
 
 interface Wallet {
+  [x: string]: string;
   id: string;
   admin: string;
   name: string;
@@ -31,6 +32,7 @@ interface User {
   allowanceWallet: Wallet;
 }
 
+
 type WalletType = 'Allowance' | 'Private';
 
 declare module '*.svg' {
@@ -50,3 +52,29 @@ type NostrZapRewards = {
   Link: string,
   Price: number,
 };
+
+
+interface Transaction {
+  checking_id: string;
+  pending: boolean;
+  amount: number; // in millisatoshis (msats)
+  fee: number;
+  memo: string;
+  time: number; // Unix timestamp
+}
+
+interface PrivateWalletTransaction {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  transaction: Transaction;
+  time: number;
+}
+
+interface UserTransactionSummary {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  totalAmountSats: number;
+  rank: number;
+}
