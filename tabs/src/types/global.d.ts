@@ -20,7 +20,6 @@ interface ZapRewards {
 }
 
 interface Wallet {
-  [x: string]: string;
   id: string;
   admin: string;
   name: string;
@@ -103,4 +102,9 @@ interface UserTransactionSummary {
   walletId: string;
   totalAmountSats: number;
   rank: number;
+}
+
+interface WalletTransaction {
+  wallet_id: string;
+  transactions: Transaction[];
 }
