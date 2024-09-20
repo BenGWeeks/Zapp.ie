@@ -486,4 +486,5 @@
 
 .stringTabTitle.active {
     border-bottom: 2px solid #5b5fc7;
+    font-weight: bold;
   }
