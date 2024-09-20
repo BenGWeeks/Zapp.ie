@@ -1,4 +1,5 @@
 /// <reference path="./types/global.d.ts" />
+import { setAadObjectId } from './globalstate';
 
 import {
   TeamsActivityHandler,
@@ -64,6 +65,8 @@ export class TeamsBot extends TeamsActivityHandler {
       }
 
       try {
+        const aadObjectId = context.activity.from.aadObjectId;
+        setAadObjectId(aadObjectId);
         let mentions = TurnContext.getMentions(context.activity);
         //console.log('context.activity:', context.activity);
 

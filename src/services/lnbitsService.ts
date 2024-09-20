@@ -1,6 +1,7 @@
 // lnbitsService.ts
 
 /// <reference path="../../src/types/global.d.ts" />
+import { aadObjectId } from '../globalstate';
 
 import dotenvFlow from 'dotenv-flow';
 
@@ -224,8 +225,10 @@ const getUsers = async (
     );
 
     console.log('getUsers usersData:', usersData);
+    const currentuserId = aadObjectId;
+    const filteresUsers = usersData.filter(user => user?.aadObjectId !== currentuserId);
 
-    return usersData;
+    return filteresUsers;
   } catch (error) {
     console.error(error);
     throw error;
