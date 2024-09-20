@@ -1,5 +1,5 @@
 /// <reference path="./types/global.d.ts" />
-import { setAadObjectId } from './globalstate';
+import { setCurrentUser } from './globalstate';
 
 import {
   TeamsActivityHandler,
@@ -7,10 +7,11 @@ import {
   SigninStateVerificationQuery,
   MemoryStorage,
   ConversationState,
-  UserState,
+  UserState,TeamInfo,
   CardFactory,
   Middleware,
   MessageFactory,
+  TeamsInfo,
 } from 'botbuilder';
 import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
 import { Client } from '@microsoft/microsoft-graph-client';
@@ -23,8 +24,12 @@ import { error } from 'console';
 import { getUser, getWalletById } from './services/lnbitsService';
 
 let globalWalletId: string | null = null;
+let currentUser: User | null = null;
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
+interface CancellationToken {
+  isCancellationRequested: boolean;
+}
 
 // Define global variables
 let globalZapAmount: number;
@@ -65,8 +70,18 @@ export class TeamsBot extends TeamsActivityHandler {
       }
 
       try {
-        const aadObjectId = context.activity.from.aadObjectId;
-        setAadObjectId(aadObjectId);
+        const userProfile = await this.getUserProfile(context, context.turnState.get('cancellationToken'));
+        console.log('User Profile:', userProfile);
+        const currentUser = {
+          id: null, // This id is from the lnbits user table
+          displayName: userProfile.name,
+          profileImg: userProfile.profile, // Add logic to set profile image if available
+          aadObjectId: userProfile.aadObjectId,
+          email: userProfile.email,
+          privateWallet: null,
+          allowanceWallet: null
+        };
+        setCurrentUser(currentUser);
         let mentions = TurnContext.getMentions(context.activity);
         //console.log('context.activity:', context.activity);
 
@@ -97,7 +112,9 @@ export class TeamsBot extends TeamsActivityHandler {
           await context.sendActivity(
             `Awesome! You sent ${context.activity.value.zapAmount} Sats to your colleague with a zap!`,
           );
+          
         }
+        
       } catch (error) {
         console.error('Error in onMessage handler:', error.message);
         await context.sendActivity(
@@ -248,6 +265,8 @@ export class TeamsBot extends TeamsActivityHandler {
         console.error('Error in onMessage handler:', error);
       }
         */
+
+      
     });
 
     this.onMembersAdded(async (context, next) => {
@@ -264,7 +283,13 @@ export class TeamsBot extends TeamsActivityHandler {
       }
       await next();
     });
-  }
+    }
+  
+    // Insert the getUserProfile method here
+    private async getUserProfile(context: TurnContext, cancellationToken: CancellationToken): Promise<any> {
+      const member = await TeamsInfo.getMember(context, context.activity.from.id);
+      return member;
+    }
 
   async run(context: TurnContext) {
     try {

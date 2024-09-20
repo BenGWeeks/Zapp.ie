@@ -1,19 +1,13 @@
-// globalState.ts
-export let aadObjectId: string = '';
-export let userEmail: string = '';
+/// <reference path="./types/global.d.ts" />
 
-export function setAadObjectId(id: string) {
-  aadObjectId = id;
+
+export let currentUser: User;
+
+
+export function setCurrentUser(user: User) {
+  currentUser = user;
 }
 
-export function getAadObjectId(): string {
-  return aadObjectId;
-}
-
-export function setUserEmail(email: string) {
-  userEmail = email;
-}
-
-export function getUserEmail(): string {
-  return userEmail;
+export function getCurrentUser(): User {
+  return currentUser;
 }
