@@ -1,6 +1,7 @@
 // lnbitsService.ts
 
 /// <reference path="../../src/types/global.d.ts" />
+import { currentUser } from '../globalstate';
 
 import dotenvFlow from 'dotenv-flow';
 
@@ -15,27 +16,60 @@ const userName = process.env.LNBITS_USERNAME as string;
 const password = process.env.LNBITS_PASSWORD as string;
 //const adminkey = process.env.LNBITS_ADMINKEY as string; // This changes per wallet!
 
+// Store token in localStorage (persists between page reloads)
+let accessToken = null;
+
 // LNBits API is documented here:
 // https://demo.lnbits.com/docs/
 
-export async function getAccessToken(
-  username: string,
-  password: string,
-): Promise<string> {
-  const response = await fetch(`${lnbiturl}/api/v1/auth`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ username, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error creating access token (status: ${response.status})`);
+export async function getAccessToken(username: string, password: string) {
+  if (accessToken) {
+    console.log('Using cached access token');
+    return accessToken;
   }
+  try {
+    const response = await fetch(`${lnbiturl}/api/v1/auth`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+      credentials: 'omit', // No cookies sent or accepted
+    });
 
-  const data = await response.json();
-  return data.access_token;
+    if (!response.ok) {
+      throw new Error(
+        `Error creating access token (status: ${response.status}): ${response.statusText}`,
+      );
+    }
+
+    // Check if response has content
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Response is not in JSON format');
+    }
+
+    // Parse the response as JSON
+    const data = await response.json();
+
+    // Check if the expected data is available
+    if (!data || !data.access_token) {
+      throw new Error('Access token is missing in the response');
+    }
+
+    // Store the access token in memory (string type)
+    accessToken = data.access_token;
+    console.log('Access token fetched and stored');
+
+    return accessToken;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error in getAccessToken:', error.message);
+    } else {
+      console.error('Unexpected error in getAccessToken:', error);
+    }
+    throw error; // Re-throw the error to handle it elsewhere
+  }
 }
 
 const getWallets = async (
@@ -224,8 +258,11 @@ const getUsers = async (
     );
 
     console.log('getUsers usersData:', usersData);
+    const filteresUsers = usersData.filter(
+      user => user?.aadObjectId !== currentUser?.aadObjectId,
+    );
 
-    return usersData;
+    return filteresUsers;
   } catch (error) {
     console.error(error);
     throw error;

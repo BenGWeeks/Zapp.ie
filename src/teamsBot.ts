@@ -1,4 +1,5 @@
 /// <reference path="./types/global.d.ts" />
+import { setCurrentUser } from './globalstate';
 
 import {
   TeamsActivityHandler,
@@ -7,9 +8,11 @@ import {
   MemoryStorage,
   ConversationState,
   UserState,
+  TeamInfo,
   CardFactory,
   Middleware,
   MessageFactory,
+  TeamsInfo,
 } from 'botbuilder';
 import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
 import { Client } from '@microsoft/microsoft-graph-client';
@@ -19,11 +22,15 @@ import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
 import { error } from 'console';
-import { getUser, getWalletById } from './services/lnbitsService';
+import { getUser, getUsers, getWalletById } from './services/lnbitsService';
 
 let globalWalletId: string | null = null;
+let currentUser: User | null = null;
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
+interface CancellationToken {
+  isCancellationRequested: boolean;
+}
 
 // Define global variables
 let globalZapAmount: number;
@@ -64,6 +71,38 @@ export class TeamsBot extends TeamsActivityHandler {
       }
 
       try {
+        const userProfile = await this.getUserProfile(
+          context,
+          context.turnState.get('cancellationToken'),
+        );
+        console.log('User Profile:', userProfile);
+        const lnBitsUser = await getUsers(adminKey, {
+          aadObjectId: userProfile.aadObjectId,
+        })[0];
+        console.log('LNBits User:', lnBitsUser);
+        let privateWallet = null;
+        let allowanceWallet = null;
+        if (lnBitsUser) {
+          privateWallet = await getWalletById(
+            adminKey,
+            lnBitsUser.extra.privateWalletId,
+          );
+          allowanceWallet = await getWalletById(
+            adminKey,
+            lnBitsUser.extra.allowanceWalletId,
+          );
+        }
+        const currentUser = {
+          id: null, // This id is from the lnbits user table
+          displayName: userProfile.name,
+          profileImg: userProfile.profile, // Add logic to set profile image if available
+          aadObjectId: userProfile.aadObjectId,
+          email: userProfile.email,
+          privateWallet: privateWallet,
+          allowanceWallet: allowanceWallet,
+        };
+
+        setCurrentUser(currentUser);
         let mentions = TurnContext.getMentions(context.activity);
         //console.log('context.activity:', context.activity);
 
@@ -261,6 +300,15 @@ export class TeamsBot extends TeamsActivityHandler {
       }
       await next();
     });
+  }
+
+  // Insert the getUserProfile method here
+  private async getUserProfile(
+    context: TurnContext,
+    cancellationToken: CancellationToken,
+  ): Promise<any> {
+    const member = await TeamsInfo.getMember(context, context.activity.from.id);
+    return member;
   }
 
   async run(context: TurnContext) {
