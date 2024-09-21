@@ -93,7 +93,7 @@ export class TeamsBot extends TeamsActivityHandler {
           );
         }
         const currentUser = {
-          id: lnBitsUser.id, // This id is from the lnbits user table
+          id: null, // This id is from the lnbits user table
           displayName: userProfile.name,
           profileImg: userProfile.profile, // Add logic to set profile image if available
           aadObjectId: userProfile.aadObjectId,
@@ -101,6 +101,7 @@ export class TeamsBot extends TeamsActivityHandler {
           privateWallet: privateWallet,
           allowanceWallet: allowanceWallet,
         };
+
         setCurrentUser(currentUser);
         let mentions = TurnContext.getMentions(context.activity);
         //console.log('context.activity:', context.activity);
