@@ -19,6 +19,18 @@ interface ZapRewards {
   price: number;
 }
 
+interface UserAccount {
+  id: string;
+  is_super_user: boolean;
+  is_admin: boolean;
+  username: string;
+  email: string;
+  balance_msat: number;
+  transaction_count: number;
+  wallet_count: number;
+  last_payment: string;
+}
+
 interface Wallet {
   id: string;
   admin: string;
@@ -39,6 +51,7 @@ interface User {
   privateWallet: Wallet;
   allowanceWallet: Wallet;
 }
+
 
 type WalletType = 'Allowance' | 'Private';
 
@@ -67,4 +80,43 @@ declare module '*.png' {
 declare module '*.module.css' {
   const classes: { [key: string]: string };
   export default classes;
+}
+
+type NostrZapRewards = {
+  Image: string,
+  Name: string,
+  ShortDescription: string,
+  Link: string,
+  Price: number,
+};
+
+
+interface Transaction {
+  checking_id: string;
+  pending: boolean;
+  amount: number; // in millisatoshis (msats)
+  fee: number;
+  memo: string;
+  time: number; // Unix timestamp
+}
+
+interface PrivateWalletTransaction {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  transaction: Transaction;
+  time: number;
+}
+
+interface UserTransactionSummary {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  totalAmountSats: number;
+  rank: number;
+}
+
+interface WalletTransaction {
+  wallet_id: string;
+  transactions: Transaction[];
 }

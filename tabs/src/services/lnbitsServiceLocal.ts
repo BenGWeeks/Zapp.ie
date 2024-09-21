@@ -15,7 +15,7 @@ export async function getAccessToken(username: string, password: string) {
     `getAccessToken starting ... (username: ${username}, filterById: ${password}))`,
   );
   if (accessToken) {
-    console.log('Using cached access token');
+    console.log('Using cached access token: ' + accessToken);
     return accessToken;
   } else {
     console.log('No cached access token found');
@@ -26,7 +26,7 @@ export async function getAccessToken(username: string, password: string) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'accept': 'application/json',
+        accept: 'application/json',
       },
       body: JSON.stringify({ username, password }),
       //credentials: 'omit', // No cookies sent or accepted
@@ -110,6 +110,62 @@ const getWallets = async (
     }
 
     return filteredData;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const getWalletDetails = async (inKey: string, walletId: string) => {
+  console.log(
+    `getWalletDetails starting ... (inKey: ${inKey}, walletId: ${walletId}))`,
+  );
+
+  try {
+    const response = await fetch(`/api/v1/wallets/${walletId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Key': inKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Error getting wallet details (status: ${response.status})`,
+      );
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const getWalletBalance = async (inKey: string) => {
+  console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
+
+  try {
+    const response = await fetch(`/api/v1/wallet`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Key': inKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Error getting wallet balance (status: ${response.status})`,
+      );
+    }
+
+    const data = await response.json();
+
+    return data.balance / 1000; // return in Sats (not millisatoshis)
   } catch (error) {
     console.error(error);
     throw error;
@@ -234,62 +290,6 @@ const getUsers = async (
     console.log('getUsers usersData:', usersData);
 
     return usersData;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-const getWalletDetails = async (inKey: string, walletId: string) => {
-  console.log(
-    `getWalletDetails starting ... (inKey: ${inKey}, walletId: ${walletId}))`,
-  );
-
-  try {
-    const response = await fetch(`/api/v1/wallets/${walletId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': inKey,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Error getting wallet details (status: ${response.status})`,
-      );
-    }
-
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-const getWalletBalance = async (inKey: string) => {
-  console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
-
-  try {
-    const response = await fetch(`/api/v1/wallet`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': inKey,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Error getting wallet balance (status: ${response.status})`,
-      );
-    }
-
-    const data = await response.json();
-
-    return data.balance / 1000; // return in Sats (not millisatoshis)
   } catch (error) {
     console.error(error);
     throw error;
@@ -706,16 +706,22 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   }
 };
 
-const getNostrRewards = async (adminKey: string, stallId: string): Promise<NostrZapRewards[]> => {
+const getNostrRewards = async (
+  adminKey: string,
+  stallId: string,
+): Promise<NostrZapRewards[]> => {
   console.log('Getting products ...');
   try {
-    const response = await fetch(`/nostrmarket/api/v1/stall/product/${stallId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': adminKey,
+    const response = await fetch(
+      `/nostrmarket/api/v1/stall/product/${stallId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': adminKey,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`Error getting products (status: ${response.status})`);
@@ -740,6 +746,67 @@ const getNostrRewards = async (adminKey: string, stallId: string): Promise<Nostr
   }
 };
 
+const fetchWalletTransactions = async (
+  walletId: string,
+  apiKey: string,
+): Promise<Transaction[]> => {
+  try {
+    console.log(`Fetching transactions for wallet: ${walletId}`); // Log wallet ID
+    const response = await fetch(
+      `/usermanager/api/v1/transactions/${walletId}`,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'X-Api-Key': apiKey,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorMessage = `Failed to fetch transactions for wallet ${walletId}: ${response.status} - ${response.statusText}`;
+      console.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    console.log(`Transactions fetched for wallet: ${walletId}`, data); // Log fetched data
+    return data; // Assuming data is an array of transactions
+  } catch (error) {
+    console.error(`Error fetching transactions for wallet ${walletId}:`, error);
+    throw error; // Re-throw the error to handle it in the parent function
+  }
+};
+
+// Function to get transactions for all users
+const fetchAllUsersTransactions = async (
+  users: { wallet_id: string }[],
+  apiKey: string,
+): Promise<WalletTransaction[]> => {
+  const usersTransactions: WalletTransaction[] = [];
+
+  // Iterate over each user and fetch transactions for their wallet
+  for (const user of users) {
+    try {
+      const transactions = await fetchWalletTransactions(
+        user.wallet_id,
+        apiKey,
+      );
+      usersTransactions.push({
+        wallet_id: user.wallet_id,
+        transactions: transactions,
+      });
+    } catch (error) {
+      console.error(
+        `Error fetching transactions for wallet ${user.wallet_id}:`,
+        error,
+      );
+    }
+  }
+
+  return usersTransactions; // Returns an array of all users' wallet transactions
+};
+
 export {
   getUsers,
   getWallets,
@@ -757,4 +824,6 @@ export {
   getWalletIdByUserId,
   getUserWallets,
   getNostrRewards,
+  fetchWalletTransactions,
+  fetchAllUsersTransactions,
 };

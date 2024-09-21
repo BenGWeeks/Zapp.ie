@@ -8,7 +8,6 @@ import Rewards from './Rewards';
 import Wallet from './Wallet';
 import YourWallet from './YourWallet';
 
-
 const App: React.FC = () => {
   return (
     <Router>

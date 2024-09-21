@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import FeedComponent from './components/FeedComponent';
 import ZapActivityChartComponent from './components/ZapActivityChartComponent';
+import Leaderboard from './components/Leaderboard';
+import styles from './components/Leaderboard.module.css';
 
 const Home: React.FC = () => {
   const inKey = 'ca04dc4dbc114b298f6d121b1d4ffc8e'; // Hardcoded to my wallet for now.
@@ -14,6 +16,7 @@ const Home: React.FC = () => {
       <br />
       <FeedComponent />
     </div>
+    
   );
 };
 
