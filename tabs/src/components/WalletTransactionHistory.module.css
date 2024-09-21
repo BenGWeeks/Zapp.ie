@@ -1,8 +1,26 @@
-.stringTabTitle {
+.transaction-tabs {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  button {
+    padding: 10px;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button.active {
+    background-color: #f0a500;
+  }
+  
+  .stringTabTitle {
     position: relative;
     line-height: 20px;
-    padding-bottom: 15px;
-    }
+}
 .stringBadgeIconStack {
     display: flex;
     flex-direction: row;
@@ -159,30 +177,33 @@
     z-index: 1;
     font-family: 'Segoe UI';
 }
-.daysInactive {
-    /*top: calc(50% - 5px);*/
-    /*right: 2px;*/
+.daysCopy {
+    position: absolute;
+    top: calc(50% - 5px);
+    right: 2px;
     line-height: 10px;
-    width: 65px;
-    text-align: center;
-    display: inline-block;
 }
-.daysActive {
-    /*top: calc(50% - 5px);*/
-    /*left: 40.52%;*/
+.daysCopy3 {
+    position: absolute;
+    top: calc(50% - 5px);
+    left: 40.52%;
     line-height: 10px;
-    width: 65px;
-    font-weight: bold;
     color: #5b5fc7;
     text-align: center;
-    display: inline-block;
 }
-
+.daysCopy1 {
+    position: absolute;
+    top: calc(50% - 5px);
+    left: 0px;
+    line-height: 10px;
+    text-align: left;
+}
 .pivotPointsdoubleFull60 {
     width: 232px;
+    position: relative;
     height: 10px;
     z-index: 2;
-    /*text-align: right;*/
+    text-align: right;
     font-size: 10px;
     font-family: 'Segoe UI';
 }
@@ -329,7 +350,7 @@
     justify-content: flex-end;
     padding: 0px 28px 0px 0px;
     gap: 10px;
-    text-align: right;
+    text-align: end!important;
     color: #f2a900;
 }
 .bodyContents {
@@ -484,7 +505,3 @@
     font-family: Inter;
 }
 
-.stringTabTitle.active {
-    border-bottom: 2px solid #5b5fc7;
-    font-weight: bold;
-  }

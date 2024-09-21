@@ -1,5 +1,5 @@
 .string {
-    width: 58px;
+    width: 48px;
     position: relative;
     line-height: 16px;
     display: flex;
@@ -9,6 +9,7 @@
 }
 
 .string2 {
+    width: auto;
     flex: 1;
     position: relative;
     line-height: 16px;
@@ -41,45 +42,15 @@
     font-family: 'Segoe UI';
 }
 
-.iconContent {
-    width: 20px;
-    position: relative;
-    height: 20px;
-}
-
-.base {
-    border-radius: 100px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 2px;
-}
-
-.iconbutton {
-    border-radius: 4px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: flex-start;
-}
-
-.buttonsStack {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: flex-start;
-}
-
 .headerContents {
+    width: 100%;
     flex: 1;
     height: 32px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
-
+    justify-content: space-between;
+    padding: 0px 10px;
     box-sizing: border-box;
     gap: 20px;
     padding-right: 10px;
@@ -87,13 +58,15 @@
 }
 
 .headercell {
+    width: 100% - 20px;
     align-self: stretch;
     background-color: #1f1f1f;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    justify-content: flex-start;
     color: #d8d8d8;
+    justify-content: space-between;
+    padding: 0px 10px;
 }
 
 .avatarIcon {
@@ -114,7 +87,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    gap: 50px;
+    gap: 30px;
 }
 
 .mainContentStack {
@@ -129,6 +102,7 @@
 
 .b {
     position: relative;
+    font-weight: bold;
 }
 
 .icon {
@@ -139,43 +113,30 @@
     flex-shrink: 0;
 }
 
-.transactionDetails {
-    align-self: stretch;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0px 28px 0px 20px;
-    gap: 10px;
-    text-align: right;
-}
-
 .bodyContents {
+    width: 100%;
     flex: 1;
     background-color: #1f1f1f;
-    height: 44px;
+    height: 32px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 0px 10px;
+    padding: 0px;
     box-sizing: border-box;
     border-bottom: 1px solid #2D2B2C;
 }
 
 .bodycell {
-    align-self: stretch;
-    height: 44px;
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding: 20px;
-
+    justify-content: space-between;
+    align-items: center;
+    background-color: #222;
+    border-bottom: 1px solid #333;
 }
 
 .feedlist {
-    width: auto;
+    width: 100%;
     padding: 0;
     margin: 0;
     position: relative;
@@ -188,16 +149,9 @@
     font-size: 12px;
     color: #fff;
     font-family: Inter;
-    padding: 20px;
     background-color: #2d2b2c;
-}
-
-
-.leaderboardContainer {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 .bodyContents {
@@ -205,9 +159,7 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 10px;
-    border-bottom: 1px solid #2D2B2C;
-    /* Optional: Add a bottom border for separation */
+    padding-left: 15px;
 }
 
 .mainContentStack {
@@ -242,10 +194,8 @@
 }
 
 .horizontalContainer {
-    width: 100%;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 .yellowAmount {
@@ -253,15 +203,12 @@
     ;
 }
 
-
-
 .circleFirstPlace,
 .circleSecondPlace,
 .circleThirdPlace,
 .circleDefaultPlace {
     width: 24px;
     height: 24px;
-
 }
 
 .table {
@@ -291,4 +238,12 @@ ul {
     color: black;
     font-weight: 700;
     font-size: 12px;
+}
+
+.firstPlace,
+.secondPlace,
+.thirdPlace,
+.defaultPlace {
+    display: flex;
+    align-items: center;
 }
