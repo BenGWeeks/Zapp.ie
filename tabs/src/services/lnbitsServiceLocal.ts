@@ -321,7 +321,7 @@ const getWalletName = async (inKey: string) => {
   }
 };
 
-const getPayments = async (inKey: string) => {
+const getWalletPayments = async (inKey: string) => {
   console.log(`getPayments starting ... (inKey: ${inKey})`);
 
   try {
@@ -710,7 +710,9 @@ const getNostrRewards = async (
   adminKey: string,
   stallId: string,
 ): Promise<NostrZapRewards[]> => {
-  console.log('Getting products ...');
+  console.log(
+    `getNostrRewards starting ... (adminKey: ${adminKey}, stallId: ${stallId})`,
+  );
   try {
     const response = await fetch(
       `/nostrmarket/api/v1/stall/product/${stallId}`,
@@ -746,12 +748,15 @@ const getNostrRewards = async (
   }
 };
 
-const fetchWalletTransactions = async (
+const getWalletTransactions = async (
   walletId: string,
   apiKey: string,
 ): Promise<Transaction[]> => {
+  console.log(
+    `getNostrRewards starting ... (walletId: ${walletId}, apiKey: ${apiKey})`,
+  );
+
   try {
-    console.log(`Fetching transactions for wallet: ${walletId}`); // Log wallet ID
     const response = await fetch(
       `/usermanager/api/v1/transactions/${walletId}`,
       {
@@ -778,42 +783,13 @@ const fetchWalletTransactions = async (
   }
 };
 
-// Function to get transactions for all users
-const fetchAllUsersTransactions = async (
-  users: { wallet_id: string }[],
-  apiKey: string,
-): Promise<WalletTransaction[]> => {
-  const usersTransactions: WalletTransaction[] = [];
-
-  // Iterate over each user and fetch transactions for their wallet
-  for (const user of users) {
-    try {
-      const transactions = await fetchWalletTransactions(
-        user.wallet_id,
-        apiKey,
-      );
-      usersTransactions.push({
-        wallet_id: user.wallet_id,
-        transactions: transactions,
-      });
-    } catch (error) {
-      console.error(
-        `Error fetching transactions for wallet ${user.wallet_id}:`,
-        error,
-      );
-    }
-  }
-
-  return usersTransactions; // Returns an array of all users' wallet transactions
-};
-
 export {
   getUsers,
   getWallets,
   getWalletName,
   getWalletId,
   getWalletBalance,
-  getPayments,
+  getWalletPayments,
   getWalletDetails,
   getWalletPayLinks,
   getInvoicePayment,
@@ -824,6 +800,5 @@ export {
   getWalletIdByUserId,
   getUserWallets,
   getNostrRewards,
-  fetchWalletTransactions,
-  fetchAllUsersTransactions,
+  getWalletTransactions,
 };

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Leaderboard.module.css';
-import { getUsers, getUserWallets, fetchWalletTransactions } from '../services/lnbitsServiceLocal';
+import {
+  getUsers,
+  getUserWallets,
+  getWalletTransactions,
+} from '../services/lnbitsServiceLocal';
 import ZapIcon from '../images/ZapIcon.svg';
 import circleFirstPlace from '../images/circleFirstPlace.svg';
 import CircleSecondPlace from '../images/circleSecondPlace.svg';
@@ -14,7 +18,9 @@ interface LeaderboardProps {
 }
 
 const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
-  const [userTransactionSummary, setUserTransactionSummary] = useState<UserTransactionSummary[]>([]);
+  const [userTransactionSummary, setUserTransactionSummary] = useState<
+    UserTransactionSummary[]
+  >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isAscending, setIsAscending] = useState<boolean>(true);
@@ -34,19 +40,19 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
           const privateWalletTransactionsData: PrivateWalletTransaction[] = [];
 
           await Promise.all(
-            usersData.map(async (user) => {
+            usersData.map(async user => {
               const wallets = await getUserWallets(adminKey, user.id);
-              const privateWallet = wallets?.find((wallet) =>
-                wallet.name.toLowerCase().includes('private')
+              const privateWallet = wallets?.find(wallet =>
+                wallet.name.toLowerCase().includes('private'),
               ); // Find "Private" wallet
 
               if (privateWallet) {
-                const transactions = await fetchWalletTransactions(
+                const transactions = await getWalletTransactions(
                   privateWallet.id,
-                  adminKey // Pass only wallet ID and admin key
+                  adminKey, // Pass only wallet ID and admin key
                 );
 
-                transactions.forEach((transaction) => {
+                transactions.forEach(transaction => {
                   privateWalletTransactionsData.push({
                     userId: user.id,
                     displayName: user.displayName,
@@ -56,13 +62,14 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
                   });
                 });
               }
-            })
+            }),
           );
 
           // Group and sum amounts by users
-          const transactionSummary: { [key: string]: UserTransactionSummary } = {};
+          const transactionSummary: { [key: string]: UserTransactionSummary } =
+            {};
 
-          privateWalletTransactionsData.forEach((entry) => {
+          privateWalletTransactionsData.forEach(entry => {
             const { userId, displayName, walletId, transaction } = entry;
             const amountInSats = transaction.amount / 1000; // Convert msats to sats
 
@@ -109,7 +116,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
 
   const handleSort = () => {
     const sortedUsers = [...userTransactionSummary].sort((a, b) =>
-      isAscending ? a.totalAmountSats - b.totalAmountSats : b.totalAmountSats - a.totalAmountSats
+      isAscending
+        ? a.totalAmountSats - b.totalAmountSats
+        : b.totalAmountSats - a.totalAmountSats,
     );
     setUserTransactionSummary(sortedUsers);
     setIsAscending(!isAscending);
@@ -153,7 +162,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
 
       <div className={`${styles.horizontalContainer} ${styles.table}`}>
         <ul>
-          {userTransactionSummary.map((summary) => (
+          {userTransactionSummary.map(summary => (
             <li key={summary.userId} className={styles.bodycell}>
               <div className={styles.bodyContents}>
                 <div className={styles.mainContentStack}>
@@ -166,7 +175,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
                             alt="First Place"
                             className={styles.circleFirstPlace}
                           />
-                          <span className={`${styles.rankNumber} ${styles.blackRank}`}>
+                          <span
+                            className={`${styles.rankNumber} ${styles.blackRank}`}
+                          >
                             {summary.rank}
                           </span>
                         </div>
@@ -177,7 +188,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
                             alt="Second Place"
                             className={styles.circleSecondPlace}
                           />
-                          <span className={`${styles.rankNumber} ${styles.blackRank}`}>
+                          <span
+                            className={`${styles.rankNumber} ${styles.blackRank}`}
+                          >
                             {summary.rank}
                           </span>
                         </div>
@@ -188,7 +201,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
                             alt="Third Place"
                             className={styles.circleThirdPlace}
                           />
-                          <span className={`${styles.rankNumber} ${styles.blackRank}`}>
+                          <span
+                            className={`${styles.rankNumber} ${styles.blackRank}`}
+                          >
                             {summary.rank}
                           </span>
                         </div>
@@ -199,15 +214,24 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
                             alt="Place"
                             className={styles.circleDefaultPlace}
                           />
-                          <span className={`${styles.rankNumber}`}>{summary.rank}</span>
+                          <span className={`${styles.rankNumber}`}>
+                            {summary.rank}
+                          </span>
                         </div>
                       )}
                     </div>
                     <div className={styles.userName}>{summary.displayName}</div>
                   </div>
                 </div>
-                <b className={`${styles.b}  ${summary.rank <= 3 ? styles.yellowAmount : ''} ${getTextColorByRank(summary.rank)}`}>
-                  {new Intl.NumberFormat('en-US').format(summary.totalAmountSats)}</b>
+                <b
+                  className={`${styles.b}  ${
+                    summary.rank <= 3 ? styles.yellowAmount : ''
+                  } ${getTextColorByRank(summary.rank)}`}
+                >
+                  {new Intl.NumberFormat('en-US').format(
+                    summary.totalAmountSats,
+                  )}
+                </b>
                 <img className={styles.icon} alt="Zap Icon" src={ZapIcon} />
               </div>
             </li>
