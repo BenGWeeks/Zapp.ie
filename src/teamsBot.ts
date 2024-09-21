@@ -7,7 +7,8 @@ import {
   SigninStateVerificationQuery,
   MemoryStorage,
   ConversationState,
-  UserState,TeamInfo,
+  UserState,
+  TeamInfo,
   CardFactory,
   Middleware,
   MessageFactory,
@@ -21,7 +22,7 @@ import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
 import { error } from 'console';
-import { getUser, getWalletById } from './services/lnbitsService';
+import { getUser, getUsers, getWalletById } from './services/lnbitsService';
 
 let globalWalletId: string | null = null;
 let currentUser: User | null = null;
@@ -70,16 +71,35 @@ export class TeamsBot extends TeamsActivityHandler {
       }
 
       try {
-        const userProfile = await this.getUserProfile(context, context.turnState.get('cancellationToken'));
+        const userProfile = await this.getUserProfile(
+          context,
+          context.turnState.get('cancellationToken'),
+        );
         console.log('User Profile:', userProfile);
+        const lnBitsUser = await getUsers(adminKey, {
+          aadObjectId: userProfile.aadObjectId,
+        })[0];
+        console.log('LNBits User:', lnBitsUser);
+        let privateWallet = null;
+        let allowanceWallet = null;
+        if (lnBitsUser) {
+          privateWallet = await getWalletById(
+            adminKey,
+            lnBitsUser.extra.privateWalletId,
+          );
+          allowanceWallet = await getWalletById(
+            adminKey,
+            lnBitsUser.extra.allowanceWalletId,
+          );
+        }
         const currentUser = {
-          id: null, // This id is from the lnbits user table
+          id: lnBitsUser.id, // This id is from the lnbits user table
           displayName: userProfile.name,
           profileImg: userProfile.profile, // Add logic to set profile image if available
           aadObjectId: userProfile.aadObjectId,
           email: userProfile.email,
-          privateWallet: null,
-          allowanceWallet: null
+          privateWallet: privateWallet,
+          allowanceWallet: allowanceWallet,
         };
         setCurrentUser(currentUser);
         let mentions = TurnContext.getMentions(context.activity);
@@ -112,9 +132,7 @@ export class TeamsBot extends TeamsActivityHandler {
           await context.sendActivity(
             `Awesome! You sent ${context.activity.value.zapAmount} Sats to your colleague with a zap!`,
           );
-          
         }
-        
       } catch (error) {
         console.error('Error in onMessage handler:', error.message);
         await context.sendActivity(
@@ -265,8 +283,6 @@ export class TeamsBot extends TeamsActivityHandler {
         console.error('Error in onMessage handler:', error);
       }
         */
-
-      
     });
 
     this.onMembersAdded(async (context, next) => {
@@ -283,13 +299,16 @@ export class TeamsBot extends TeamsActivityHandler {
       }
       await next();
     });
-    }
-  
-    // Insert the getUserProfile method here
-    private async getUserProfile(context: TurnContext, cancellationToken: CancellationToken): Promise<any> {
-      const member = await TeamsInfo.getMember(context, context.activity.from.id);
-      return member;
-    }
+  }
+
+  // Insert the getUserProfile method here
+  private async getUserProfile(
+    context: TurnContext,
+    cancellationToken: CancellationToken,
+  ): Promise<any> {
+    const member = await TeamsInfo.getMember(context, context.activity.from.id);
+    return member;
+  }
 
   async run(context: TurnContext) {
     try {
