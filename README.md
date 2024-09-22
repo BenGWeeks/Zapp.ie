@@ -1,6 +1,40 @@
+![CoverImage](https://github.com/user-attachments/assets/db930cee-8f0f-47b3-9729-9da8c3b6b2c1)
+
 # Overview
 
-Zapp.ie seamlessly integrates into Microsoft Teams, bringing a unique blend of Bitcoin micro-transactions and AI automation to enhance team collaboration and recognition. With Zapp.ie, you can effortlessly send Bitcoin-based rewards (Sats) to colleagues as a token of appreciation, automate recognition for positive behavior, and foster a more engaged and motivated workplace. Transform how your team acknowledges great work and builds a culture of gratitude directly within Teams.
+Zapp.ie is an innovative solution that seamlessly integrates into Microsoft Teams and leverages Microsoft Copilot to create a dynamic, value-driven ecosystem of collaboration. Through a combination of AI automation and Bitcoin micro-transactions, Zapp.ie enables users, copilots (AI agents), and even customers to engage in meaningful interactions that drive success.
+
+With Zapp.ie, users, copilots, and customers can:
+
+- Send and receive Bitcoin-based rewards (Sats) as a token of appreciation for helping reach goals—whether from teammate to teammate, teammate to copilot, teammate to customer, or even copilot to copilot.
+- Reinforce positive behaviors and effective workflows through microtransactions based on real value, enhancing both AI copilots’ learning and motivating teammates and customers to adopt the right ways of working.
+- Enable both teammates and copilots to fund their own development by earning and utilizing rewards to further their personal and professional growth.
+
+Zapp.ie transforms traditional incentives into a powerful, value-for-value system where AI copilots, human teammates, and customers work together, driving continuous improvement and engagement in a transparent, rewarding manner.
+
+# Design
+
+The vision of the solution (many elements still in draft) can be seen here:
+
+<table width="100%">
+  <tr>
+    <td width="30%"><img src="https://github.com/user-attachments/assets/aa9a5979-302f-4812-be14-4e92a874f544"/></td>
+    <td width="30%"><img src="https://github.com/user-attachments/assets/82c97b0a-2771-40a9-ba55-95b9f9736474"/></td>
+    <td width="30%"><img src="https://github.com/user-attachments/assets/ec7827a8-43ed-455b-93e8-e42ea8d97613"/></td>
+  </tr>
+  <tr>
+    <td width="30%"><img src="https://github.com/user-attachments/assets/dfdea569-36cd-4407-9fb5-b782b7535aa6"/></td>
+    <td width="30%"><img src="https://github.com/user-attachments/assets/2ed3a8e4-3128-475e-baf8-5a1fc13f0ab3"/></td>
+    <td width="30%"><img src="https://github.com/user-attachments/assets/9f904f0b-e91a-4797-a5f1-a1d06243db3a"/></td>
+  </tr>
+  <tr>
+    <td width="30%"><img src="https://github.com/user-attachments/assets/a9519947-26c8-4b5b-b0d8-4db7db0ccecc"/></td>
+    <td width="30%"><img src="https://github.com/user-attachments/assets/03c1d7c7-7e86-46a9-845e-f5301bb80c45"/></td>
+    <td width="30%"><img src="https://github.com/user-attachments/assets/6ec83fd9-f9cb-4ca1-b9d7-9ef84db09bd2"/></td>
+  </tr>
+</table>
+
+The designs can be previewed in [Figma](https://www.figma.com/proto/i0GdiVa7Dgu1FVSNwhBpjZ/Zapp.ie?node-id=607-67310&node-type=frame&t=FVljvFCjf72XgbJR-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=607%3A67310)
 
 # Getting Started with Zapp.ie
 
@@ -62,3 +96,9 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
 - From VS Code:
   1. Navigate to the _Tabs_ directory
   2. Type `npm start`
+
+# Get in touch
+
+Have fun, and tag us on Twitter / Nostr!
+
+![FooterImage](https://github.com/user-attachments/assets/3c798d0d-9466-493d-9a66-ee5fe2c374f5)
