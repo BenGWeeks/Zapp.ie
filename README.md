@@ -1,4 +1,4 @@
-![CoverImage](https://github.com/user-attachments/assets/efa1b16f-074c-47e9-8529-42c5bca0991f)
+![CoverImage](https://github.com/user-attachments/assets/db930cee-8f0f-47b3-9729-9da8c3b6b2c1)
 
 # Overview
 
