@@ -96,3 +96,9 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
 - From VS Code:
   1. Navigate to the _Tabs_ directory
   2. Type `npm start`
+
+# Get in touch
+
+Have fun, and tag us on Twitter / Nostr!
+
+![FooterImage](https://github.com/user-attachments/assets/3c798d0d-9466-493d-9a66-ee5fe2c374f5)
