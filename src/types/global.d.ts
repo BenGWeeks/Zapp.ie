@@ -17,8 +17,8 @@ interface User {
   profileImg: string;
   aadObjectId: string;
   email: string;
-  privateWallet: Wallet;
-  allowanceWallet: Wallet;
+  privateWallet: Wallet | null;
+  allowanceWallet: Wallet | null;
 }
 
 type WalletType = 'Allowance' | 'Private';

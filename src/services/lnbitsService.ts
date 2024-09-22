@@ -120,6 +120,7 @@ const getWallets = async (
         adminkey: filteredData.adminkey,
         user: filteredData.user,
         inkey: filteredData.inkey,
+        // See: https://github.com/lnbits/lnbits/issues/2690
         deleted: (
           await getWalletById(filteredData.user, filteredData.id)
         )?.deleted,
@@ -884,12 +885,20 @@ const createInvoice = async (
   }
 };
 
-const payInvoice = async (adminKey: string, paymentRequest: string) => {
+const payInvoice = async (
+  adminKey: string,
+  paymentRequest: string,
+  extra: object,
+) => {
   console.log(
-    `payInvoice starting ... (adminKey: ${adminKey}, paymentRequest: ${paymentRequest})`,
+    `payInvoice starting ... (adminKey: ${adminKey}, paymentRequest: ${paymentRequest}, extra: ${JSON.stringify(
+      extra,
+    )})`,
   );
 
   try {
+    //const encodedExtra = JSON.stringify(extra);
+
     const response = await fetch(`${lnbiturl}/api/v1/payments`, {
       method: 'POST',
       headers: {
@@ -899,6 +908,7 @@ const payInvoice = async (adminKey: string, paymentRequest: string) => {
       body: JSON.stringify({
         out: true,
         bolt11: paymentRequest,
+        extra: extra, //encodedExtra,
       }),
     });
 

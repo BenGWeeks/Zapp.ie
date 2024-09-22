@@ -1,21 +1,10 @@
 // src/types/global.d.ts
-interface Zap {
-  id: string;
-  bolt11: string;
-  from: string | null;
-  to: string | null;
-  memo: string;
-  amount: number;
-  wallet_id: string;
-  time: number;
-  extra: [];
-}
 
-interface ZapRewards {
+interface Reward {
   image: string;
-  title: string;
+  name: string;
   shortDescription: string;
-  longDescription: string;
+  link: string;
   price: number;
 }
 
@@ -48,12 +37,22 @@ interface User {
   profileImg: string;
   aadObjectId: string;
   email: string;
-  privateWallet: Wallet;
-  allowanceWallet: Wallet;
+  privateWallet: Wallet | null;
+  allowanceWallet: Wallet | null;
 }
 
-
 type WalletType = 'Allowance' | 'Private';
+
+interface Transaction {
+  checking_id: string;
+  pending: boolean;
+  amount: number; // in millisatoshis (msats)
+  fee: number;
+  memo: string;
+  time: number; // Unix timestamp
+  extra: { [key: string]: any }; // JSON object
+  wallet_id: string;
+}
 
 declare module '*.module.css' {
   const classes: { [key: string]: string };
@@ -65,58 +64,7 @@ declare module '*.svg' {
   export default content;
 }
 
-type NostrZapRewards = {
-  image: string,
-  name: string,
-  shortDescription: string,
-  link: string,
-  price: number,
-};
 declare module '*.png' {
   const content: any;
   export default content;
-}
-
-declare module '*.module.css' {
-  const classes: { [key: string]: string };
-  export default classes;
-}
-
-type NostrZapRewards = {
-  Image: string,
-  Name: string,
-  ShortDescription: string,
-  Link: string,
-  Price: number,
-};
-
-
-interface Transaction {
-  checking_id: string;
-  pending: boolean;
-  amount: number; // in millisatoshis (msats)
-  fee: number;
-  memo: string;
-  time: number; // Unix timestamp
-}
-
-interface PrivateWalletTransaction {
-  userId: string;
-  displayName: string;
-  walletId: string;
-  transaction: Transaction;
-  time: number;
-}
-
-interface UserTransactionSummary {
-  userId: string;
-  displayName: string;
-  walletId: string;
-  totalAmountSats: number;
-  rank: number;
-}
-
-interface WalletTransaction {
-  wallet_id: string;
-  transactions: Transaction[];
 }

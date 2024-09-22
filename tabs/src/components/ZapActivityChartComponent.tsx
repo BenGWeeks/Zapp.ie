@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
-import { getWalletZapsSince } from '../services/lnbitsServiceLocal';
+import { getWalletTransactionsSince } from '../services/lnbitsServiceLocal';
 import styles from './ZapActivityChartComponent.module.css';
 
 interface ZapContributionsChartProps {
@@ -24,16 +24,18 @@ function generateDateRange(fromDate: string, toDate: string): string[] {
 }
 
 const transformZapsToActivities = (
-  zaps: Zap[],
+  transactions: Transaction[],
   fromDate: string,
   toDate: string,
 ): Activity[] => {
   const dateAmounts: { [date: string]: number } = {};
 
-  zaps.forEach(zap => {
-    if (zap.time && !isNaN(zap.time)) {
-      const date = new Date(zap.time * 1000).toISOString().split('T')[0];
-      const amount = Math.abs(zap.amount);
+  transactions.forEach(transaction => {
+    if (transaction.time && !isNaN(transaction.time)) {
+      const date = new Date(transaction.time * 1000)
+        .toISOString()
+        .split('T')[0];
+      const amount = Math.abs(transaction.amount);
       dateAmounts[date] = (dateAmounts[date] || 0) + amount;
     }
   });
@@ -59,6 +61,8 @@ const transformZapsToActivities = (
     return { date, count: totalAmount, level };
   });
 
+  console.log('Activities: ', activities);
+
   return activities;
 };
 
@@ -75,9 +79,16 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const zapsData: Zap[] = await getWalletZapsSince(lnKey, timestamp); // This currently only gets zaps for the specified wallet.
+        console.log('Fetching zaps for wallet:', lnKey);
+        console.log('Fetching zaps since:', timestamp);
+
+        const transactionsData: Transaction[] =
+          await getWalletTransactionsSince(lnKey, timestamp, { tag: 'zap' }); // This currently only gets zaps for the specified wallet.
+
+        console.log('Chart Transactions: ', transactionsData);
+
         const activitiesData = transformZapsToActivities(
-          zapsData,
+          transactionsData,
           fromDate,
           toDate,
         );

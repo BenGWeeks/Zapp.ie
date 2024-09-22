@@ -3,7 +3,8 @@ import styles from './Leaderboard.module.css';
 import {
   getUsers,
   getUserWallets,
-  getWalletTransactions,
+  getUserWalletTransactions,
+  getWalletTransactionsSince,
 } from '../services/lnbitsServiceLocal';
 import ZapIcon from '../images/ZapIcon.svg';
 import circleFirstPlace from '../images/circleFirstPlace.svg';
@@ -17,6 +18,22 @@ interface LeaderboardProps {
   timestamp?: number | null;
 }
 
+interface PrivateWalletTransaction {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  transaction: Transaction;
+  time: number;
+}
+
+interface UserTransactionSummary {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  totalAmountSats: number;
+  rank: number;
+}
+
 const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
   const [userTransactionSummary, setUserTransactionSummary] = useState<
     UserTransactionSummary[]
@@ -24,6 +41,12 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isAscending, setIsAscending] = useState<boolean>(true);
+
+  // Use the provided timestamp to 0
+  const paymentsSinceTimestamp =
+    timestamp === null || timestamp === undefined || timestamp === 0
+      ? 0
+      : timestamp;
 
   useEffect(() => {
     const fetchUsersAndPrivateWalletTransactions = async () => {
@@ -41,15 +64,23 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
 
           await Promise.all(
             usersData.map(async user => {
-              const wallets = await getUserWallets(adminKey, user.id);
-              const privateWallet = wallets?.find(wallet =>
-                wallet.name.toLowerCase().includes('private'),
-              ); // Find "Private" wallet
+              //const wallets = await getUserWallets(adminKey, user.id);
+              //const privateWallet = wallets?.find(wallet =>
+              //  wallet.name.toLowerCase().includes('private'),
+              //); // Find "Private" wallets only.
+              const privateWallet = user.privateWallet;
 
               if (privateWallet) {
-                const transactions = await getWalletTransactions(
+                /*
+                const transactions = await getUserWalletTransactions(
                   privateWallet.id,
-                  adminKey, // Pass only wallet ID and admin key
+                  adminKey,
+                  { tag: 'zap' }, // Filter to just zaps
+                );*/
+                const transactions = await getWalletTransactionsSince(
+                  privateWallet.inkey,
+                  0, // TODO: Should pass in the timeSinceTimestamp, but no results for some reason. 1000th out?
+                  { tag: 'zap' },
                 );
 
                 transactions.forEach(transaction => {
@@ -136,7 +167,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div>{error}</div>;
   }
 
   return (

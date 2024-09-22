@@ -10,15 +10,15 @@ const FeedComponent: FunctionComponent = () => {
   );
   const [activePeriod, setActivePeriod] = useState(7); // Set default to 7-days
   const [showFeed, setShowFeed] = useState(true);
-  
+
   const handleShowFeed = () => {
     setShowFeed(true);
-    setTimestamp(Math.floor(Date.now() / 1000)); // Update timestamp when showing leaderboard
+    //setTimestamp(Math.floor(Date.now() / 1000)); // Update timestamp when showing leaderboard
   };
 
   const handleShowLeaderboard = () => {
     setShowFeed(false);
-    setTimestamp(Math.floor(Date.now() / 1000)); // Update timestamp when showing leaderboard
+    //setTimestamp(Math.floor(Date.now() / 1000)); // Update timestamp when showing leaderboard
   };
 
   const handlePeriodClick = (days: number) => {

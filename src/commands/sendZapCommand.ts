@@ -65,7 +65,7 @@ export async function SendZap(
     const extra = {
       from: sendersWallet,
       to: receiversWallet,
-      type: 'zap',
+      tag: 'zap',
     };
 
     // Create an invoice for the amount in the recipient's wallet
@@ -87,7 +87,11 @@ export async function SendZap(
 
     console.log('sendersWallet: ', sendersWallet);
 
-    const result = await payInvoice(sendersWallet.adminkey, paymentRequest);
+    const result = await payInvoice(
+      sendersWallet.adminkey,
+      paymentRequest,
+      extra,
+    );
 
     console.log('Payment Result:', result);
 
