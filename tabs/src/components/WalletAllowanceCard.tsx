@@ -57,20 +57,20 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
       </div>
       <div className='mainContent'>
         <div className="row" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
-          <div className="col-md-4">
+          <div className="col-md-5">
             <div className='amountDisplayContainer'>
               <div className='amountDisplay'>{balance?.toLocaleString() ?? '0'}</div>
               <div >Sats</div>
-              <div style={{ width: 12, height: 12, position: 'relative' }}>
-                <div style={{ width: 10, height: 10, left: 1, top: 1, position: 'absolute', background: '#5B5FC7' }}></div>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-1" style={{ paddingTop: '20px' }}>
-            <button className='refreshImageIcon'>
+              <div style={{ paddingLeft: '20px' }}>
+            
+          
+              <button className='refreshImageIcon' >
               <img src={ArrowClockwise} alt="icon" style={{ width: 30, height: 30 }} />
             </button>
+            </div>
+            </div>
           </div>
+          
           <div className="col-md-2" >
           </div>
           <div className="col-md-3">

@@ -37,7 +37,7 @@ const WalletYourWalletInfoCard: React.FC = () => {
         <div className="item"> <h1>{balance?.toLocaleString() ?? '0'}</h1>
         </div>
         <div className="item">Sats</div>
-        <div className="col-md-1" style={{ paddingTop: '30px' }}>
+        <div className="col-md-1 item" style={{ paddingTop: '30px', paddingLeft: '10px'  }}>
             <button className='refreshImageIcon'>
               <img src={ArrowClockwise} alt="icon" style={{ width: 30, height: 30 }} />
             </button>
