@@ -68,3 +68,20 @@ declare module '*.png' {
   const content: any;
   export default content;
 }
+
+
+interface PrivateWalletTransaction {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  transaction: Transaction;
+  time: number;
+}
+
+interface UserTransactionSummary {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  totalAmountSats: number;
+  rank: number;
+}

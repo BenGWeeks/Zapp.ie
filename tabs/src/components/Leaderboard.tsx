@@ -18,22 +18,6 @@ interface LeaderboardProps {
   timestamp?: number | null;
 }
 
-interface PrivateWalletTransaction {
-  userId: string;
-  displayName: string;
-  walletId: string;
-  transaction: Transaction;
-  time: number;
-}
-
-interface UserTransactionSummary {
-  userId: string;
-  displayName: string;
-  walletId: string;
-  totalAmountSats: number;
-  rank: number;
-}
-
 const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
   const [userTransactionSummary, setUserTransactionSummary] = useState<
     UserTransactionSummary[]
@@ -79,7 +63,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
                 );*/
                 const transactions = await getWalletTransactionsSince(
                   privateWallet.inkey,
-                  0, // TODO: Should pass in the timeSinceTimestamp, but no results for some reason. 1000th out?
+                  paymentsSinceTimestamp,
                   { tag: 'zap' },
                 );
 
@@ -181,7 +165,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
             onClick={handleSort}
             style={{ cursor: 'pointer' }}
           >
-            <b className={`${styles.string3} ${styles.b}`}>Zap Amount</b>
+            <b className={`${styles.string3} ${styles.b}`}>Zap amount</b>
             <img
               src={isAscending ? AscendingIcon : DescendingIcon}
               alt={isAscending ? 'Ascending' : 'Descending'}
@@ -198,7 +182,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
               <div className={styles.bodyContents}>
                 <div className={styles.mainContentStack}>
                   <div className={styles.personDetails}>
-                    <div className={styles.userName}>
+                    <div className={styles.userRank}>
                       {summary.rank === 1 ? (
                         <div className={styles.firstPlace}>
                           <img
@@ -251,19 +235,19 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
                         </div>
                       )}
                     </div>
-                    <div className={styles.userName}>{summary.displayName}</div>
+                    <div className={styles.userName}>{summary.displayName} </div>
                   </div>
                 </div>
                 <b
-                  className={`${styles.b}  ${
-                    summary.rank <= 3 ? styles.yellowAmount : ''
-                  } ${getTextColorByRank(summary.rank)}`}
+                  className={`${styles.b} ${summary.rank <= 3 ? styles.yellowAmount : ''
+                    } ${getTextColorByRank(summary.rank)}`}
                 >
                   {new Intl.NumberFormat('en-US').format(
                     summary.totalAmountSats,
                   )}
                 </b>
                 <img className={styles.icon} alt="Zap Icon" src={ZapIcon} />
+
               </div>
             </li>
           ))}
