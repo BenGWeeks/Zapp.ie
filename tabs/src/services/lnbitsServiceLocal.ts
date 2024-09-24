@@ -102,7 +102,7 @@ const getWallets = async (
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
-    const response = await fetch(`/api/v1/wallets`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ const getWalletDetails = async (inKey: string, walletId: string) => {
   );
 
   try {
-    const response = await fetch(`/api/v1/wallets/${walletId}`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallets/${walletId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ const getWalletBalance = async (inKey: string) => {
   console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/wallet`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallet`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ const getUserWallets = async (
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
-    const response = await fetch(`/users/api/v1/user/${userId}/wallet`, {
+    const response = await fetch(`${nodeUrl}/users/api/v1/user/${userId}/wallet`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -261,7 +261,7 @@ const getUsers = async (
     console.log('encodedExtra:', encodedExtra);
 
     const response = await fetch(
-      `/usermanager/api/v1/users?extra=${encodedExtra}`,
+      `${nodeUrl}/usermanager/api/v1/users?extra=${encodedExtra}`,
       {
         method: 'GET',
         headers: {
@@ -330,7 +330,7 @@ const getUser = async (
   }
 
   try {
-    const response = await fetch(`/usermanager/api/v1/users/${userId}`, {
+    const response = await fetch(`${nodeUrl}/usermanager/api/v1/users/${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -384,7 +384,7 @@ const getWalletName = async (inKey: string) => {
   console.log(`getWalletName starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/wallet`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallet`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -409,7 +409,7 @@ const getWalletPayments = async (inKey: string) => {
   console.log(`getPayments starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/payments?limit=100`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments?limit=100`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -436,7 +436,7 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
 
   try {
     const response = await fetch(
-      `/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`,
+      `${nodeUrl}/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`,
       {
         method: 'GET',
         headers: {
@@ -527,7 +527,7 @@ const getWalletId = async (inKey: string) => {
   console.log(`getWalletId starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/wallets`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -564,7 +564,7 @@ const getInvoicePayment = async (lnKey: string, invoice: string) => {
   );
 
   try {
-    const response = await fetch(`/api/v1/payments/${invoice}`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments/${invoice}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -606,7 +606,7 @@ const getWalletTransactionsSince = async (
 
     const response = await fetch(
       //`/api/v1/payments?limit=100&extra=${encodedExtra}`, // This approach doesn't work on this endpoint for some reason, we need to filter afterwards.
-      `/api/v1/payments?limit=100`,
+      `${nodeUrl}/api/v1/payments?limit=100`,
       {
         method: 'GET',
         headers: {
@@ -677,7 +677,7 @@ const createInvoice = async (
   );
 
   try {
-    const response = await fetch(`/api/v1/payments`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -710,7 +710,7 @@ const payInvoice = async (adminKey: string, paymentRequest: string) => {
   );
 
   try {
-    const response = await fetch(`/api/v1/payments`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -744,7 +744,7 @@ const createWallet = async (
   );
 
   try {
-    const url = `/api/v1/wallet`;
+    const url = `${nodeUrl}/api/v1/wallet`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -777,7 +777,7 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   );
 
   try {
-    const response = await fetch(`/api/v1/wallets?user_id=${userId}`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallets?user_id=${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -809,7 +809,7 @@ const getNostrRewards = async (
   );
   try {
     const response = await fetch(
-      `/nostrmarket/api/v1/stall/product/${stallId}`,
+      `${nodeUrl}/nostrmarket/api/v1/stall/product/${stallId}`,
       {
         method: 'GET',
         headers: {
@@ -855,7 +855,7 @@ const getUserWalletTransactions = async (
 
   try {
     const response = await fetch(
-      `/usermanager/api/v1/transactions/${walletId}`,
+      `${nodeUrl}/usermanager/api/v1/transactions/${walletId}`,
       {
         method: 'GET',
         headers: {
