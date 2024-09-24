@@ -269,7 +269,7 @@ const getInvoicePayment = async (inKey: string, invoice: string) => {
     const response = await fetch(`${lnbiturl}/api/v1/payments/${invoice}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
         'X-Api-Key': inKey,
       },
     });

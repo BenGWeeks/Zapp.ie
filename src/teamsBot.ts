@@ -14,7 +14,6 @@ import {
 import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { OnBehalfOfUserCredential } from '@microsoft/teamsfx';
-import { EnsureWalletMiddleware } from './services/EnsureWalletMiddleware';
 import { SendZapCommand, SendZap } from './commands/sendZapCommand';
 import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
@@ -110,9 +109,28 @@ export class TeamsBot extends TeamsActivityHandler {
             zapAmount,
           );
 
-          await context.sendActivity(
-            `Awesome! You sent ${zapAmount} Sats to your colleague with a zap!`,
-          );
+const receiverName = context.activity.value.zapReceiverName;
+console.log('Receiver:', context.activity.value);
+console.log('Receiver Name:', context.activity.value.zapReceiverId);
+
+          // Create a mention object
+const mention = {
+  mentioned: {
+    id: context.activity.value.zapReceiverId,
+    name: receiverName,
+  },
+  text: `<at>${receiverName}</at>`,
+  type: 'mention',
+};
+
+const message = MessageFactory.text(
+  `Awesome! You sent ${context.activity.value.zapAmount} Sats to your colleague with a zap! ${mention.text}`
+);
+
+// Add the mention to the message's entities
+message.entities = [mention];
+
+          await context.sendActivity(message);
         }
       } catch (error) {
         console.error('Error in onMessage handler:', error.message);
