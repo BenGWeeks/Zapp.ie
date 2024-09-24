@@ -18,6 +18,22 @@ interface LeaderboardProps {
   timestamp?: number | null;
 }
 
+interface PrivateWalletTransaction {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  transaction: Transaction;
+  time: number;
+}
+
+interface UserTransactionSummary {
+  userId: string;
+  displayName: string;
+  walletId: string;
+  totalAmountSats: number;
+  rank: number;
+}
+
 const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
   const [userTransactionSummary, setUserTransactionSummary] = useState<
     UserTransactionSummary[]
@@ -235,19 +251,21 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ timestamp }) => {
                         </div>
                       )}
                     </div>
-                    <div className={styles.userName}>{summary.displayName} </div>
+                    <div className={styles.userName}>
+                      {summary.displayName}{' '}
+                    </div>
                   </div>
                 </div>
                 <b
-                  className={`${styles.b} ${summary.rank <= 3 ? styles.yellowAmount : ''
-                    } ${getTextColorByRank(summary.rank)}`}
+                  className={`${styles.b} ${
+                    summary.rank <= 3 ? styles.yellowAmount : ''
+                  } ${getTextColorByRank(summary.rank)}`}
                 >
                   {new Intl.NumberFormat('en-US').format(
                     summary.totalAmountSats,
                   )}
                 </b>
                 <img className={styles.icon} alt="Zap Icon" src={ZapIcon} />
-
               </div>
             </li>
           ))}
