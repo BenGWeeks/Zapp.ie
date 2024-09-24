@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import FeedComponent from './components/FeedComponent';
 import ZapActivityChartComponent from './components/ZapActivityChartComponent';
+import TotalZapsComponent from './components/TotalZapsComponent';
 import Leaderboard from './components/Leaderboard';
 import styles from './components/Leaderboard.module.css';
 
@@ -11,10 +12,42 @@ const Home: React.FC = () => {
   });
 
   return (
-    <div>
-      <ZapActivityChartComponent lnKey={inKey} timestamp={timestamp} />
-      <br />
-      <FeedComponent />
+    <div style={{ background: '#1F1F1F' }}>
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          padding: 20,
+          //background: '#1F1F1F',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+          gap: 918,
+          display: 'inline-flex',
+        }}
+      >
+        <div
+          style={{
+            height: 246.19,
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+            gap: 6,
+            display: 'flex',
+          }}
+        >
+          <TotalZapsComponent />
+          <ZapActivityChartComponent lnKey={inKey} timestamp={timestamp} />
+        </div>
+      </div>
+      <div
+        style={{
+          paddingLeft: 20,
+          paddingRight: 20,
+          paddingBottom: 20,
+          paddingTop: 0,
+        }}
+      >
+        <FeedComponent />
+      </div>
     </div>
   );
 };
