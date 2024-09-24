@@ -1,4 +1,6 @@
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import {  BrowserRouter as Router,Routes, Route, useNavigate } from 'react-router-dom';
+import React from 'react';
+
 // Fluent UI imports
 import { ThemeProvider } from '@fluentui/react';
 import { theme } from './styles/Theme'; // Adjust the import path as necessary
@@ -16,7 +18,10 @@ import { PageLayout } from './components/PageLayout';
 
 // Import the pages
 import Home from './Home';
-import Users from './Users';
+import './App.css';
+import Rewards from './Rewards';
+import Wallet from './Wallet';
+import YourWallet from './YourWallet';
 
 type AppProps = {
   pca: IPublicClientApplication;
@@ -28,6 +33,9 @@ function App({ pca }: AppProps) {
   const navigationClient = new CustomNavigationClient(navigate);
   pca.setNavigationClient(navigationClient);
 
+
+
+
   return (
     <MsalProvider instance={pca}>
       <ThemeProvider theme={theme}>
@@ -38,6 +46,7 @@ function App({ pca }: AppProps) {
         </PageLayout>
       </ThemeProvider>
     </MsalProvider>
+
   );
 }
 
@@ -46,6 +55,9 @@ function Pages() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/users" element={<Users />} />
+      <Route path="/Rewards" element={<Rewards />} />
+      <Route path="/Wallet" element={<Wallet />} />
+      <Route path="/YourWallet" element={<YourWallet />} />
     </Routes>
   );
 }

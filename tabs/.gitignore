@@ -1,6 +1,16 @@
 # dependencies
-node_modules/
+
 .github/workflows
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+/dist
 
 # misc
 .deployment

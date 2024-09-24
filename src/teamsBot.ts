@@ -14,22 +14,16 @@ import {
 import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { OnBehalfOfUserCredential } from '@microsoft/teamsfx';
-import { EnsureWalletMiddleware } from './services/EnsureWalletMiddleware';
 import { SendZapCommand, SendZap } from './commands/sendZapCommand';
 import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
-import {
-  getWallets,
-  ensureMatchingUserWallet,
-  payInvoice,
-  getWalletIdByUserId,
-  createInvoice,
-  getWalletId,
-} from './services/lnbitsService';
 import { error } from 'console';
+import { getUser, getWalletById } from './services/lnbitsService';
 
 let globalWalletId: string | null = null;
+
+const adminKey = process.env.LNBITS_ADMINKEY as string;
 
 // Define global variables
 let globalZapAmount: number;
@@ -71,53 +65,40 @@ export class TeamsBot extends TeamsActivityHandler {
 
       try {
         let mentions = TurnContext.getMentions(context.activity);
-        console.log('context.activity:', context.activity);
+        //console.log('context.activity:', context.activity);
 
         if (
           context.activity.value &&
           context.activity.value.action === 'submitZaps'
         ) {
-          const userAadObjectId = context.activity.from.aadObjectId;
-          const userName = context.activity.from.name;
+          const currentUser = context.turnState.get('user');
 
-          const zapReceiverWalletId =
-            context.activity.value.zapReceiverWalletId;
-          const senderWallet = await ensureMatchingUserWallet(
-            userAadObjectId,
-            userName,
-            'Sending',
-          );
-          const zapMessage = context.activity.value.zapMessage;
-          const zapAmount = context.activity.value.zapAmount;
+          const receiverId = context.activity.value.zapReceiverId;
+          const receiver = await getUser(adminKey, receiverId);
 
-          if (!senderWallet) {
+          if (!currentUser.allowanceWallet.id) {
             throw new error('No sending wallet found.');
           }
 
-          const receiverWallets = await getWallets(null, zapReceiverWalletId);
-
-          if (receiverWallets.length != 1) {
-            throw new Error(
-              'Expected exactly one receiving wallet, but found ' +
-                receiverWallets.length,
-            );
+          if (!receiver.privateWallet) {
+            throw new Error('Receiver wallet not found.');
           }
 
           await SendZap(
-            senderWallet,
-            receiverWallets[0],
-            zapMessage,
-            zapAmount,
+            currentUser.allowanceWallet,
+            receiver.privateWallet,
+            context.activity.value.zapMessage,
+            context.activity.value.zapAmount,
           );
 
           await context.sendActivity(
-            `Awesome! You sent ${zapAmount} Sats to your colleague with a zap!`,
+            `Awesome! You sent ${context.activity.value.zapAmount} Sats to your colleague with a zap!`,
           );
         }
       } catch (error) {
         console.error('Error in onMessage handler:', error.message);
         await context.sendActivity(
-          `Oops! Unable to send zap (${error.message}`,
+          `Oops! Unable to send zap (${error.message})`,
         );
       }
 
@@ -195,7 +176,7 @@ export class TeamsBot extends TeamsActivityHandler {
         // Log user information
         console.log(`Zap from userId: ${userId}`);
         console.log(`Zap from userName: ${userName}`);
-        const { receivingWalletId, sendingWalletId } = await ensureUserWallet(
+        const { privateWalletId, allowanceWalletId } = await ensureUserWallet(
           userId,
           userName,
         );
@@ -327,6 +308,7 @@ export class TeamsBot extends TeamsActivityHandler {
       console.log(`User ID: ${userId}, User Name: ${userName}`);
 
       // Ensure the user has a wallet and get the wallet ID
+      /*
       const wallet = await ensureMatchingUserWallet(
         userId,
         userName,
@@ -338,6 +320,7 @@ export class TeamsBot extends TeamsActivityHandler {
       } else {
         await context.sendActivity('Failed to ensure wallet.');
       }
+        */
     } catch (error) {
       console.error('Error in onSignInInvoke:', error);
       await context.sendActivity('An error occurred during sign-in.');
