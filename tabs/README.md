@@ -20,7 +20,7 @@ npm ls http-proxy-middleware
 ## SSO Authentication
 
 For the SSO authentication function to work, obtain the MS Bot Framework ID saved in the Environment variables.
-1. Navigate to https:portal.azure.com and search for App Registrartion
+1. Navigate to https:portal.azure.com and search for App Registration
 2. Search for the Bot App regristation using the client ID used in your environment variables.
 3. Under Manage, select Authentication.
 4. Under Platform configurations , click **Add a platform**
