@@ -133,7 +133,7 @@ const TotalZapsComponent: FunctionComponent = () => {
     <div className={styles.sentcomponent}>
       {/* Total Zaps Section */}
       <div className={styles.zapStats}>
-        <p className={styles.title}>Total zaps sent</p>
+        <p className={styles.title}>Total Zaps sent</p>
         <div className={styles.zapsSentContainer}>
           <span className={styles.bigNumber}>
             {zapsSent.totalZaps.toLocaleString()}
@@ -174,7 +174,7 @@ const TotalZapsComponent: FunctionComponent = () => {
                 </td>
               </tr>
               <tr>
-                <td>Biggest zap</td>
+                <td>Biggest Zap</td>
                 <td className={`${styles.statValue}`}>
                   {loading ? (
                     'Loading ...'
