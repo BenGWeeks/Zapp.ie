@@ -52,12 +52,12 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
   return (
     <div className="wallet-container">
       <div className="wallet-header">
-        <h2>Allowance</h2>
+        <h4>Allowance</h4>
         <p>Amount available to send to your teammates:</p>
       </div>
       <div className='mainContent'>
         <div className="row" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
-          <div className="col-md-5">
+          <div className="col-md-6">
             <div className='amountDisplayContainer'>
               <div className='amountDisplay'>{balance?.toLocaleString() ?? '0'}</div>
               <div >Sats</div>
@@ -71,14 +71,12 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
             </div>
           </div>
           
-          <div className="col-md-2" >
-          </div>
           <div className="col-md-3">
             <BatteryImageDisplay value={batteryPercentage} />
           </div>
         </div>
         <div className="row" style={{ paddingTop: '20px', paddingBottom: '20px' }}>
-          <div className="col-md-7">
+          <div className="col-md-6">
             <div className='nextAllwanceContainer'>
               <img src={Calendar} alt="" />
               <div className="remaining smallTextFont">
@@ -100,7 +98,7 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
               <span className="color-box spent-color"></span>Spent this week:
             </div>
           </div>
-          <div className="col-md-2">
+          <div className="col-md-3">
             <div className="spent smallTextFont">
               <b>{balance?.toLocaleString() ?? '0'}</b> Sats
             </div>

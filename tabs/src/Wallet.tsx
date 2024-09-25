@@ -1,15 +1,11 @@
-import React from "react";
-import WalletAllowanceCard from "./components/WalletAllowanceCard";
-import WalletTransactionHistory from "./components/WalletTransactionHistory";
-import WalletTransactionLog from "./components/WalletTransactionLog";
+import React from 'react';
+import WalletAllwanaceMainComponent from './components/WalletAllwanaceMainComponent';
 
 const Wallet: React.FC = () => {
-
-
   return (
     <div>
       <div>
-        <WalletAllowanceCard
+        {/* <WalletAllowanceCard
           availableSats={2000000}
           availableAmountUSD={74.2}
           remainingSats={90000}
@@ -17,6 +13,9 @@ const Wallet: React.FC = () => {
         />
         <WalletTransactionHistory />
         <WalletTransactionLog />
+         */}
+
+        <WalletAllwanaceMainComponent />
       </div>
     </div>
   );
