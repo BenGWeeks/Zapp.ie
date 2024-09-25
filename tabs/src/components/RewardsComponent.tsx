@@ -116,7 +116,7 @@ const RewardsComponent: FunctionComponent<{
       >
         {rewards.length > 0 ? ( // Check if rewards array has elements
           rewards.map(reward => (
-            <div key={reward.image} className={styles.card}>
+            <div key={reward.id} className={styles.card}>
               <img
                 src={reward.image}
                 alt={reward.name}
