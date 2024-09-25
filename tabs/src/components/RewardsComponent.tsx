@@ -5,6 +5,7 @@ import {
   getUserWallets,
 } from '../services/lnbitsServiceLocal';
 import PurchasePopup from './PurchasePopup';
+import ProvidedBy from '../images/ProvidedBy.svg';
 
 const stallID = process.env.REACT_APP_LNBITS_STORE_ID as string;
 
@@ -104,7 +105,7 @@ const RewardsComponent: FunctionComponent<{
   // Only render rewards if they exist
   return (
     <div className={styles.mainContainer}>
-      <div className={styles.title}>Rewards</div>
+      <div className={styles.title}>Rewards <img src={ProvidedBy} alt="Provided By" className={styles.providedByImage} /></div>
       <div
         className={styles.carousel}
         ref={carouselRef}
