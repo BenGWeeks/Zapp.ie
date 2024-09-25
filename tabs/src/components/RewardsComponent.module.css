@@ -1,6 +1,6 @@
 .mainContainer {
     width: 100%;
-    height: 545px;
+    height: 565px;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -51,7 +51,7 @@
     top: 5px;
     right: 20px;
     height: 40px;
-  }
+}
 
 .carousel {
     display: flex;
@@ -216,4 +216,4 @@
 
 .noPointer {
     cursor: default;
-  }
+}
