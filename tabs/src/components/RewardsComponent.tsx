@@ -17,6 +17,7 @@ const RewardsComponent: FunctionComponent<{
   const [startPosition, setStartPosition] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
+  const [selectedReward, setSelectedReward] = useState<Reward | null>(null); // State to store the selected reward
   const [userWallet, setUserWallet] = useState<Wallet | null>(null); // State to store the user's wallet
   const [hasEnoughSats, setHasEnoughSats] = useState<boolean>(false); // State to store if user has enough Sats
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -34,6 +35,7 @@ const RewardsComponent: FunctionComponent<{
 
         // Map API data to Rewards format
         const transformedRewards = rewardsData.map((product: any) => ({
+          id: product.id,
           image: product.images[0],
           name: product.name,
           shortDescription: product.config.description,
@@ -78,13 +80,14 @@ const RewardsComponent: FunctionComponent<{
     return new Intl.NumberFormat('en-US').format(price);
   };
 
-  const handleBuyClick = async (price: number, reward: string) => {
+  const handleBuyClick = async (price: number, reward: Reward) => {
     try {
       const wallets = await getUserWallets(adminKey, userId);
       const privateWallet = wallets?.find(wallet => wallet.name === 'Private');
       if (privateWallet) {
         setUserWallet(privateWallet);
         setHasEnoughSats(privateWallet.balance_msat / 1000 >= price);
+        setSelectedReward(reward);
         setShowPopup(true);
       } else {
         console.error('No private wallet found for the user');
@@ -136,22 +139,22 @@ const RewardsComponent: FunctionComponent<{
               </div>
               <button
                 className={styles.buyButton}
-                onClick={() => handleBuyClick(reward.price, reward.name)}
+                onClick={() => handleBuyClick(reward.price, reward)}
               >
                 Buy
               </button>
             </div>
           ))
         ) : (
-          <p className={styles.noPointer}>No rewards available</p> // Add a fallback message
+          <p className={styles.noPointer}>No rewards available</p>
         )}
       </div>
-      {showPopup && userWallet && (
+      {showPopup && userWallet && selectedReward && (
         <PurchasePopup
           onClose={handleClosePopup}
           wallet={userWallet}
           hasEnoughSats={hasEnoughSats}
-          productName=""
+          reward={selectedReward} 
         />
       )}{' '}
       {/* Render popup if showPopup is true and userWallet is available */}

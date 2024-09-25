@@ -5,14 +5,14 @@ interface PurchasePopupProps {
   onClose: () => void;
   wallet: Wallet; // Accept wallet as a prop
   hasEnoughSats: boolean; // Accept hasEnoughSats as a prop
-  productName: string; // Add productName as a prop
+  reward: Reward; // Add productName as a prop
 }
 
 const PurchasePopup: React.FC<PurchasePopupProps> = ({
   onClose,
   wallet,
   hasEnoughSats,
-  productName, // Destructure productName from props
+  reward, // Destructure productName from props
 }) => {
   const storeOwnerEmail = process.env.REACT_APP_STORE_OWNER_EMAIL;
   console.log('Store Owner Email:', storeOwnerEmail);
@@ -31,7 +31,8 @@ const PurchasePopup: React.FC<PurchasePopupProps> = ({
 
   const handleConfirmClick = () => {
     if (storeOwnerEmail) {
-      window.location.href = `mailto:${storeOwnerEmail}`;
+      const subject = encodeURIComponent(`REWARD PURCHASE REQUEST: ${reward.name}`);
+      window.location.href = `mailto:${storeOwnerEmail}?subject=${subject}`;
     } else {
       console.error('Store owner email is not defined.');
     }
