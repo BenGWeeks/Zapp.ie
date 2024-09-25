@@ -3,16 +3,16 @@ import styles from './PurchasePopup.module.css';
 
 interface PurchasePopupProps {
   onClose: () => void;
-  wallet: Wallet; // Accept wallet as a prop
-  hasEnoughSats: boolean; // Accept hasEnoughSats as a prop
-  reward: Reward; // Add productName as a prop
+  wallet: Wallet;
+  hasEnoughSats: boolean;
+  reward: Reward;
 }
 
 const PurchasePopup: React.FC<PurchasePopupProps> = ({
   onClose,
   wallet,
   hasEnoughSats,
-  reward, // Destructure productName from props
+  reward,
 }) => {
   const storeOwnerEmail = process.env.REACT_APP_STORE_OWNER_EMAIL;
   console.log('Store Owner Email:', storeOwnerEmail);
