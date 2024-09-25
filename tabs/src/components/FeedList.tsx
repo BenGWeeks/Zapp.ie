@@ -153,7 +153,9 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
                   />
                   <div className={styles.userName}>{zap.to?.displayName}</div>
                 </div>
-                <div className={styles.userName}>{zap.transaction.memo}</div>
+                <div className={styles.userName} title={zap.transaction.memo}>
+                  {zap.transaction.memo}
+                </div>
               </div>
               <div className={styles.transactionDetails}>
                 <b className={styles.b}>
