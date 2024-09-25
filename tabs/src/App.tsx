@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 // Fluent UI imports
 import { ThemeProvider, Stack } from '@fluentui/react';
 import React from 'react';
-import { theme } from './styles/Theme'; // Adjust the import path as necessary
+
 
 
 // MSAL imports
@@ -37,13 +37,13 @@ function App({ pca }: AppProps) {
 
   return (
     <MsalProvider instance={pca}>
-      <ThemeProvider theme={theme}>
+
         <PageLayout>
           <Stack horizontalAlign="center">
             <Pages />
           </Stack>
         </PageLayout>
-      </ThemeProvider>
+
     </MsalProvider>
   );
 }
