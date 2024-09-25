@@ -50,7 +50,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 0px 10px;
+
     box-sizing: border-box;
     gap: 20px;
     padding-right: 10px;
@@ -66,7 +66,7 @@
     align-items: flex-start;
     color: #d8d8d8;
     justify-content: space-between;
-    padding: 0px 10px;
+
 }
 
 .avatarIcon {
@@ -79,6 +79,13 @@
 .userName {
     flex: content;
     position: relative;
+    margin-left: 5px;
+}
+
+.userRank {
+    flex: content;
+    position: relative;
+    margin-left: 10px;
 }
 
 .personDetails {
@@ -88,6 +95,7 @@
     align-items: center;
     justify-content: flex-start;
     gap: 30px;
+    padding-left: 0px;
 }
 
 .mainContentStack {
@@ -103,6 +111,7 @@
 .b {
     position: relative;
     font-weight: bold;
+    text-align: right;
 }
 
 .icon {
@@ -133,6 +142,7 @@
     align-items: center;
     background-color: #222;
     border-bottom: 1px solid #333;
+    padding: 0px;
 }
 
 .feedlist {
@@ -159,7 +169,8 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding-left: 15px;
+    padding-left: 3px;
+    padding-right: 35px;
 }
 
 .mainContentStack {
@@ -172,9 +183,7 @@
     align-items: center;
 }
 
-.userName {
-    margin-left: 10px;
-}
+
 
 .avatarIcon {
     width: 40px;
@@ -190,12 +199,13 @@
 .icon {
     width: 16px;
     height: 16px;
-    padding-right: 25px;
+
 }
 
 .horizontalContainer {
     margin: 0;
     padding: 0;
+    padding: 0px;
 }
 
 .yellowAmount {
