@@ -1,19 +1,21 @@
 import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
 import styles from './RewardsComponent.module.css';
-import { getNostrRewards } from '../services/lnbitsServiceLocal';
+import { getNostrRewards, getUserWallets } from '../services/lnbitsServiceLocal';
+import PurchasePopup from './PurchasePopup';
 
 const stallID = process.env.REACT_APP_LNBITS_STORE_ID as string;
 
-/// <reference path = "../global.d.ts" />
-/// <reference types="react-scripts" />
-
-const RewardsComponent: FunctionComponent<{ adminKey: string }> = ({
+const RewardsComponent: FunctionComponent<{ adminKey: string; userId: string }> = ({
   adminKey,
+  userId,
 }) => {
   const [rewards, setRewards] = useState<Reward[]>([]); // Initialize as an empty array
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [showPopup, setShowPopup] = useState(false); // State to manage popup visibility
+  const [userWallet, setUserWallet] = useState<Wallet | null>(null); // State to store the user's wallet
+  const [hasEnoughSats, setHasEnoughSats] = useState<boolean>(false); // State to store if user has enough Sats
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,6 +75,26 @@ const RewardsComponent: FunctionComponent<{ adminKey: string }> = ({
     return new Intl.NumberFormat('en-US').format(price);
   };
 
+  const handleBuyClick = async (price: number) => {
+    try {
+      const wallets = await getUserWallets(adminKey, userId);
+      const privateWallet = wallets?.find(wallet => wallet.name === 'Private');
+      if (privateWallet) {
+        setUserWallet(privateWallet);
+        setHasEnoughSats(privateWallet.balance_msat / 1000 >= price);
+        setShowPopup(true);
+      } else {
+        console.error('No private wallet found for the user');
+      }
+    } catch (error) {
+      console.error('Error fetching user wallet:', error);
+    }
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
+
   // Only render rewards if they exist
   return (
     <div className={styles.mainContainer}>
@@ -109,13 +131,16 @@ const RewardsComponent: FunctionComponent<{ adminKey: string }> = ({
                 <p className={styles.price}>{formatPrice(reward.price)}</p>
                 <p className={styles.sats}>Sats</p>
               </div>
-              <button className={styles.buyButton}>Buy</button>
+              <button className={styles.buyButton} onClick={() => handleBuyClick(reward.price)}>Buy</button>
             </div>
           ))
         ) : (
-          <p>No rewards available</p> // Add a fallback message
+          <p className={styles.noPointer}>No rewards available</p> // Add a fallback message
         )}
       </div>
+      {showPopup && userWallet && (
+        <PurchasePopup onClose={handleClosePopup} wallet={userWallet} hasEnoughSats={hasEnoughSats} />
+      )} {/* Render popup if showPopup is true and userWallet is available */}
     </div>
   );
 };

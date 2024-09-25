@@ -203,3 +203,7 @@
     border-top-right-radius: 4px;
     transition: height 0.3s ease;
 }
+
+.noPointer {
+    cursor: default;
+  }
