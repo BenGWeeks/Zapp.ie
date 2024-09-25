@@ -35,7 +35,7 @@ const transformZapsToActivities = (
       const date = new Date(transaction.time * 1000)
         .toISOString()
         .split('T')[0];
-      const amount = Math.abs(transaction.amount);
+      const amount = Math.abs(transaction.amount / 1000); // Convert from msats to Sats
       dateAmounts[date] = (dateAmounts[date] || 0) + amount;
     }
   });
@@ -48,13 +48,13 @@ const transformZapsToActivities = (
     const totalAmount = dateAmounts[date] || 0;
 
     let level = 0;
-    if (totalAmount >= 1000 && totalAmount < 2000) {
+    if (totalAmount > 0 && totalAmount < 1000) {
       level = 1;
-    } else if (totalAmount >= 2000 && totalAmount < 3000) {
+    } else if (totalAmount >= 1000 && totalAmount < 2000) {
       level = 2;
-    } else if (totalAmount >= 3000 && totalAmount < 4000) {
+    } else if (totalAmount >= 2000 && totalAmount < 3000) {
       level = 3;
-    } else if (totalAmount >= 4000) {
+    } else if (totalAmount >= 3000) {
       level = 4;
     }
 
