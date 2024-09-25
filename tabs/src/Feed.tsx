@@ -10,7 +10,7 @@ const Home: React.FC = () => {
   });
 
   return (
-    <div style={{ background: '#1F1F1F' }}>
+    <div style={{ background: '#1F1F1F', paddingBottom: 40 }}>
       <div
         style={{
           width: '100%',
