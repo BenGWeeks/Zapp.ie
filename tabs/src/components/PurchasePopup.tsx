@@ -36,6 +36,7 @@ const PurchasePopup: React.FC<PurchasePopupProps> = ({
     } else {
       console.error('Store owner email is not defined.');
     }
+    onClose();
   };
 
   // Log wallet ID and balance to the console
