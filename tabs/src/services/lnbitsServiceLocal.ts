@@ -406,7 +406,7 @@ const getWalletName = async (inKey: string) => {
 };
 
 const getWalletPayments = async (inKey: string) => {
-  console.log(`getPayments starting ... (inKey: ${inKey})`);
+  console.log(`getWalletPayments starting ... (inKey: ${inKey})`);
 
   try {
     const response = await fetch(`/api/v1/payments?limit=100`, {

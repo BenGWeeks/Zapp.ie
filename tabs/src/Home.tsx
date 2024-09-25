@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useMsal } from "@azure/msal-react";
-import { callMsGraph, ProfileData } from "./components/UserDetails";
-import { Stack, PrimaryButton, Image, Text } from '@fluentui/react';
-import { AuthenticatedTemplate, UnauthenticatedTemplate } from "@azure/msal-react";
-import { IRawStyle } from '@fluentui/react';
-import SignInSignOutButton from './components/SignInSignOutButton';
-import { useNavigate } from 'react-router-dom';
-import './styles/Home.css';
+import React, { useState } from 'react';
+import FeedComponent from './components/FeedComponent';
+import ZapActivityChartComponent from './components/ZapActivityChartComponent';
+import TotalZapsComponent from './components/TotalZapsComponent';
+
 
 const centeredImageStyle: IRawStyle = {
   display: 'block',
@@ -33,29 +29,42 @@ export function Home() {
   }, [accounts, navigate]);
 
   return (
-    <div className="home-container">
-      <div className="overlay"></div>
-      <div className="content">
-        <Image src="eirevo.png" styles={{ root: centeredImageStyle }} alt="Eirevo" width="5%" />
-        <AuthenticatedTemplate>
-          <Text styles={{ root: { color: 'white', fontSize: '48px', fontWeight: 'bold' } }}>
-            Zapp.ie
-          </Text>
-          <Stack tokens={{ childrenGap: 10 }} styles={{ root: { marginTop: '100px' } }}>
-            {graphData && <ProfileData graphData={graphData} />}
-          </Stack>
-        </AuthenticatedTemplate>
-        <UnauthenticatedTemplate>
-          <Text styles={{ root: { color: '#F2A900', fontSize: '4vw', fontWeight: 'bold',lineHeight: '64px' } }}>
-            Zapp.ie
-          </Text>
-          <Text styles={{ root: { textAlign: 'center', marginTop: '100px', color: 'white', fontSize: '14px', display: 'block',lineHeight: '18px', paddingBottom: '80px'} }}>
-            <p>Boost collaboration, reward achievements, incentivize improvement, and drive real value with Zaps.</p>
-            <p>To get started, please log in to access your dashboard, manage your rewards, and start recognizing your teammates' efforts.</p>
-            <br></br>
-          </Text>
-          <SignInSignOutButton />
-        </UnauthenticatedTemplate>
+
+    <div style={{ background: '#1F1F1F' }}>
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          padding: 20,
+          //background: '#1F1F1F',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+          gap: 918,
+          display: 'inline-flex',
+        }}
+      >
+        <div
+          style={{
+            /*height: 246.19,*/
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+            gap: 6,
+            display: 'flex',
+          }}
+        >
+          <TotalZapsComponent />
+          <ZapActivityChartComponent lnKey={inKey} timestamp={timestamp} />
+        </div>
+      </div>
+      <div
+        style={{
+          paddingLeft: 20,
+          paddingRight: 20,
+          paddingBottom: 20,
+          paddingTop: 0,
+        }}
+      >
+        <FeedComponent />
       </div>
     </div>
   );
