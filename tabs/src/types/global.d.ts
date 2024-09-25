@@ -1,6 +1,7 @@
 // src/types/global.d.ts
 
 interface Reward {
+  id: string;
   image: string;
   name: string;
   shortDescription: string;
