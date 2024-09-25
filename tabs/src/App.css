@@ -1,4 +1,11 @@
-.App {
+body{
+  background-color: #2D2B2C;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+
+App {
   text-align: center;
 }
 

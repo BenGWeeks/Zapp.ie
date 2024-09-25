@@ -2,7 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './FooterComponent.module.css';
 
-const FooterComponent: React.FC = () => {
+type FooterComponentProps = {
+  hidden: boolean;
+};
+
+const FooterComponent: React.FC<FooterComponentProps> = ({ hidden }) => {
+
+  if (hidden) {
+    return null;
+}
   return (
     <footer className={styles.footer}>
       <Link to="/">Home</Link>&nbsp;|&nbsp;
