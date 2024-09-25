@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import FeedComponent from './components/FeedComponent';
 import ZapActivityChartComponent from './components/ZapActivityChartComponent';
 import TotalZapsComponent from './components/TotalZapsComponent';
-import Leaderboard from './components/Leaderboard';
-import styles from './components/Leaderboard.module.css';
 
 const Home: React.FC = () => {
   const inKey = 'a77d1194b4f348b1a61e4e2938b5762f'; // TODO: Hardcoded to Ben's Allowance wallet for now.
@@ -27,7 +25,7 @@ const Home: React.FC = () => {
       >
         <div
           style={{
-            height: 246.19,
+            /*height: 246.19,*/
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
             gap: 6,
