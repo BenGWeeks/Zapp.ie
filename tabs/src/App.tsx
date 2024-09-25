@@ -15,6 +15,7 @@ import { CustomNavigationClient } from './utils/NavigationClient';
 import { PageLayout } from './components/PageLayout';
 
 // Import the pages
+import Login from './Login';
 import Home from './Home';
 import Users from './Users';
 import './App.css';
@@ -50,7 +51,8 @@ function App({ pca }: AppProps) {
 function Pages() {
   return (
     <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Login />} />
+            <Route path="/leaderboard" element={<Home />} />
             <Route path="/users" element={<Users />} />
             <Route path="/Rewards" element={<Rewards />} />
             <Route path="/Wallet" element={<Wallet />} />

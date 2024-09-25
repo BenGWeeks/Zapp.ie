@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import { AuthenticatedTemplate } from "@azure/msal-react";
 import FooterComponent from "./FooterComponent";
 import styles from './PageLayout.module.css';
 
@@ -17,7 +18,9 @@ export const PageLayout: React.FC<Props> = ({ children }) => {
             <div className={styles.contentWrap}>
                 {children}
             </div>
-            <FooterComponent hidden={hideNavBar} />
+            <AuthenticatedTemplate>
+                <FooterComponent hidden={hideNavBar} />
+            </AuthenticatedTemplate>
         </div>
     );
 };
