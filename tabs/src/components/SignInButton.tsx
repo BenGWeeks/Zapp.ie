@@ -39,9 +39,10 @@ export const SignInButton = () => {
 
     return (
         <div>
-            <DefaultButton
-                text="Login"
+            <DefaultButton 
+                text="Log in now to power up your workplace!"
                 onClick={() => handleLogin("popup")}
+                styles={{ root: { color: 'black', width:'auto' } }}
             />
             {open && <ContextualMenu {...menuProps} />}
         </div>

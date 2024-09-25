@@ -16,7 +16,7 @@ import { PageLayout } from './components/PageLayout';
 
 // Import the pages
 import Login from './Login';
-import Home from './Home';
+import Feed from './Feed';
 import Users from './Users';
 import './App.css';
 import Rewards from './Rewards';
@@ -52,7 +52,7 @@ function Pages() {
   return (
     <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/leaderboard" element={<Home />} />
+            <Route path="/feed" element={<Feed />} />
             <Route path="/users" element={<Users />} />
             <Route path="/Rewards" element={<Rewards />} />
             <Route path="/Wallet" element={<Wallet />} />

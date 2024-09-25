@@ -23,7 +23,7 @@ export function Login() {
   useEffect(() => {
     if (accounts.length > 0) {
       // Redirect authenticated users to /leaderboard
-      navigate('/leaderboard');
+      navigate('/feed');
     }
   }, [accounts, navigate]);
 
@@ -41,13 +41,13 @@ export function Login() {
           </Stack>
         </AuthenticatedTemplate>
         <UnauthenticatedTemplate>
-          <Text styles={{ root: { color: 'white', fontSize: '4vw', fontWeight: 'bold' } }}>
+          <Text styles={{ root: { color: '#F2A900', fontSize: '4vw', fontWeight: 'bold',lineHeight: '2' } }}>
             Zapp.ie
           </Text>
-          <Text styles={{ root: { textAlign: 'center', display: 'block', marginTop: '100px', color: 'white', fontSize: '1vw' } }}>
+          <Text styles={{ root: { textAlign: 'center', marginTop: '100px', color: 'white', fontSize: '1vw', fontfamily: 'Inter', display: 'block'} }}>
             <p>Boost collaboration, reward achievements, incentivize improvement, and drive real value with Zaps.</p>
             <p>To get started, please log in to access your dashboard, manage your rewards, and start recognizing your teammates' efforts.</p>
-            <p><b>Log in now to power up your workplace!</b></p>
+            <br></br>
           </Text>
           <SignInSignOutButton />
         </UnauthenticatedTemplate>
