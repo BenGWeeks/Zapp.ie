@@ -1,14 +1,17 @@
 import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
 import styles from './RewardsComponent.module.css';
-import { getNostrRewards, getUserWallets } from '../services/lnbitsServiceLocal';
+import {
+  getNostrRewards,
+  getUserWallets,
+} from '../services/lnbitsServiceLocal';
 import PurchasePopup from './PurchasePopup';
 
 const stallID = process.env.REACT_APP_LNBITS_STORE_ID as string;
 
-const RewardsComponent: FunctionComponent<{ adminKey: string; userId: string }> = ({
-  adminKey,
-  userId,
-}) => {
+const RewardsComponent: FunctionComponent<{
+  adminKey: string;
+  userId: string;
+}> = ({ adminKey, userId }) => {
   const [rewards, setRewards] = useState<Reward[]>([]); // Initialize as an empty array
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState(0);
@@ -75,7 +78,7 @@ const RewardsComponent: FunctionComponent<{ adminKey: string; userId: string }> 
     return new Intl.NumberFormat('en-US').format(price);
   };
 
-  const handleBuyClick = async (price: number) => {
+  const handleBuyClick = async (price: number, reward: string) => {
     try {
       const wallets = await getUserWallets(adminKey, userId);
       const privateWallet = wallets?.find(wallet => wallet.name === 'Private');
@@ -131,7 +134,12 @@ const RewardsComponent: FunctionComponent<{ adminKey: string; userId: string }> 
                 <p className={styles.price}>{formatPrice(reward.price)}</p>
                 <p className={styles.sats}>Sats</p>
               </div>
-              <button className={styles.buyButton} onClick={() => handleBuyClick(reward.price)}>Buy</button>
+              <button
+                className={styles.buyButton}
+                onClick={() => handleBuyClick(reward.price, reward.name)}
+              >
+                Buy
+              </button>
             </div>
           ))
         ) : (
@@ -139,8 +147,14 @@ const RewardsComponent: FunctionComponent<{ adminKey: string; userId: string }> 
         )}
       </div>
       {showPopup && userWallet && (
-        <PurchasePopup onClose={handleClosePopup} wallet={userWallet} hasEnoughSats={hasEnoughSats} />
-      )} {/* Render popup if showPopup is true and userWallet is available */}
+        <PurchasePopup
+          onClose={handleClosePopup}
+          wallet={userWallet}
+          hasEnoughSats={hasEnoughSats}
+          productName=""
+        />
+      )}{' '}
+      {/* Render popup if showPopup is true and userWallet is available */}
     </div>
   );
 };
