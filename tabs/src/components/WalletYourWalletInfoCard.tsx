@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './WalletYourWalletInfoCard.css';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
-import { getUserWallets } from '../services/lnbitsServiceLocal';
+import { getUsers, getUserWallets } from '../services/lnbitsServiceLocal';
+import { useMsal } from '@azure/msal-react';
 
 // interface WalletYourWalletInfoCardProps {
 //   totalSats: number;
@@ -12,21 +13,32 @@ const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 const WalletYourWalletInfoCard: React.FC = () => {
   const [balance, setBalance] = useState<number>();
 
+  const { instance, accounts } = useMsal();
+  const account = accounts[0];
+
   const fetchAmountReceived = async () => {
     console.log('Fetching your wallet ...');
-    const walletForUser = await getUserWallets(
-      adminKey,
-      '2984e3ac627e4fea9fd6dde9c4df83b5',
-    );
 
-    console.log('Wallets: ', walletForUser);
+    const currentUserLNbitDetails = await getUsers(adminKey, {
+      aadObjectId: account.localAccountId,
+    });
 
-    if (walletForUser && walletForUser.length > 0) {
-      setBalance(
-        walletForUser.filter(
-          (wallet: { name: string }) => wallet.name === 'Private',
-        )[0].balance_msat / 1000,
+    if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
+
+      const walletForUser = await getUserWallets(
+        adminKey,
+        currentUserLNbitDetails[0].id,
       );
+
+      console.log('Wallets: ', walletForUser);
+
+      if (walletForUser && walletForUser.length > 0) {
+        setBalance(
+          walletForUser.filter(
+            (wallet: { name: string }) => wallet.name === 'Private',
+          )[0].balance_msat / 1000,
+        );
+      }
     }
   };
 
