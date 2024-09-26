@@ -1,11 +1,11 @@
 .mainContainer {
-    width: calc(100% - 20px);
-    height: 545px;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
+    width: 1052px;
+    height: 565px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    border: 20px solid rgba(31, 31, 31, 1);
+    border-top: 0px;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.14), 0px 0px 1px rgba(0, 0, 0, 0.12);
     border-radius: 4px;
     background-color: #2d2b2c;
@@ -20,11 +20,12 @@
     font-size: 12px;
     color: #d6d6d6;
     font-family: Inter;
-    padding-top: 7px;
-    padding-bottom: 17px;
-    padding-right: 15px;
     user-select: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
+
 
 .title {
     width: 278px;
@@ -41,6 +42,14 @@
     flex-grow: 0;
     z-index: 0;
     user-select: none;
+}
+
+.providedByImage {
+    position: absolute;
+    right: 0;
+    top: 5px;
+    right: 20px;
+    height: 40px;
 }
 
 .carousel {
@@ -84,7 +93,7 @@
 }
 
 .card {
-    width: calc((100% - 80px) / 3);
+    width: 336px;
     height: 100%;
     background-color: rgba(31, 31, 31, 1);
     border-radius: 4px;
@@ -202,4 +211,8 @@
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     transition: height 0.3s ease;
+}
+
+.noPointer {
+    cursor: default;
 }

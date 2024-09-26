@@ -97,6 +97,11 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
   1. Navigate to the _Tabs_ directory
   2. Type `npm start`
 
+## Set up Nostr Marketplace
+
+1. With 'Super User' permissions, add extencion "Nostr Market".
+2. Use this link to set up Merchant, Stall and Products https://github.com/lnbits/nostrmarket.
+
 # Get in touch
 
 Have fun, and tag us on Twitter / Nostr!

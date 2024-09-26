@@ -4,13 +4,13 @@ import ZapActivityChartComponent from './components/ZapActivityChartComponent';
 import TotalZapsComponent from './components/TotalZapsComponent';
 
 const Home: React.FC = () => {
-  const inKey = 'a77d1194b4f348b1a61e4e2938b5762f'; // TODO: Hardcoded to Ben's Allowance wallet for now.
+  //const inKey = 'a77d1194b4f348b1a61e4e2938b5762f'; // TODO: Hardcoded to Ben's Allowance wallet for now.
   const [timestamp] = useState(() => {
     return Math.floor(Date.now() / 1000) - 60 * 60 * 24 * 365 * (8.5 / 12); // Last 8.5 months
   });
 
   return (
-    <div style={{ background: '#1F1F1F' }}>
+    <div style={{ background: '#1F1F1F', paddingBottom: 40 }}>
       <div
         style={{
           width: '100%',
@@ -33,7 +33,7 @@ const Home: React.FC = () => {
           }}
         >
           <TotalZapsComponent />
-          <ZapActivityChartComponent lnKey={inKey} timestamp={timestamp} />
+          <ZapActivityChartComponent lnKey={''} timestamp={timestamp} />
         </div>
       </div>
       <div
