@@ -1,59 +1,62 @@
 import React, { useEffect, useState } from 'react';
-import './WalletAllowanceCard.css'; // Assuming you'll use CSS for styling
+import './WalletAllowanceComponent.css'; // Assuming you'll use CSS for styling
 import BatteryImageDisplay from './BatteryImageDisplay';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import Calendar from '../images/Calendar.svg';
-import { getUsers, getUserWallets } from '../services/lnbitsServiceLocal';
+import {
+  getAllowance,
+  getUsers,
+  getUserWallets,
+} from '../services/lnbitsServiceLocal';
 import { useMsal } from '@azure/msal-react';
-
-interface AllowanceCardProps {
-  availableSats: number;
-  availableAmountUSD: number;
-  remainingSats: number;
-  spentSats: number;
-  timestamp?: number | null;
-}
 
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
-const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
-  spentSats,
-  timestamp,
-}) => {
-  const [batteryPercentage, setBatteryPercentage] = useState<number>(0);
-  const [balance, setBalance] = useState<number>();
+interface AllowanceCardProps {
+  // Define the props here if there are any, for example:
+  // someProp: string;
+}
 
-  // Calculate the timestamp for 7 days ago
-  const sevenDaysAgo = Date.now() / 1000 - 7 * 24 * 60 * 60;
+const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({}) => {
+  const [batteryPercentage, setBatteryPercentage] = useState<number>(0);
+  const [balance, setBalance] = useState<number>(0);
+  const [allowance, setAllowance] = useState<Allowance | null>(null);
+  const [spentSats, setSpentSats] = useState<number>(0);
 
   const { instance, accounts } = useMsal();
   const account = accounts[0];
 
-  // Use the provided timestamp or default to 7 days ago
-  const paymentsSinceTimestamp =
-    timestamp === null || timestamp === undefined || timestamp === 0
-      ? sevenDaysAgo
-      : timestamp;
-
   const fetchAmountReceived = async () => {
     console.log('Fetching your wallet ...');
 
-    const currentUserLNbitDetails = await getUsers(adminKey, {
+    console.log('account.localAccountId:', account.localAccountId);
+
+    const user = await getUsers(adminKey, {
       aadObjectId: account.localAccountId,
     });
 
-      if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
-        const bal =
-          (currentUserLNbitDetails[0].allowanceWallet?.balance_msat ?? 0) / 1000;
+    console.log('User:', user);
 
-      setBalance(bal);
-      setBatteryPercentage((spentSats / bal) * 100);
+    if (user && user.length > 0) {
+      const balance = (user[0].allowanceWallet?.balance_msat ?? 0) / 1000;
+      setBalance(balance);
+
+      const allowance = await getAllowance(adminKey, user[0].id);
+      console.log('Allowance:', allowance);
+
+      if (allowance) {
+        setAllowance(allowance);
+        setBatteryPercentage((allowance?.amount - balance / balance) * 100);
+      } else {
+        setAllowance(null);
+        setBatteryPercentage(0);
+      }
     }
   };
 
   useEffect(() => {
     fetchAmountReceived();
-  });
+  }, []);
 
   return (
     <div className="wallet-container">
@@ -97,10 +100,22 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
               <img src={Calendar} alt="" />
               <div className="remaining smallTextFont">Next allowance</div>
               <div className="remaining smallTextFont">
-                25,000 <span>Sats</span>
+                {allowance ? allowance.amount.toLocaleString() : '0'}{' '}
+                <span>Sats</span>
               </div>
               <div className="remaining smallTextFont">
-                <div>Mon, September 23</div>
+                <div>
+                  {allowance
+                    ? new Date(allowance.nextPaymentDate).toLocaleDateString(
+                        'en-US',
+                        {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        },
+                      )
+                    : 'TBC'}
+                </div>
               </div>
             </div>
           </div>
@@ -118,7 +133,7 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
               <b>{balance?.toLocaleString() ?? '0'}</b> Sats
             </div>
             <div className="spent smallTextFont">
-              <b>{spentSats.toLocaleString()}</b> Sats
+              <b>{spentSats?.toLocaleString()}</b> Sats
             </div>
           </div>
         </div>

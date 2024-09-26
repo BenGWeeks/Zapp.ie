@@ -11,7 +11,6 @@ import moment from 'moment';
 import { useMsal } from '@azure/msal-react';
 
 interface WalletTransactionLogProps {
-  timestamp?: number | null;
   activeTab?: string;
   filterZaps?: (activeTab: string) => void;
 }
@@ -19,7 +18,6 @@ interface WalletTransactionLogProps {
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
 const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
-  timestamp,
   activeTab,
 }) => {
   const [zaps, setZaps] = useState<Transaction[]>([]);
@@ -31,10 +29,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
   const sevenDaysAgo = Date.now() / 1000 - 30 * 24 * 60 * 60;
 
   // Use the provided timestamp or default to 7 days ago
-  const paymentsSinceTimestamp =
-    timestamp === null || timestamp === undefined || timestamp === 0
-      ? sevenDaysAgo
-      : timestamp;
+  const paymentsSinceTimestamp = sevenDaysAgo;
   const activeTabForData =
     activeTab === null || activeTab === undefined || activeTab === ''
       ? 'all'
@@ -63,6 +58,8 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
       const currentUserLNbitDetails = await getUsers(adminKey, {
         aadObjectId: account.localAccountId,
       });
+
+      console.log('Current user: ', currentUserLNbitDetails);
 
       if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
         const wallets = await getUserWallets(
@@ -114,7 +111,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
     setZaps([]);
     getAllUsers();
     fetchZaps();
-  }, [timestamp]);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -148,7 +145,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
                   <div className={styles.lightHelightInItems}>
                     {' '}
                     {moment(moment.now()).diff(zap.time * 1000, 'days')} days
-                    ago from <b>{zap.extra?.from?.displayName} </b>
+                    ago from <b>{zap.extra?.from?.displayName ?? 'Unknown'} </b>
                   </div>
                   <p className={styles.lightHelightInItems}>{zap.memo}</p>
                 </div>
@@ -168,7 +165,13 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
                   </b>{' '}
                   Sats{' '}
                 </div>
-                <div className={styles.lightHelightInItems}> about $0.11 </div>
+                <div
+                  style={{ display: 'none' }}
+                  className={styles.lightHelightInItems}
+                >
+                  {' '}
+                  about $0.11{' '}
+                </div>
               </div>
             </div>
           </div>

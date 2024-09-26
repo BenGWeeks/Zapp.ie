@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './WalletYourWalletInfoCard.css';
+import './WalletInfoCard.css';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import { getUsers, getUserWallets } from '../services/lnbitsServiceLocal';
 import { useMsal } from '@azure/msal-react';

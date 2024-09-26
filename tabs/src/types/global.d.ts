@@ -58,14 +58,19 @@ interface Transaction {
   wallet_id: string;
 }
 
-interface WeeklyAllowance {
+interface Allowance {
   id: string;
-  admin: string;
   name: string;
-  user: string;
-  adminkey: string;
-  inkey: string;
+  wallet: string;
+  toWallet: string;
   amount: number;
+  startDate: date;
+  endDate: date | null;
+  frequency: AllowanceFrequency;
+  nextPaymentDate: date;
+  lastPaymentDate: date | null;
+  memo: string | null;
+  active: boolean;
 }
 
 declare module '*.module.css' {
