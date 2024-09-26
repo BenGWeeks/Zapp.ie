@@ -373,6 +373,7 @@ const getUser = async (
       profileImg: user.profileImg,
       aadObjectId: user.extra?.aadObjectId || null,
       email: user.email,
+      type: user.extra?.type || 'Teammate',
       privateWallet: privateWallet || null,
       allowanceWallet: allowanceWallet || null,
     };
@@ -476,6 +477,7 @@ const getWalletById = async (
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
+
     const response = await fetch(
       `${nodeUrl}/users/api/v1/user/${userId}/wallet`,
       {
@@ -908,7 +910,7 @@ const getUserWalletTransactions = async (
 };
 
 const getUserWeeklyAllowance = async (
-  adminKey: string
+  adminKey: string,
 ): Promise<WeeklyAllowance | null> => {
   try {
     let weeklyAllowance: WeeklyAllowance = {

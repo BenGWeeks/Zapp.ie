@@ -38,9 +38,12 @@ interface User {
   profileImg: string;
   aadObjectId: string;
   email: string;
+  type: UserType;
   privateWallet: Wallet | null;
   allowanceWallet: Wallet | null;
 }
+
+type UserType = 'Teammate' | 'Copilot' | 'Guest';
 
 type WalletType = 'Allowance' | 'Private';
 
