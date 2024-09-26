@@ -8,6 +8,7 @@ import {
 import ArrowIncoming from '../images/ArrowIncoming.svg';
 import ArrowOutgoing from '../images/ArrowOutcoming.svg';
 import moment from 'moment';
+import { useMsal } from '@azure/msal-react';
 
 interface WalletTransactionLogProps {
   timestamp?: number | null;
@@ -48,6 +49,9 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
     console.log('Users: ', users);
   };
 
+  const { accounts } = useMsal();
+  const account = accounts[0];
+
   const fetchZaps = async () => {
     console.log('Fetching payments since: ', paymentsSinceTimestamp);
     setLoading(true);
@@ -56,33 +60,39 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
     let allZaps: Transaction[] = [];
 
     try {
-      const wallets = await getUserWallets(
-        adminKey,
-        '2984e3ac627e4fea9fd6dde9c4df83b5',
-      ); // We'll just look at the private wallets.
+      const currentUserLNbitDetails = await getUsers(adminKey, {
+        aadObjectId: account.localAccountId,
+      });
 
-      // Loop through all the wallets
-      if (wallets) {
-        console.log('Wallets1');
-        for (const wallet of wallets) {
-          const zaps = await getWalletTransactionsSince(
-            wallet.inkey,
-            paymentsSinceTimestamp,
-            null, //{ tag: 'zap' }
-          );
+      if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
+        const wallets = await getUserWallets(
+          adminKey,
+          currentUserLNbitDetails[0].id,
+        ); // We'll just look at the private wallets.
 
-          for (const zap of zaps) {
-            zap.extra.from = users.filter(
-              u => u.id === zap.extra?.from?.user,
-            )[0];
-            zap.extra.to = users.filter(u => u.id === zap.extra?.to?.user)[0];
+        // Loop through all the wallets
+        if (wallets) {
+          console.log('Wallets1');
+          for (const wallet of wallets) {
+            const zaps = await getWalletTransactionsSince(
+              wallet.inkey,
+              paymentsSinceTimestamp,
+              null, //{ tag: 'zap' }
+            );
+
+            for (const zap of zaps) {
+              zap.extra.from = users.filter(
+                u => u.id === zap.extra?.from?.user,
+              )[0];
+              zap.extra.to = users.filter(u => u.id === zap.extra?.to?.user)[0];
+            }
+
+            allZaps = allZaps.concat(zaps);
+            console.log('Zaps: ', allZaps);
           }
-
-          allZaps = allZaps.concat(zaps);
-          console.log('Zaps: ', allZaps);
         }
+        setZaps(prevState => [...prevState, ...allZaps]);
       }
-      setZaps(prevState => [...prevState, ...allZaps]);
     } catch (error) {
       if (error instanceof Error) {
         setError(`Failed to fetch users: ${error.message}`);
@@ -138,7 +148,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
                   <div className={styles.lightHelightInItems}>
                     {' '}
                     {moment(moment.now()).diff(zap.time * 1000, 'days')} days
-                    ago from <b>{zap.extra?.from?.displayName}{' '}</b>
+                    ago from <b>{zap.extra?.from?.displayName} </b>
                   </div>
                   <p className={styles.lightHelightInItems}>{zap.memo}</p>
                 </div>
