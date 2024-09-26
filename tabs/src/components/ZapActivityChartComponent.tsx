@@ -154,7 +154,7 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
         }}
         colorScheme="dark"
         labels={{
-          totalCount: '{{count}} Sats zapped',
+          totalCount: '{{count}} Sats zapped (up until yesterday)',
         }}
       />
     </div>
