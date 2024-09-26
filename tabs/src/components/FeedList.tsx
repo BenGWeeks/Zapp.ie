@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styles from './FeedList.module.css';
 import {
   getUser,
@@ -24,6 +24,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const [zaps, setZaps] = useState<ZapTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const initialRender = useRef(true);
 
   const paymentsSinceTimestamp =
     timestamp === null || timestamp === undefined || timestamp === 0
@@ -64,7 +65,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
               );
 
               allZaps = allZaps.concat(zaps);
-              console.log('Timestamp changed: ', transactions);
+              //console.log('Transactions: ', transactions);
             }
           } else {
             console.log('No wallets found for user: ', user.id);
@@ -88,9 +89,12 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   };
 
   useEffect(() => {
-    // Clear the zaps
-    setZaps([]);
-    fetchZaps();
+    if (initialRender.current) {
+      initialRender.current = false;
+      // Clear the zaps
+      setZaps([]);
+      fetchZaps();
+    }
   }, [timestamp]);
 
   if (loading) {
