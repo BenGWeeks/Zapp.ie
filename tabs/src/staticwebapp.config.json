@@ -1,0 +1,7 @@
+{
+    "navigationFallback": {
+      "rewrite": "/",
+      "exclude": ["/api/*"]
+    }
+  }
+  
