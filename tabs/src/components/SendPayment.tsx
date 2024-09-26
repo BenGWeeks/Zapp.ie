@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styles from './SendPayment.module.css';
 import qrCodeImage from '../images/QRCode.svg';
+import checkmarkIcon from '../images/CheckmarkCircleGreen.svg';
+import dismissIcon from '../images/DismissCircleRed.svg';
 
 interface SendPopupProps {
     onClose: () => void;
@@ -15,25 +17,34 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
     const [inputValue, setInputValue] = useState('');
     const [invoice, setInvoice] = useState('');
     const [sendAnonymously, setSendAnonymously] = useState(false);
+    const [isSendPopupVisible, setIsSendPopupVisible] = useState(false); 
+    const [isPaymentSuccess, setIsPaymentSuccess] = useState(false); // need to add logic to check if payment was successful
+    const [isSuccessFailurePopupVisible, setIsSuccessFailurePopupVisible] = useState(false);
     const isSendDisabled = !inputValue || !invoice;
 
     const handleButtonClick = (value: string) => {
         setInputValue(value);
     };
+
     const handleCancelClick = () => {
         onClose();
     };
 
     const handleSendClick = () => {
-        // Send payment logic here
+        setIsSuccessFailurePopupVisible(true); 
+        setIsSendPopupVisible(true);
+        setIsPaymentSuccess(true); // Show the success OR failure popup
     };
 
+    const handleChangeAmountClick = () => {
+        setIsSuccessFailurePopupVisible(false);
+    };
 
     return (
         <div className={styles.overlay} onClick={handleOverlayClick}>
             <div className={styles.popup}>
                 <p className={styles.title}>Send some zaps</p>
-                <p className={styles.text}>Show gratitude, thanks and recognising awesomeness to others in your team</p>
+                <p className={styles.text}>Show gratitude, thanks, and recognizing awesomeness to others in your team</p>
                 <div className={styles.container}>
                     <div className={styles.inputRow}>
                         <input
@@ -58,7 +69,7 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
                 />
                 <div className={styles.buttonContainer}>
                     <button className={styles.scanButton}>
-                        <img src={qrCodeImage} alt="QR Code" className={styles.qrIcon} /> {/* Use the <img> tag */}
+                        <img src={qrCodeImage} alt="QR Code" className={styles.qrIcon} />
                         Scan QR code
                     </button>
                 </div>
@@ -75,10 +86,42 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
                             />
                             <label htmlFor="sendAnonymously" className={styles.checkboxLabel}>Send anonymously</label>
                         </div>
-                        <button onClick={handleSendClick} className={styles.sendButton} disabled={isSendDisabled}>Send</button>
+                        <button
+                            onClick={handleSendClick}
+                            className={isSendDisabled ? styles.sendButton : styles.sendButtonEnabled}
+                            disabled={isSendDisabled}
+                        >
+                            Send
+                        </button>
                     </div>
                 </div>
             </div>
+            {/* Success or failure popup, only visible based on isSuccessFailurePopupVisible */}
+            {isSuccessFailurePopupVisible && isPaymentSuccess && (
+                <div className={styles.overlay} onClick={handleOverlayClick}>
+                    <div className={styles.sendPopupSuccess}>
+                        <div className={styles.sendPopupHeader}>
+                            <img src={checkmarkIcon} alt="Checkmark" className={styles.checkmarkIcon} />
+                            <div className={styles.sendPopupText}>Zaps sent successfully!</div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isSuccessFailurePopupVisible && !isPaymentSuccess && (
+                <div className={styles.overlay} onClick={handleOverlayClick}>
+                    <div className={styles.sendPopupFailed}>
+                        <div className={styles.sendPopupHeader}>
+                            <img src={dismissIcon} alt="Dismiss" className={styles.checkmarkIcon} />
+                            <div className={styles.sendPopupText}>Zaps cannot be sent</div>
+                        </div>
+                        <div className={styles.sendPopupSubText}>You do not have enough Sats on your wallet</div>
+                        <div className={styles.buttonContainerSmallPopup}>
+                            <button className={styles.cancelButton} onClick={handleCancelClick}>Cancel</button>
+                            <button className={styles.changeAmountButton} onClick={handleChangeAmountClick}>Change amount</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

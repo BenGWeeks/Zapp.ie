@@ -204,7 +204,8 @@
     font-style: normal;
     font-weight: normal;
     font-size: 12px;
-    color: #F2A900;;
+    color: #F2A900;
+    ;
 }
 
 .cancelButton:hover {
@@ -284,8 +285,117 @@
     font-style: normal;
     font-weight: normal;
     font-size: 12px;
+    color: rgba(121, 121, 121, 1);
 }
 
 .sendButton:hover {
+    background-color: #1F1F1F;
+}
+
+.sendButtonEnabled {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 111px;
+    height: 38px;
+    background: #F2A900;
+    border-radius: 4px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+  }
+  
+  .sendButtonEnabled:hover {
+    background-color: #d18a00;
+  }
+
+  .sendPopupSuccess {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 32px 32px;
+    gap: 20px;
+    position: relative;
+    width: 287px;
+    height: 84px;
+    background: #2D2B2C;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12), 0px 14px 250px rgba(0, 0, 0, 0.14);
+    border-radius: 4px;
+  }
+  .sendPopupFailed {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    padding: 28px 32px 32px;
+    gap: 20px;
+    position: relative;
+    width: 337px;
+    height: 184px;
+    background: #2D2B2C;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12), 0px 14px 250px rgba(0, 0, 0, 0.14);
+    border-radius: 4px;
+    
+  }
+  .sendPopupHeader {
+    display: flex;
+    align-items: center; 
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .sendPopupText {
+    color: white;
+    font-size: 16px;
+  }
+
+  .sendPopupSubText {
+    color:  rgba(216, 216, 216, 1);
+    font-size: 14px; 
+    margin-top: 10px;
+  }
+ 
+  .checkmarkIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .buttonContainerSmallPopup {
+    display: flex;
+    justify-content: space-between;
+    width: 100%+20px;
+    margin-top: 0px;
+}
+
+.changeAmountButton {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 117px;
+    height: 38px;
+    border: 1px solid #F2A900;
+    border-radius: 4px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    color: #F2A900;
+    ;
+}
+
+.changeAmountButton:hover {
     background-color: #1F1F1F;
 }
