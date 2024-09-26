@@ -1,7 +1,7 @@
 {
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
     "manifestVersion": "1.16",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.microsoft.teams.extension",
     "developer": {
@@ -77,8 +77,8 @@
                 "channelTab"
             ], 
             "name": "Feed", 
-            "contentUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/", 
-            "websiteUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/"
+            "contentUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/", 
+            "websiteUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/"
         }, 
         { 
             "entityId": "usersTab", 
@@ -91,8 +91,8 @@
                 "channelTab"
             ], 
             "name": "Users", 
-            "contentUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/users", 
-            "websiteUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/users"
+            "contentUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/users", 
+            "websiteUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/users"
         } ,       { 
             "entityId": "rewardsTab", 
             "scopes": [       
@@ -104,8 +104,8 @@
                 "channelTab"
             ], 
             "name": "Rewards", 
-            "contentUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/rewards", 
-            "websiteUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/rewards"
+            "contentUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/rewards", 
+            "websiteUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/rewards"
         },
                { 
             "entityId": "walletTab", 
@@ -118,8 +118,8 @@
                 "channelTab"
             ], 
             "name": "Rewards", 
-            "contentUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/wallet", 
-            "websiteUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/wallet"
+            "contentUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/wallet", 
+            "websiteUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/wallet"
         }
     ],
     "permissions": [
