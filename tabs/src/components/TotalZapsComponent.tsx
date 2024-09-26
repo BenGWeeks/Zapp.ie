@@ -56,6 +56,7 @@ const TotalZapsComponent: FunctionComponent = () => {
         console.log('Users: ', users);
 
         if (users) {
+          setUsers(users);
           for (const user of users) {
             const wallets = await getUserWallets(adminKey, user.id);
             console.log('Wallets: ', wallets);
@@ -112,8 +113,11 @@ const TotalZapsComponent: FunctionComponent = () => {
       const currentTime = Date.now() / 1000;
       const firstZapTime = Math.min(...zaps.map(zap => zap.time));
       const numberOfDays = (currentTime - firstZapTime) / (24 * 60 * 60);
-      const average = total / numberOfDays;
-      setAveragePerDay(Math.floor(Math.abs(average)));
+      const averagePerDay = total / numberOfDays;
+      setAveragePerDay(Math.floor(Math.abs(averagePerDay)));
+
+      const averagePerUser = total / users.length;
+      setAveragePerUser(Math.floor(Math.abs(averagePerUser)));
 
       // Calculate the biggest zap considering only negative values
       const negativeZaps = zaps.filter(zap => zap.amount < 0);
