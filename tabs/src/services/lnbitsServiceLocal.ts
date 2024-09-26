@@ -15,11 +15,11 @@ export async function getAccessToken(
   username: string,
   password: string,
 ): Promise<string> {
-  console.log(
+  /*console.log(
     `getAccessToken starting ... (username: ${username}, filterById: ${password}))`,
-  );
+  );*/
   if (accessToken) {
-    console.log('Using cached access token: ' + accessToken);
+    //console.log('Using cached access token: ' + accessToken);
     return accessToken;
   } else {
     console.log('No cached access token found');
@@ -46,9 +46,9 @@ export async function getAccessToken(
         body: JSON.stringify({ username, password }),
       });
 
-      console.log('Request URL:', response.url);
-      console.log('Request Status:', response.status);
-      console.log('Request Headers:', response.headers);
+      //console.log('Request URL:', response.url);
+      //console.log('Request Status:', response.status);
+      //console.log('Request Headers:', response.headers);
 
       if (!response.ok) {
         throw new Error(
@@ -96,9 +96,9 @@ const getWallets = async (
   filterByName?: string,
   filterById?: string,
 ): Promise<Wallet[] | null> => {
-  console.log(
+  /*console.log(
     `getWallets starting ... (filterByName: ${filterByName}, filterById: ${filterById}))`,
-  );
+  );*/
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
@@ -138,9 +138,9 @@ const getWallets = async (
 };
 
 const getWalletDetails = async (inKey: string, walletId: string) => {
-  console.log(
+  /*console.log(
     `getWalletDetails starting ... (inKey: ${inKey}, walletId: ${walletId}))`,
-  );
+  );*/
 
   try {
     const response = await fetch(`/api/v1/wallets/${walletId}`, {
@@ -167,7 +167,7 @@ const getWalletDetails = async (inKey: string, walletId: string) => {
 };
 
 const getWalletBalance = async (inKey: string) => {
-  console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
+  //console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
 
   try {
     const response = await fetch(`/api/v1/wallet`, {
@@ -197,9 +197,9 @@ const getUserWallets = async (
   adminKey: string,
   userId: string,
 ): Promise<Wallet[] | null> => {
-  console.log(
+  /*console.log(
     `getUserWallets starting ... (adminKey: ${adminKey}, userId: ${userId})`,
-  );
+  );*/
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
@@ -248,17 +248,17 @@ const getUsers = async (
   adminKey: string,
   filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
 ): Promise<User[] | null> => {
-  console.log(
+  /*console.log(
     `getUsers starting ... (adminKey: ${adminKey}, filterByExtra: ${JSON.stringify(
       filterByExtra,
     )})`,
-  );
+  );*/
 
   try {
     // URL encode the extra filter
     //const encodedExtra = encodeURIComponent(JSON.stringify(filterByExtra));
     const encodedExtra = JSON.stringify(filterByExtra);
-    console.log('encodedExtra:', encodedExtra);
+    //console.log('encodedExtra:', encodedExtra);
 
     const response = await fetch(
       `/usermanager/api/v1/users?extra=${encodedExtra}`,
@@ -279,7 +279,7 @@ const getUsers = async (
 
     const data = await response.json();
 
-    console.log('getUsers data:', data);
+    //console.log('getUsers data:', data);
 
     // Map the users to match the User interface
     const usersData: User[] = await Promise.all(
@@ -308,7 +308,7 @@ const getUsers = async (
       }),
     );
 
-    console.log('getUsers usersData:', usersData);
+    //console.log('getUsers usersData:', usersData);
 
     return usersData;
   } catch (error) {
@@ -321,9 +321,9 @@ const getUser = async (
   adminKey: string,
   userId: string,
 ): Promise<User | null> => {
-  console.log(
+  /*console.log(
     `getUser starting ... (adminKey: ${adminKey}, userId: ${userId})`,
-  );
+  );*/
 
   if (!userId || userId === '' || userId == 'undefined') {
     return null;
@@ -371,7 +371,7 @@ const getUser = async (
       allowanceWallet: allowanceWallet || null,
     };
 
-    console.log('userData:', userData);
+    //console.log('userData:', userData);
 
     return userData;
   } catch (error) {
@@ -381,7 +381,7 @@ const getUser = async (
 };
 
 const getWalletName = async (inKey: string) => {
-  console.log(`getWalletName starting ... (inKey: ${inKey})`);
+  //console.log(`getWalletName starting ... (inKey: ${inKey})`);
 
   try {
     const response = await fetch(`/api/v1/wallet`, {
@@ -406,7 +406,7 @@ const getWalletName = async (inKey: string) => {
 };
 
 const getWalletPayments = async (inKey: string) => {
-  console.log(`getWalletPayments starting ... (inKey: ${inKey})`);
+  //console.log(`getWalletPayments starting ... (inKey: ${inKey})`);
 
   try {
     const response = await fetch(`/api/v1/payments?limit=100`, {
@@ -430,9 +430,9 @@ const getWalletPayments = async (inKey: string) => {
 };
 
 const getWalletPayLinks = async (inKey: string, walletId: string) => {
-  console.log(
+  /*console.log(
     `getWalletPayLinks starting ... (inKey: ${inKey}, walletId: ${walletId})`,
-  );
+  );*/
 
   try {
     const response = await fetch(
@@ -466,7 +466,7 @@ const getWalletById = async (
   userId: string,
   id: string,
 ): Promise<Wallet | null> => {
-  console.log(`getWalletById starting ... (userId: ${userId}, id: ${id})`);
+  //console.log(`getWalletById starting ... (userId: ${userId}, id: ${id})`);
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
@@ -524,7 +524,7 @@ const getWalletById = async (
 
 // May need fixing!
 const getWalletId = async (inKey: string) => {
-  console.log(`getWalletId starting ... (inKey: ${inKey})`);
+  //console.log(`getWalletId starting ... (inKey: ${inKey})`);
 
   try {
     const response = await fetch(`/api/v1/wallets`, {
@@ -559,9 +559,9 @@ const getWalletId = async (inKey: string) => {
 };
 
 const getInvoicePayment = async (lnKey: string, invoice: string) => {
-  console.log(
+  /*console.log(
     `getInvoicePayment starting ... (inKey: ${lnKey}, invoice: ${invoice})`,
-  );
+  );*/
 
   try {
     const response = await fetch(`/api/v1/payments/${invoice}`, {
@@ -592,11 +592,11 @@ const getWalletTransactionsSince = async (
   timestamp: number,
   filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
 ): Promise<Transaction[]> => {
-  console.log(
+  /*console.log(
     `getWalletTransactionsSince starting ... (lnKey: ${inKey}, timestamp: ${timestamp}, filterByExtra: ${JSON.stringify(
       filterByExtra,
     )}`,
-  );
+  );*/
 
   // Note that the timestamp is in seconds, not milliseconds.
   try {
@@ -655,7 +655,7 @@ const getWalletTransactionsSince = async (
       }),
     );
 
-    console.log('Transactions:', transactionData);
+    //console.log('Transactions:', transactionData);
 
     return transactionData;
   } catch (error) {
@@ -672,9 +672,9 @@ const createInvoice = async (
   memo: string,
   extra: object,
 ) => {
-  console.log(
+  /*console.log(
     `createInvoice starting ... (lnKey: ${lnKey}, recipientWalletId: ${recipientWalletId}, amount: ${amount}, memo: ${memo}, extra: ${extra})`,
-  );
+  );*/
 
   try {
     const response = await fetch(`/api/v1/payments`, {
@@ -705,9 +705,9 @@ const createInvoice = async (
 };
 
 const payInvoice = async (adminKey: string, paymentRequest: string) => {
-  console.log(
+  /*console.log(
     `payInvoice starting ... (adminKey: ${adminKey}, paymentRequest: ${paymentRequest})`,
-  );
+  );*/
 
   try {
     const response = await fetch(`/api/v1/payments`, {
@@ -739,9 +739,9 @@ const createWallet = async (
   objectID: string,
   displayName: string,
 ) => {
-  console.log(
+  /*console.log(
     `createWallet starting ... (apiKey: ${apiKey}, objectID: ${objectID}, displayName: ${displayName})`,
-  );
+  );*/
 
   try {
     const url = `/api/v1/wallet`;
@@ -772,9 +772,9 @@ const createWallet = async (
 
 // TODO: This method needs checking!
 const getWalletIdByUserId = async (adminKey: string, userId: string) => {
-  console.log(
+  /*console.log(
     `getWalletIdByUserId starting ... (adminKey: ${adminKey}, userId: ${userId})`,
-  );
+  );*/
 
   try {
     const response = await fetch(`/api/v1/wallets?user_id=${userId}`, {
@@ -804,9 +804,9 @@ const getNostrRewards = async (
   adminKey: string,
   stallId: string,
 ): Promise<Reward[]> => {
-  console.log(
+  /*console.log(
     `getNostrRewards starting ... (adminKey: ${adminKey}, stallId: ${stallId})`,
-  );
+  );*/
   try {
     const response = await fetch(
       `/nostrmarket/api/v1/stall/product/${stallId}`,
@@ -847,11 +847,11 @@ const getUserWalletTransactions = async (
   apiKey: string,
   filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
 ): Promise<Transaction[]> => {
-  console.log(
+  /*console.log(
     `getNostrRewards starting ... (walletId: ${walletId}, apiKey: ${apiKey}, filterByExtra: ${JSON.stringify(
       filterByExtra,
     )}`,
-  );
+  );*/
 
   try {
     const response = await fetch(
@@ -884,10 +884,10 @@ const getUserWalletTransactions = async (
         })
       : data;
 
-    console.log(
+    /*console.log(
       `Transactions fetched for wallet: ${walletId}`,
       filteredPayments,
-    ); // Log fetched data
+    );*/ // Log fetched data
     return filteredPayments; // Assuming data is an array of transactions
   } catch (error) {
     console.error(`Error fetching transactions for wallet ${walletId}:`, error);
