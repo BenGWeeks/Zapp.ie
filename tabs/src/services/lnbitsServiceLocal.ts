@@ -367,6 +367,7 @@ const getUser = async (
       profileImg: user.profileImg,
       aadObjectId: user.extra?.aadObjectId || null,
       email: user.email,
+      type: user.extra?.type || 'Teammate',
       privateWallet: privateWallet || null,
       allowanceWallet: allowanceWallet || null,
     };
