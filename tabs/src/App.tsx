@@ -1,10 +1,12 @@
-
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from 'react-router-dom';
 // Fluent UI imports
 import { ThemeProvider, Stack } from '@fluentui/react';
 import React from 'react';
-
-
 
 // MSAL imports
 import { MsalProvider } from '@azure/msal-react';
@@ -21,9 +23,6 @@ import Users from './Users';
 import './App.css';
 import Rewards from './Rewards';
 import Wallet from './Wallet';
-import YourWallet from './YourWallet';
-
-
 
 type AppProps = {
   pca: IPublicClientApplication;
@@ -37,13 +36,11 @@ function App({ pca }: AppProps) {
 
   return (
     <MsalProvider instance={pca}>
-
-        <PageLayout>
-          <Stack horizontalAlign="center">
-            <Pages />
-          </Stack>
-        </PageLayout>
-
+      <PageLayout>
+        <Stack horizontalAlign="center">
+          <Pages />
+        </Stack>
+      </PageLayout>
     </MsalProvider>
   );
 }
@@ -51,14 +48,13 @@ function App({ pca }: AppProps) {
 function Pages() {
   return (
     <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/feed" element={<Feed />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/Rewards" element={<Rewards />} />
-            <Route path="/Wallet" element={<Wallet />} />
-          </Routes>
-
- );
+      <Route path="/" element={<Login />} />
+      <Route path="/feed" element={<Feed />} />
+      <Route path="/users" element={<Users />} />
+      <Route path="/Rewards" element={<Rewards />} />
+      <Route path="/Wallet" element={<Wallet />} />
+    </Routes>
+  );
 }
 
 export default App;

@@ -4,7 +4,7 @@ import WalletYourWalletInfoCard from './WalletYourWalletInfoCard';
 import WalletTransactionHistory from './WalletTransactionHistory';
 import WalletAllowanceCard from './WalletAllowanceCard';
 
-const WalletAllwanaceMainComponent: FunctionComponent = () => {
+const WalletAllowanceMainComponent: FunctionComponent = () => {
   const [timestamp, setTimestamp] = useState(
     Math.floor(Date.now() / 1000 - 7 * 24 * 60 * 60),
   );
@@ -76,4 +76,4 @@ const WalletAllwanaceMainComponent: FunctionComponent = () => {
   );
 };
 
-export default WalletAllwanaceMainComponent;
+export default WalletAllowanceMainComponent;
