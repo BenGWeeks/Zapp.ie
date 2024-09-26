@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './WalletYourWalletInfoCard.css';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import { getUserWallets } from '../services/lnbitsServiceLocal';
+import SendPayment from './SendPayment';
 
 // interface WalletYourWalletInfoCardProps {
 //   totalSats: number;
@@ -28,6 +29,15 @@ const WalletYourWalletInfoCard: React.FC = () => {
     fetchAmountReceived();
   });
 
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const handleOpenPopup = () => {
+    setIsPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
   
   return (
     <div className="wallet-info">
@@ -45,7 +55,8 @@ const WalletYourWalletInfoCard: React.FC = () => {
       </div>
       <div className="row wallet-buttons">
           <div className="col-md-3"> <button className="receive-btn">Receive</button></div>
-          <div className="col-md-3"><button className="send-btn">Send</button></div>
+          <div className="col-md-3"><button onClick={handleOpenPopup} className="send-btn">Send</button></div>
+          {isPopupOpen && <SendPayment onClose={handleClosePopup} />}
           <div className="col-md-6"><span></span></div>
         </div>
        
