@@ -8,7 +8,8 @@
         "name": "eir evo",
         "websiteUrl": "https://www.example.com",
         "privacyUrl": "https://www.example.com/privacy",
-        "termsOfUseUrl": "https://www.example.com/termofuse"
+        "termsOfUseUrl": "https://www.example.com/termofuse",
+        "mpnId": "506002"
     },
     "icons": {
         "color": "color.png",
@@ -75,9 +76,9 @@
                 "personalTab",
                 "channelTab"
             ], 
-            "name": "Home", 
-            "contentUrl": "http://localhost:3000/", 
-            "websiteUrl": "http://localhost:3000/"
+            "name": "Feed", 
+            "contentUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/", 
+            "websiteUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/"
         }, 
         { 
             "entityId": "usersTab", 
@@ -90,8 +91,35 @@
                 "channelTab"
             ], 
             "name": "Users", 
-            "contentUrl": "http://localhost:3000/Users", 
-            "websiteUrl": "http://localhost:3000/Users"
+            "contentUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/users", 
+            "websiteUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/users"
+        } ,       { 
+            "entityId": "rewardsTab", 
+            "scopes": [       
+                "team",
+                "personal"
+            ], 
+            "context": [ 
+                "personalTab",
+                "channelTab"
+            ], 
+            "name": "Rewards", 
+            "contentUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/rewards", 
+            "websiteUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/rewards"
+        },
+               { 
+            "entityId": "walletTab", 
+            "scopes": [       
+                "team",
+                "personal"
+            ], 
+            "context": [ 
+                "personalTab",
+                "channelTab"
+            ], 
+            "name": "Rewards", 
+            "contentUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/wallet", 
+            "websiteUrl": "https://calm-smoke-0bd84271e.5.azurestaticapps.net/wallet"
         }
     ],
     "permissions": [
@@ -99,7 +127,9 @@
         "messageTeamMembers"
     ],
     "validDomains": [
-        "${{BOT_DOMAIN}}"
+        "${{BOT_DOMAIN}}",
+        "*.azurestaticapps.net",
+        "*.microsoft.com"
     ],
     "webApplicationInfo": {
         "id": "${{AAD_APP_CLIENT_ID}}",
