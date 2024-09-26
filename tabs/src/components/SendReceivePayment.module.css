@@ -18,7 +18,21 @@
     gap: 20px;
     opacity: 1;
     position: relative;
-    /* display: flex; */
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px 32px 32px;
+    background: #2D2B2C;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12), 0px 14px 250px rgba(0, 0, 0, 0.14);
+    border-radius: 4px;
+}
+
+.popupReceive {
+    width: 688px;
+    height: 218px;
+    padding: 28px 32px 32px 32px;
+    gap: 20px;
+    opacity: 1;
+    position: relative;
     flex-direction: column;
     align-items: flex-start;
     padding: 28px 32px 32px;
@@ -311,13 +325,13 @@
     font-style: normal;
     font-weight: normal;
     font-size: 12px;
-  }
-  
-  .sendButtonEnabled:hover {
-    background-color: #d18a00;
-  }
+}
 
-  .sendPopupSuccess {
+.sendButtonEnabled:hover {
+    background-color: #d18a00;
+}
+
+.sendPopupSuccess {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -329,8 +343,9 @@
     background: #2D2B2C;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12), 0px 14px 250px rgba(0, 0, 0, 0.14);
     border-radius: 4px;
-  }
-  .sendPopupFailed {
+}
+
+.sendPopupFailed {
     display: flex;
     flex-direction: column;
     align-items: left;
@@ -342,32 +357,33 @@
     background: #2D2B2C;
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12), 0px 14px 250px rgba(0, 0, 0, 0.14);
     border-radius: 4px;
-    
-  }
-  .sendPopupHeader {
+
+}
+
+.sendPopupHeader {
     display: flex;
-    align-items: center; 
+    align-items: center;
     flex-direction: row;
     gap: 10px;
-  }
+}
 
-  .sendPopupText {
+.sendPopupText {
     color: white;
     font-size: 16px;
-  }
+}
 
-  .sendPopupSubText {
-    color:  rgba(216, 216, 216, 1);
-    font-size: 14px; 
+.sendPopupSubText {
+    color: rgba(216, 216, 216, 1);
+    font-size: 14px;
     margin-top: 10px;
-  }
- 
-  .checkmarkIcon {
+}
+
+.checkmarkIcon {
     width: 24px;
     height: 24px;
-  }
+}
 
-  .buttonContainerSmallPopup {
+.buttonContainerSmallPopup {
     display: flex;
     justify-content: space-between;
     width: 100%+20px;
@@ -398,4 +414,100 @@
 
 .changeAmountButton:hover {
     background-color: #1F1F1F;
+}
+
+.receivePopupWithQrCode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 32px 32px;
+    gap: 4px;
+    position: relative;
+    width: 688px;
+    height: 360px;
+    background: #2D2B2C;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.12), 0px 14px 250px rgba(0, 0, 0, 0.14);
+    border-radius: 4px;
+}
+
+.sendQrCodeContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 40px;
+    width: 625px;
+    height: 232px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+}
+
+.qrCode {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 11px 13px;
+    gap: 0px;
+    width: 234px;
+    height: 232px;
+    background: #FFFFFF;
+    border: 1px solid #F5F5F5;
+    border-radius: 24px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+.txtContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 0px;
+    gap: 20px;
+    width: 351px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+    font-size: 16px;
+    margin-bottom: 20px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    font-family: 'Segoe UI';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: rgba(216, 216, 216, 1);
+}
+
+.receiveButtonContainer {
+    display: flex;
+    /* gap: 10px; */
+    margin-top: 10px;
+    justify-content: space-between;
+}
+
+.copyButton,
+.closeButton {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 96px;
+    height: 38px;
+    border: 1px solid #D8D8D8;
+    border-radius: 4px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    background-color: #2D2B2C;
+}
+
+.copyIcon {
+    margin-right: 5px;
+    width: 20px;
+    height: 20px;
 }

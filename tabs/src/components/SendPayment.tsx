@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './SendPayment.module.css';
+import styles from './SendReceivePayment.module.css';
 import qrCodeImage from '../images/QRCode.svg';
 import checkmarkIcon from '../images/CheckmarkCircleGreen.svg';
 import dismissIcon from '../images/DismissCircleRed.svg';
@@ -17,7 +17,7 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
     const [inputValue, setInputValue] = useState('');
     const [invoice, setInvoice] = useState('');
     const [sendAnonymously, setSendAnonymously] = useState(false);
-    const [isSendPopupVisible, setIsSendPopupVisible] = useState(false); 
+    const [isSendPopupVisible, setIsSendPopupVisible] = useState(false);
     const [isPaymentSuccess, setIsPaymentSuccess] = useState(false); // need to add logic to check if payment was successful
     const [isSuccessFailurePopupVisible, setIsSuccessFailurePopupVisible] = useState(false);
     const isSendDisabled = !inputValue || !invoice;
@@ -31,7 +31,7 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
     };
 
     const handleSendClick = () => {
-        setIsSuccessFailurePopupVisible(true); 
+        setIsSuccessFailurePopupVisible(true);
         setIsSendPopupVisible(true);
         setIsPaymentSuccess(true); // Show the success OR failure popup
     };

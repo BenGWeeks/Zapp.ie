@@ -3,6 +3,7 @@ import './WalletYourWalletInfoCard.css';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import { getUserWallets } from '../services/lnbitsServiceLocal';
 import SendPayment from './SendPayment';
+import ReceivePayment from './ReceivePayment';
 
 // interface WalletYourWalletInfoCardProps {
 //   totalSats: number;
@@ -13,6 +14,8 @@ const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 const WalletYourWalletInfoCard: React.FC = () => {
 
   const [balance, setBalance] = useState<number>();
+  const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
+  const [isSendPopupOpen, setIsSendPopupOpen] = useState(false);
   
   const fetchAmountReceived = async () => {
     console.log('Fetching your wallet ...');
@@ -29,14 +32,20 @@ const WalletYourWalletInfoCard: React.FC = () => {
     fetchAmountReceived();
   });
 
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-
-  const handleOpenPopup = () => {
-    setIsPopupOpen(true);
+  const handleOpenReceivePopup = () => {
+    setIsReceivePopupOpen(true);
   };
 
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
+  const handleCloseReceivePopup = () => {
+    setIsReceivePopupOpen(false);
+  };
+
+  const handleOpenSendPopup = () => {
+    setIsSendPopupOpen(true);
+  };
+
+  const handleCloseSendPopup = () => {
+    setIsSendPopupOpen(false);
   };
   
   return (
@@ -54,9 +63,25 @@ const WalletYourWalletInfoCard: React.FC = () => {
           </div>
       </div>
       <div className="row wallet-buttons">
-          <div className="col-md-3"> <button className="receive-btn">Receive</button></div>
-          <div className="col-md-3"><button onClick={handleOpenPopup} className="send-btn">Send</button></div>
-          {isPopupOpen && <SendPayment onClose={handleClosePopup} />}
+          <div className="col-md-3"> <button onClick={handleOpenReceivePopup} className="receive-btn">Receive</button></div>
+          <div className="col-md-3"><button onClick={handleOpenSendPopup} className="send-btn">Send</button></div>
+          {isReceivePopupOpen && (
+        <div className="overlay" onClick={handleCloseReceivePopup}>
+          <div className="popup" onClick={(e) => e.stopPropagation()}>
+            <ReceivePayment onClose={handleCloseReceivePopup} />
+            <button className="close-btn" onClick={handleCloseReceivePopup}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {isSendPopupOpen && (
+        <div className="overlay" onClick={handleCloseSendPopup}>
+          <div className="popup" onClick={(e) => e.stopPropagation()}>
+            <SendPayment onClose={handleCloseSendPopup} />
+            <button className="close-btn" onClick={handleCloseSendPopup}>Close</button>
+          </div>
+        </div>
+      )}
           <div className="col-md-6"><span></span></div>
         </div>
        
