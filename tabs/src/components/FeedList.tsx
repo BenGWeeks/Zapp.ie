@@ -163,7 +163,9 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
               </div>
               <div className={styles.transactionDetails}>
                 <b className={styles.b}>
-                  {-1 * Math.floor(zap.transaction.amount / 1000)}
+                  {Math.abs(
+                    Math.floor(zap.transaction.amount / 1000),
+                  ).toLocaleString()}
                 </b>
                 <img className={styles.icon} alt="" src={ZapIcon} />
               </div>
