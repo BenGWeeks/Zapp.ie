@@ -4,7 +4,8 @@
   padding: 15px;
   border-radius: 10px;
   width: 100%;
-  font-size: 20px;
+  font-size: 14px;
+  width: 900px;
 }
 
 .wallet-header {
@@ -25,7 +26,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 20px 0;
+  margin: 14px 0;
 }
 
 .battery-icon {

@@ -1,11 +1,17 @@
 import React, { useCallback, useState } from 'react';
 import styles from './WalletTransactionHistory.module.css';
+import WalletTransactionLog from './WalletTransactionLog';
 
 const WalletTransactionHistory: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('all');
 
   const onHistoryTabClick = (tabName: string) =>  {
     setActiveTab(tabName);
+  };
+
+  const filterZaps = (currentActiveTab: string) => {
+    // Define filterZaps function here or import it from WalletTransactionLog
+    console.log(`Filtering zaps for tab: ${currentActiveTab}`);
   };
 
   return (
@@ -43,6 +49,7 @@ const WalletTransactionHistory: React.FC = () => {
           </div>
         </div>
       </div>
+      <WalletTransactionLog filterZaps={onHistoryTabClick}  activeTab={activeTab}/>
     </div>
   );
 };

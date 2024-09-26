@@ -58,6 +58,16 @@ interface Transaction {
   wallet_id: string;
 }
 
+interface WeeklyAllowance {
+  id: string;
+  admin: string;
+  name: string;
+  user: string;
+  adminkey: string;
+  inkey: string;
+  amount: number;
+}
+
 declare module '*.module.css' {
   const classes: { [key: string]: string };
   export default classes;
