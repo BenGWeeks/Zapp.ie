@@ -24,20 +24,10 @@ const WalletYourWalletInfoCard: React.FC = () => {
     });
 
     if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
-
-      const walletForUser = await getUserWallets(
-        adminKey,
-        currentUserLNbitDetails[0].id,
-      );
-
-      console.log('Wallets: ', walletForUser);
-
-      if (walletForUser && walletForUser.length > 0) {
-        setBalance(
-          walletForUser.filter(
-            (wallet: { name: string }) => wallet.name === 'Private',
-          )[0].balance_msat / 1000,
-        );
+      if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
+        const bal =
+          (currentUserLNbitDetails[0].privateWallet?.balance_msat ?? 0) / 1000;
+        setBalance(bal);
       }
     }
   };

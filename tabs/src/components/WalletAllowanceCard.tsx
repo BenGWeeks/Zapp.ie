@@ -42,22 +42,12 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({
       aadObjectId: account.localAccountId,
     });
 
-    if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
-      const walletForUser = await getUserWallets(
-        adminKey,
-        currentUserLNbitDetails[0].id,
-      );
-
-      console.log('Wallets: ', walletForUser);
-
-      if (walletForUser && walletForUser.length > 0) {
+      if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
         const bal =
-          walletForUser.filter(
-            (wallet: { name: string }) => wallet.name === 'Allowance',
-          )[0].balance_msat / 1000;
-        setBalance(bal);
-        setBatteryPercentage((spentSats / bal) * 100);
-      }
+          (currentUserLNbitDetails[0].allowanceWallet?.balance_msat ?? 0) / 1000;
+
+      setBalance(bal);
+      setBatteryPercentage((spentSats / bal) * 100);
     }
   };
 
