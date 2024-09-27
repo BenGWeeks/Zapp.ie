@@ -31,6 +31,7 @@ jobs:
           REACT_APP_LNBITS_STORE_ID: ${{ secrets.REACT_APP_LNBITS_STORE_ID }} 
           REACT_APP_TENANT_ID:  ${{ secrets.REACT_APP_TENANT_ID }}
           REACT_APP_AAD_CLIENT_ID:  ${{ secrets.REACT_APP_AAD_CLIENT_ID }}
+          REACT_APP_LNBITS_STORE_OWNER_EMAIL: ${{ secrets.REACT_APP_LNBITS_STORE_OWNER_EMAIL }}
           
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_CALM_SMOKE_0BD84271E }}
