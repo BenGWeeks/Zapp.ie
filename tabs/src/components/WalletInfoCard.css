@@ -1,12 +1,12 @@
 .wallet-info {
     background-color: #333;
     color: #f0f0f0;
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px;
     min-width: 900px;
     margin: 0;
     text-align:left;
-    font-size: 20px;
+    font-size: 14px;
   }
   
   .wallet-total {
@@ -41,13 +41,14 @@
   }
   .horizontal-container h1 {
     color: #f0a500;
+    font-size: 48px;
   }
 
   
   .item {
-    padding: 10px;
+    padding: 5px;
     border-radius: 5px;
     color: white;
-    align-self:center;
+    align-self:baseline;
   }
   

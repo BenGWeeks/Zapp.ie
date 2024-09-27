@@ -102,7 +102,7 @@ const getWallets = async (
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
-    const response = await fetch(`/api/v1/wallets`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -143,7 +143,7 @@ const getWalletDetails = async (inKey: string, walletId: string) => {
   );*/
 
   try {
-    const response = await fetch(`/api/v1/wallets/${walletId}`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallets/${walletId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ const getWalletBalance = async (inKey: string) => {
   //console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/wallet`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallet`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -203,14 +203,17 @@ const getUserWallets = async (
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
-    const response = await fetch(`/users/api/v1/user/${userId}/wallet`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-        //'X-Api-Key': adminKey,
+    const response = await fetch(
+      `${nodeUrl}/users/api/v1/user/${userId}/wallet`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+          //'X-Api-Key': adminKey,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(
@@ -258,10 +261,11 @@ const getUsers = async (
     // URL encode the extra filter
     //const encodedExtra = encodeURIComponent(JSON.stringify(filterByExtra));
     const encodedExtra = JSON.stringify(filterByExtra);
-    //console.log('encodedExtra:', encodedExtra);
+    console.log('encodedExtra:', encodedExtra);
+    console.log('encodedExtra:', encodedExtra);
 
     const response = await fetch(
-      `/usermanager/api/v1/users?extra=${encodedExtra}`,
+      `${nodeUrl}/usermanager/api/v1/users?extra=${encodedExtra}`,
       {
         method: 'GET',
         headers: {
@@ -330,13 +334,16 @@ const getUser = async (
   }
 
   try {
-    const response = await fetch(`/usermanager/api/v1/users/${userId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': adminKey,
+    const response = await fetch(
+      `${nodeUrl}/usermanager/api/v1/users/${userId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': adminKey,
+        },
       },
-    });
+    );
 
     if (response.status === 404) {
       return null;
@@ -367,6 +374,7 @@ const getUser = async (
       profileImg: user.profileImg,
       aadObjectId: user.extra?.aadObjectId || null,
       email: user.email,
+      type: user.extra?.type || 'Teammate',
       privateWallet: privateWallet || null,
       allowanceWallet: allowanceWallet || null,
     };
@@ -384,7 +392,7 @@ const getWalletName = async (inKey: string) => {
   //console.log(`getWalletName starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/wallet`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallet`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -409,7 +417,7 @@ const getWalletPayments = async (inKey: string) => {
   //console.log(`getWalletPayments starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/payments?limit=100`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments?limit=100`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -436,7 +444,7 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
 
   try {
     const response = await fetch(
-      `/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`,
+      `${nodeUrl}/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`,
       {
         method: 'GET',
         headers: {
@@ -470,14 +478,18 @@ const getWalletById = async (
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
-    const response = await fetch(`/users/api/v1/user/${userId}/wallet`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        //'X-Api-Key': adminKey,
-        Authorization: `Bearer ${accessToken}`,
+
+    const response = await fetch(
+      `${nodeUrl}/users/api/v1/user/${userId}/wallet`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          //'X-Api-Key': adminKey,
+          Authorization: `Bearer ${accessToken}`,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       console.error(
@@ -527,7 +539,7 @@ const getWalletId = async (inKey: string) => {
   //console.log(`getWalletId starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/wallets`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -564,7 +576,7 @@ const getInvoicePayment = async (lnKey: string, invoice: string) => {
   );*/
 
   try {
-    const response = await fetch(`/api/v1/payments/${invoice}`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments/${invoice}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -606,7 +618,7 @@ const getWalletTransactionsSince = async (
 
     const response = await fetch(
       //`/api/v1/payments?limit=100&extra=${encodedExtra}`, // This approach doesn't work on this endpoint for some reason, we need to filter afterwards.
-      `/api/v1/payments?limit=100`,
+      `${nodeUrl}/api/v1/payments?limit=100`,
       {
         method: 'GET',
         headers: {
@@ -677,7 +689,7 @@ const createInvoice = async (
   );*/
 
   try {
-    const response = await fetch(`/api/v1/payments`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -710,7 +722,7 @@ const payInvoice = async (adminKey: string, paymentRequest: string) => {
   );*/
 
   try {
-    const response = await fetch(`/api/v1/payments`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -744,7 +756,7 @@ const createWallet = async (
   );*/
 
   try {
-    const url = `/api/v1/wallet`;
+    const url = `${nodeUrl}/api/v1/wallet`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -777,13 +789,16 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   );*/
 
   try {
-    const response = await fetch(`/api/v1/wallets?user_id=${userId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': adminKey,
+    const response = await fetch(
+      `${nodeUrl}/api/v1/wallets?user_id=${userId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': adminKey,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(
@@ -809,7 +824,7 @@ const getNostrRewards = async (
   );*/
   try {
     const response = await fetch(
-      `/nostrmarket/api/v1/stall/product/${stallId}`,
+      `${nodeUrl}/nostrmarket/api/v1/stall/product/${stallId}`,
       {
         method: 'GET',
         headers: {
@@ -855,7 +870,7 @@ const getUserWalletTransactions = async (
 
   try {
     const response = await fetch(
-      `/usermanager/api/v1/transactions/${walletId}`,
+      `${nodeUrl}/usermanager/api/v1/transactions/${walletId}`,
       {
         method: 'GET',
         headers: {
@@ -895,6 +910,36 @@ const getUserWalletTransactions = async (
   }
 };
 
+const getAllowance = async (
+  adminKey: string,
+  userId: string,
+): Promise<Allowance | null> => {
+  console.log(
+    `getNostrRewards starting ... (adminKey: ${adminKey}, stallId: ${userId})`,
+  );
+  try {
+    // TODO: Implement the actual API call to fetch the allowance
+    const allowance: Allowance = {
+      id: '123',
+      name: 'Allowance',
+      wallet: '123456789',
+      toWallet: '123456789',
+      amount: 25000,
+      startDate: new Date(),
+      endDate: null,
+      frequency: 'Monthly',
+      nextPaymentDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+      lastPaymentDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+      memo: "Don't spend it all at once",
+      active: true,
+    };
+    return allowance;
+  } catch (error) {
+    console.error(`Error fetching allowances for ${userId}:`, error);
+    throw error; // Re-throw the error to handle it in the parent function
+  }
+};
+
 export {
   getUser,
   getUsers,
@@ -914,4 +959,5 @@ export {
   getUserWallets,
   getNostrRewards,
   getUserWalletTransactions,
+  getAllowance,
 };
