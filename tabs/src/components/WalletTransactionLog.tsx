@@ -12,6 +12,7 @@ import { useMsal } from '@azure/msal-react';
 
 interface WalletTransactionLogProps {
   activeTab?: string;
+  activeWalletTabName?: string;
   filterZaps?: (activeTab: string) => void;
 }
 
@@ -19,6 +20,7 @@ const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
 const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
   activeTab,
+  activeWalletTabName,
 }) => {
   const [zaps, setZaps] = useState<Transaction[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -35,6 +37,8 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
       ? 'all'
       : activeTab;
   console.log('activeTabForData: ', activeTabForData);
+
+  console.log('activeWalletTabName: ', activeWalletTabName);
 
   const getAllUsers = async () => {
     const users = await getUsers(adminKey, {});
@@ -62,34 +66,41 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
       console.log('Current user: ', currentUserLNbitDetails);
 
       if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
-        const wallets = await getUserWallets(
-          adminKey,
-          currentUserLNbitDetails[0].id,
-        ); // We'll just look at the private wallets.
+        let inkey: any = null;
 
-        // Loop through all the wallets
-        if (wallets) {
-          console.log('Wallets1');
-          for (const wallet of wallets) {
-            const zaps = await getWalletTransactionsSince(
-              wallet.inkey,
-              paymentsSinceTimestamp,
-              null, //{ tag: 'zap' }
-            );
-
-            for (const zap of zaps) {
-              zap.extra.from = users.filter(
-                u => u.id === zap.extra?.from?.user,
-              )[0];
-              zap.extra.to = users.filter(u => u.id === zap.extra?.to?.user)[0];
-            }
-
-            allZaps = allZaps.concat(zaps);
-            console.log('Zaps: ', allZaps);
-          }
+        if (activeWalletTabName === 'Your wallet') {
+          inkey = currentUserLNbitDetails[0].privateWallet?.inkey;
+        } else {
+          inkey = currentUserLNbitDetails[0].allowanceWallet?.inkey;
         }
-        setZaps(prevState => [...prevState, ...allZaps]);
+
+        if (inkey) {
+          const zaps = await getWalletTransactionsSince(
+            inkey,
+            paymentsSinceTimestamp,
+            null, //{ tag: 'zap' }
+          );
+
+          let filteredZapsBasedOntheActiveTab: any = null;
+
+          if (activeTab === 'sent')
+            filteredZapsBasedOntheActiveTab = zaps.filter(f => f.amount < 0);
+          else if (activeTab === 'received')
+            filteredZapsBasedOntheActiveTab = zaps.filter(f => f.amount > 0);
+          else filteredZapsBasedOntheActiveTab = zaps;
+
+          for (const zap of filteredZapsBasedOntheActiveTab) {
+            zap.extra.from = users.filter(
+              u => u.id === zap.extra?.from?.user,
+            )[0];
+            zap.extra.to = users.filter(u => u.id === zap.extra?.to?.user)[0];
+          }
+
+          allZaps = allZaps.concat(filteredZapsBasedOntheActiveTab);
+          console.log('Zaps: ', allZaps);
+        }
       }
+      setZaps(prevState => [...prevState, ...allZaps]);
     } catch (error) {
       if (error instanceof Error) {
         setError(`Failed to fetch users: ${error.message}`);
@@ -102,16 +113,11 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
     }
   };
 
-  const filterZaps = (activeTab: string) => {
-    alert(`Filtering zaps for tab: ${activeTab}`);
-    console.log(`Filtering zaps for tab: ${activeTab}`);
-  };
-
   useEffect(() => {
     setZaps([]);
     getAllUsers();
     fetchZaps();
-  }, []);
+  }, [activeTab, activeWalletTabName]);
 
   if (loading) {
     return <div>Loading...</div>;
