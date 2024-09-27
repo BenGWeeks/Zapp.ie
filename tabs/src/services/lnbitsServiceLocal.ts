@@ -262,6 +262,7 @@ const getUsers = async (
     //const encodedExtra = encodeURIComponent(JSON.stringify(filterByExtra));
     const encodedExtra = JSON.stringify(filterByExtra);
     console.log('encodedExtra:', encodedExtra);
+    console.log('encodedExtra:', encodedExtra);
 
     const response = await fetch(
       `${nodeUrl}/usermanager/api/v1/users?extra=${encodedExtra}`,
@@ -909,24 +910,33 @@ const getUserWalletTransactions = async (
   }
 };
 
-const getUserWeeklyAllowance = async (
+const getAllowance = async (
   adminKey: string,
-): Promise<WeeklyAllowance | null> => {
+  userId: string,
+): Promise<Allowance | null> => {
+  console.log(
+    `getNostrRewards starting ... (adminKey: ${adminKey}, stallId: ${userId})`,
+  );
   try {
-    let weeklyAllowance: WeeklyAllowance = {
-      id: '',
-      admin: '',
-      name: '',
-      user: '',
-      adminkey: '',
-      inkey: '',
-      amount: 30000,
+    // TODO: Implement the actual API call to fetch the allowance
+    const allowance: Allowance = {
+      id: '123',
+      name: 'Allowance',
+      wallet: '123456789',
+      toWallet: '123456789',
+      amount: 25000,
+      startDate: new Date(),
+      endDate: null,
+      frequency: 'Monthly',
+      nextPaymentDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+      lastPaymentDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+      memo: "Don't spend it all at once",
+      active: true,
     };
-
-    return weeklyAllowance;
+    return allowance;
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error(`Error fetching allowances for ${userId}:`, error);
+    throw error; // Re-throw the error to handle it in the parent function
   }
 };
 
@@ -949,5 +959,5 @@ export {
   getUserWallets,
   getNostrRewards,
   getUserWalletTransactions,
-  getUserWeeklyAllowance,
+  getAllowance,
 };
