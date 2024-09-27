@@ -53,6 +53,23 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
   "@azure/msal-node": "^2.6.0"
 }
 ```
+## Creating a Microsoft Sandbox tenant
+
+- Sign up for a new tenant by logging in with your private outlook account here: https://developer.microsoft.com/en-us/microsoft-365/dev-program 
+- Create a new account in portal.azure.com (firstname.surname@firstnamelastnameoutlook.onmicrosoft.com) and give it a global admin and global billing rights
+- Go to portal.office.com and get a license: Admin > Buy license (trial did not work so have purchased one)
+- Assign the license to your user Users > Select User > Manage licensing > Assign purchased license
+
+When you are signing up Add the following (https://developer.microsoft.com/)
+- Product: Outlook, Microsoft Teams, SharePoint
+- Technologies: Microsoft Graph, Office Add-ins, SharePoint Framework (SPFx)
+- Click Apply and Save
+
+To be able to run bot you need to enable uploding custom app in Teams:
+- Login to https://admin.teams.microsoft.com/dashboard using firstname.surname@firstnamesurnameoutlook.onmicrosoft.com
+- Go to Teams apps > Setup Policies > Global
+- Make sure that Toggle for Upload custom apps is in On position
+- Click Save and your test tenant can permit custom app upload
 
 ## Running Zapp.ie bot
 
