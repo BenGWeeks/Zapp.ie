@@ -32,7 +32,7 @@ const Home: React.FC = () => {
             display: 'flex',
           }}
         >
-          <TotalZapsComponent />
+          <TotalZapsComponent/>
           <ZapActivityChartComponent lnKey={''} timestamp={timestamp} />
         </div>
       </div>

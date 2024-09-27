@@ -511,3 +511,33 @@
     width: 20px;
     height: 20px;
 }
+
+.qrReaderForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px;
+    padding-top: 0px;
+    gap: 10px;
+    width: 624px;
+    height: 240px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    background-color: #1F1F1F;
+}
+
+.qrReaderContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0px;
+    gap: 0px;
+    width: 230px;
+    height: 220px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    background-color: #1F1F1F;
+    position: relative;
+}
