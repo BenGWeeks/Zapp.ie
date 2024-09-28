@@ -44,7 +44,7 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
 
 - [Node.js](https://nodejs.org/), supported versions: 18
 - A Microsoft 365 tenant in which you have permission to upload Teams apps. You can get a free Microsoft 365 developer tenant by joining the [Microsoft 365 developer program](https://developer.microsoft.com/en-us/microsoft-365/dev-program).
-- [Teams Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [TeamsFx CLI](https://aka.ms/teams-toolkit-cli)
+- [Teams Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [TeamsFx CLI](https://aka.ms/teams-toolkit-cli). However, it seems recently Microsoft have removed this offering other than to users who have a Visual Studio Enterprise subscription, (see [Creating a Free Microsoft 365 Dev Tenant is Not Possible](https://o365reports.com/2024/03/14/creating-a-free-microsoft-365-e5-developer-tenant-is-no-longer-possible/)] and now advise creating a "single-license development tenant" (see steps below).
 
 > Note: If you are using node 20, you can add following snippet in package.json to remove the warning of incompatibility. (Related discussion: https://github.com/microsoft/botbuilder-js/issues/4550)
 
@@ -53,23 +53,25 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
   "@azure/msal-node": "^2.6.0"
 }
 ```
-## Creating a Microsoft Sandbox tenant
 
-- Sign up for a new tenant by logging in with your private outlook account here: https://developer.microsoft.com/en-us/microsoft-365/dev-program 
-- Create a new account in portal.azure.com (firstname.surname@firstnamelastnameoutlook.onmicrosoft.com) and give it a global admin and global billing rights
-- Go to portal.office.com and get a license: Admin > Buy license (trial did not work so have purchased one)
-- Assign the license to your user Users > Select User > Manage licensing > Assign purchased license
+## Creating a Microsoft development tenant
 
-When you are signing up Add the following (https://developer.microsoft.com/)
-- Product: Outlook, Microsoft Teams, SharePoint
-- Technologies: Microsoft Graph, Office Add-ins, SharePoint Framework (SPFx)
-- Click Apply and Save
+To sign up for a new single-license tenant:
 
-To be able to run bot you need to enable uploding custom app in Teams:
-- Login to https://admin.teams.microsoft.com/dashboard using firstname.surname@firstnamesurnameoutlook.onmicrosoft.com
-- Go to Teams apps > Setup Policies > Global
-- Make sure that Toggle for Upload custom apps is in On position
-- Click Save and your test tenant can permit custom app upload
+- Go to (Microsoft 365)[https://www.microsoft.com/en-gb/microsoft-365/business/compare-all-microsoft-365-business-products] and choose `Microsoft 365 Business Basic - Trial`. NB In our experience "purchasing" a trial (your card details are still required) failed, and we needed to purchase a `Microsoft 365 Business Basic` license.
+
+> You may receive `Please try again in a few minutes. We are unable to complete the verification check on your payment method at this time`, according to Microsoft: _For this, this error is generally just created an account, the company information is still being verified. For his, you need to contact billing support team to provide company information - name, address, phone, email, etc. After do a verification, this can be unlocked. For contacting, please refer to Get support - (Microsoft 365 admin | Microsoft Learn)[https://learn.microsoft.com/en-us/microsoft-365/admin/get-help-support?view=o365-worldwide]._ If you already have a billing tenant (such as in another tenant), you could trying copying your tenant ID from there (see (Learn more about associated billing tenants)[https://learn.microsoft.com/en-gb/azure/cost-management-billing/manage/find-tenant-id-domain]) and into the (Microsoft Admin Portal)[https://admin.microsoft.com/ by going to `Billing` > `Billing account` and click `Add an associated billing tenant`.
+
+> If you created the tenant another way where you logged in with your personal Microsoft account, go to the (Azure Admin Portal)[https://portal.azure.com] and log in with your personal account and create a new account (e.g. `firstname.lastname@tenantname.onmicrosoft.com`) and grant it `Global Administrator` and `Global Billing` roles.
+
+- Confirm the account has a `Microsoft 365 Business Basic` license by going to (Microsoft Admin Portal)[https://admin.microsoft.com/] and going to `Users` > `Active Users` (it shouldn't say `Unlicensed`). If needed purchase a license for the account, go to `...` > `Manage product licenses` > `Buy products` > `All products` > `Microsoft 365 Business Basic` and complete the purchase.
+
+To be able to deploy and run the bot, you need to enable uploding custom app in Teams:
+
+- Login to (Microsoft Teams Administration)[https://admin.teams.microsoft.com/dashboard] using the global administrator account you created above.
+- Go to `Teams apps` > `Setup Policies` > `Global`.
+- Make sure that Toggle for `Upload custom apps` is in `On` position.
+- Click `Save` and your test tenant can permit custom app upload.
 
 ## Running Zapp.ie bot
 
