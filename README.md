@@ -62,16 +62,16 @@ To sign up for a new single-license tenant:
 
 > You may receive `Please try again in a few minutes. We are unable to complete the verification check on your payment method at this time`, according to Microsoft: _For this, this error is generally just created an account, the company information is still being verified. For his, you need to contact billing support team to provide company information - name, address, phone, email, etc. After do a verification, this can be unlocked. For contacting, please refer to Get support - [Microsoft 365 admin | Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/admin/get-help-support?view=o365-worldwide)._ If you already have a billing tenant (such as in another tenant), you could trying copying your tenant ID from there (see [Learn more about associated billing tenants](https://learn.microsoft.com/en-gb/azure/cost-management-billing/manage/find-tenant-id-domain) and into the [Microsoft Admin Portal](https://admin.microsoft.com/) by going to `Billing` > `Billing account` and selecting `Add an associated billing tenant`.
 
-> If you created the tenant another way where you logged in with your personal Microsoft account, go to the [Azure Admin Portal[(https://portal.azure.com) and log in with your personal account and create a new account (e.g. `firstname.lastname@tenantname.onmicrosoft.com`) and grant it `Global Administrator` and `Global Billing` roles.
+> If you created the tenant another way where you logged in with your personal Microsoft account, go to the [Azure Admin Portal](https://portal.azure.com) and log in with your personal account and create a new account (e.g. `firstname.lastname@tenantname.onmicrosoft.com`) and grant it `Global Administrator` and `Global Billing` roles.
 
 - Confirm the account has a `Microsoft 365 Business Basic` license by going to [Microsoft Admin Portal](https://admin.microsoft.com/)and going to `Users` > `Active Users` (it shouldn't say `Unlicensed`). If needed purchase a license for the account, go to `...` > `Manage product licenses` > `Buy products` > `All products` > `Microsoft 365 Business Basic` and complete the purchase.
 
 To be able to deploy and run the bot, you need to enable uploding custom app in Teams:
 
-- Login to [Microsoft Teams Administration](https://admin.teams.microsoft.com/dashboard) using the global administrator account you created above.
-- Go to `Teams apps` > `Setup Policies` > `Global`.
-- Make sure that Toggle for `Upload custom apps` is in `On` position.
-- Click `Save` and your test tenant can permit custom app upload.
+1. Login to [Microsoft Teams Administration](https://admin.teams.microsoft.com/dashboard) using the global administrator account you created above.
+1. Go to `Teams apps` > `Setup Policies` > `Global`.
+1. Make sure that Toggle for `Upload custom apps` is in `On` position.
+1. Click `Save` and your test tenant can permit custom app upload.
 
 ## Running Zapp.ie bot
 
