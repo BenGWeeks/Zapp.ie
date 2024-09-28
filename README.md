@@ -43,8 +43,9 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
 ## Prerequisite to use this sample
 
 - [Node.js](https://nodejs.org/), supported versions: 18
-- A Microsoft 365 tenant in which you have permission to upload Teams apps. You can get a free Microsoft 365 developer tenant by joining the [Microsoft 365 developer program](https://developer.microsoft.com/en-us/microsoft-365/dev-program).
-- [Teams Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [TeamsFx CLI](https://aka.ms/teams-toolkit-cli)
+- A Microsoft 365 tenant in which you have permission to upload Teams apps (where other developers have not been deploying the same bot with a matching ID). You may be able to get a free Microsoft 365 developer tenant by joining the [Microsoft 365 developer program](https://developer.microsoft.com/en-us/microsoft-365/dev-program). However, it seems recently Microsoft have removed this offering other than to users who have a Visual Studio Enterprise subscription, (see [Creating a Free Microsoft 365 Dev Tenant is Not Possible](https://o365reports.com/2024/03/14/creating-a-free-microsoft-365-e5-developer-tenant-is-no-longer-possible/)) and now advise creating a "single-license development tenant" (see steps in `Wiki` > `Setup` > `Microsoft development tenant`).
+- [Teams Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [TeamsFx CLI](https://aka.ms/teams-toolkit-cli). You should be prompted to install this when you open the solution in VS Code.
+- [LNbits](https://www.lnbits.com) version 0.12 or higher. NB For development you can use the developer instance specified in `.env.dev`, or create your own instance, as specified in `Wiki` > `Setup` > `LNbits`.
 
 > Note: If you are using node 20, you can add following snippet in package.json to remove the warning of incompatibility. (Related discussion: https://github.com/microsoft/botbuilder-js/issues/4550)
 
@@ -60,7 +61,7 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
 
 - From VS Code:
   1. hit `F5` to start debugging. Alternatively open the `Run and Debug Activity` Panel and select `Debug in Teams (Edge)` or `Debug in Teams (Chrome)`.
-- From TeamsFx CLI:
+- Or, from TeamsFx CLI:
   1.  Install [dev tunnel cli](https://aka.ms/teamsfx-install-dev-tunnel).
   1.  Login with your M365 Account using the command `devtunnel user login`.
   1.  Start your local tunnel service by running the command `devtunnel host -p 3978 --protocol http --allow-anonymous`.
@@ -79,7 +80,7 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
   1. Sign into Azure by clicking the `Sign in to Azure` under the `ACCOUNTS` section from sidebar.
   1. Click `Provision` from `LIFECYCLE` section or open the command palette and select: `Teams: Provision`.
   1. Click `Deploy` or open the command palette and select: `Teams: Deploy`.
-- From TeamsFx CLI:
+- Or, from TeamsFx CLI:
   1. Run command: `teamsapp auth login azure`.
   1. Run command: `teamsapp provision --env dev`.
   1. Run command: `teamsapp deploy --env dev`.
@@ -88,19 +89,14 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
 
 - From VS Code:
   1. Open the `Run and Debug Activity` Panel. Select `Launch Remote (Edge)` or `Launch Remote (Chrome)` from the launch configuration drop-down.
-- From TeamsFx CLI:
+- Or, from TeamsFx CLI:
   1. Run command: `teamsapp preview --env dev`.
 
 ## Running Zapp.ie Web App (The Tabs in the bot)
 
-- From VS Code:
-  1. Navigate to the _Tabs_ directory
-  2. Type `npm start`
-
-## Set up Nostr Marketplace
-
-1. With 'Super User' permissions, add extencion "Nostr Market".
-2. Use this link to set up Merchant, Stall and Products https://github.com/lnbits/nostrmarket.
+1. Navigate to tabs folder using `cd tabs`
+1. Install the packages using `npm install`
+1. Run the application using `npm start`
 
 # Get in touch
 
