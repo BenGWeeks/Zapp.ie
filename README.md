@@ -64,7 +64,7 @@ To sign up for a new single-license tenant:
 
 > If you created the tenant another way where you logged in with your personal Microsoft account, go to the [Azure Admin Portal](https://portal.azure.com) and log in with your personal account and create a new account (e.g. `firstname.lastname@tenantname.onmicrosoft.com`) and grant it `Global Administrator` and `Global Billing` roles.
 
-- Confirm the account has a `Microsoft 365 Business Basic` license by going to [Microsoft Admin Portal](https://admin.microsoft.com/)and going to `Users` > `Active Users` (it shouldn't say `Unlicensed`). If needed purchase a license for the account, go to `...` > `Manage product licenses` > `Buy products` > `All products` > `Microsoft 365 Business Basic` and complete the purchase.
+- Confirm the account has a `Microsoft 365 Business Basic` license by going to [Microsoft Admin Portal](https://admin.microsoft.com/) and going to `Users` > `Active Users` (it shouldn't say `Unlicensed`). If needed purchase a license for the account, go to `...` > `Manage product licenses` > `Buy products` > `All products` > `Microsoft 365 Business Basic` and complete the purchase.
 
 To be able to deploy and run the bot, you need to enable uploding custom app in Teams:
 
