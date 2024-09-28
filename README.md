@@ -43,8 +43,9 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
 ## Prerequisite to use this sample
 
 - [Node.js](https://nodejs.org/), supported versions: 18
-- A Microsoft 365 tenant in which you have permission to upload Teams apps (where other developers have not been deploying the same bot with a matching ID). You may be able to get a free Microsoft 365 developer tenant by joining the [Microsoft 365 developer program](https://developer.microsoft.com/en-us/microsoft-365/dev-program). However, it seems recently Microsoft have removed this offering other than to users who have a Visual Studio Enterprise subscription, (see [Creating a Free Microsoft 365 Dev Tenant is Not Possible](https://o365reports.com/2024/03/14/creating-a-free-microsoft-365-e5-developer-tenant-is-no-longer-possible/)) and now advise creating a "single-license development tenant" (see steps below).
+- A Microsoft 365 tenant in which you have permission to upload Teams apps (where other developers have not been deploying the same bot with a matching ID). You may be able to get a free Microsoft 365 developer tenant by joining the [Microsoft 365 developer program](https://developer.microsoft.com/en-us/microsoft-365/dev-program). However, it seems recently Microsoft have removed this offering other than to users who have a Visual Studio Enterprise subscription, (see [Creating a Free Microsoft 365 Dev Tenant is Not Possible](https://o365reports.com/2024/03/14/creating-a-free-microsoft-365-e5-developer-tenant-is-no-longer-possible/)) and now advise creating a "single-license development tenant" (see steps in `Wiki` > `Setup` > `Microsoft development tenant`).
 - [Teams Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [TeamsFx CLI](https://aka.ms/teams-toolkit-cli). You should be prompted to install this when you open the solution in VS Code.
+- [LNbits](https://www.lnbits.com) version 0.12 or higher. NB For development you can use the developer instance specified in `.env.dev`, or create your own instance, as specified in `Wiki` > `Setup` > `LNbits`.
 
 > Note: If you are using node 20, you can add following snippet in package.json to remove the warning of incompatibility. (Related discussion: https://github.com/microsoft/botbuilder-js/issues/4550)
 
@@ -53,45 +54,6 @@ Zapp.ie integrates directly with Microsoft Teams to enhance collaboration and re
   "@azure/msal-node": "^2.6.0"
 }
 ```
-
-## Creating a Microsoft development tenant
-
-To sign up for a new single-license tenant:
-
-- Go to [Microsoft 365](https://www.microsoft.com/en-gb/microsoft-365/business/compare-all-microsoft-365-business-products) and choose `Microsoft 365 Business Basic - Trial`. NB In our experience "purchasing" a trial (your card details are still required) failed, and we needed to purchase a `Microsoft 365 Business Basic` license.
-
-> If you receive `Please try again in a few minutes. We are unable to complete the verification check on your payment method at this time` see [Troubleshooting](https://github.com/BenGWeeks/Zapp.ie/wiki/Troubleshooting).
-
-> If you created the tenant another way where you logged in with your personal Microsoft account, go to the [Azure Admin Portal](https://portal.azure.com) and log in with your personal account and create a new account (e.g. `firstname.lastname@tenantname.onmicrosoft.com`) and grant it `Global Administrator` and `Global Billing` roles.
-
-- Confirm the account has a `Microsoft 365 Business Basic` license by going to [Microsoft Admin Portal](https://admin.microsoft.com/) and going to `Users` > `Active Users` (it shouldn't say `Unlicensed`). If needed purchase a license for the account, go to `...` > `Manage product licenses` > `Buy products` > `All products` > `Microsoft 365 Business Basic` and complete the purchase.
-
-To be able to deploy and run the bot, you need to enable uploding custom app in Teams:
-
-1. Login to [Microsoft Teams Administration](https://admin.teams.microsoft.com/dashboard) using the global administrator account you created above.
-1. Go to `Teams apps` > `Setup Policies` > `Global`.
-1. Make sure that Toggle for `Upload custom apps` is in `On` position.
-1. Click `Save` and your test tenant can permit custom app upload.
-
-## Set up LNbits
-
-If you prefer to develop against your own LNbits instance:
-
-1. Navigate to [My LNbits](https://my.lnbits.com)
-
-### LNbits extensions
-
-To install `User Manager`:
-
-1. Login with `Super User` to your LNbits instance.
-1. Go to `Manage` > `Extensions` and select `All` and search `User Manager`.
-1. For the `User Manager` click `Manage` and `Install` the latest version.
-
-To install `Nostr Market`:
-
-1. Login with `Super User` to your LNbits instance.
-1. Go to `Manage` > `Extensions` and select `All` and search `Nostr Market`.
-1. For the `Nostr Market` click `Manage` and `Install` the latest version.
 
 ## Running Zapp.ie bot
 
@@ -132,8 +94,9 @@ To install `Nostr Market`:
 
 ## Running Zapp.ie Web App (The Tabs in the bot)
 
-1. Navigate to the _Tabs_ directory
-2. Type `npm start`
+1. Navigate to tabs folder using `cd tabs`
+1. Install the packages using `npm install`
+1. Run the application using `npm start`
 
 # Get in touch
 
