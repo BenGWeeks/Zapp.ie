@@ -1,6 +1,12 @@
 // Methods concerning the logged in user/users
+import { graphLoginRequest, graphConfig } from '../services/authConfig';
+import { msalInstance } from '../index';
 
 const getCurrentUser = async (): Promise<User | null> => {
+  //return fetch(graphConfig.graphMeEndpoint, options)
+  //.then(response => response.json())
+  //.catch(error => console.log(error));
+
   // TODO: Implement this Akash
   const user: User = {
     id: '8932744254ee408a8a2d198e69a5a714',

@@ -5,7 +5,7 @@ import {
   ContextualMenu,
   IContextualMenuProps,
 } from '@fluentui/react';
-import { loginRequest } from '../services/authConfig';
+import { graphLoginRequest } from '../services/authConfig';
 
 export const SignInButton = () => {
   const { instance } = useMsal();
@@ -17,9 +17,9 @@ export const SignInButton = () => {
     setAnchorEl(null);
 
     if (loginType === 'popup') {
-      instance.loginPopup(loginRequest);
+      instance.loginPopup(graphLoginRequest);
     } else if (loginType === 'redirect') {
-      instance.loginRedirect(loginRequest);
+      instance.loginRedirect(graphLoginRequest);
     }
   };
 

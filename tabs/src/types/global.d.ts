@@ -47,6 +47,21 @@ type UserType = 'Teammate' | 'Copilot' | 'Guest';
 
 type WalletType = 'Allowance' | 'Private';
 
+interface Copilot extends User {
+  // Additional properties specific to Copilot
+  appId: string;
+  flows: Flows[];
+}
+
+interface Flows {
+  id: string;
+  displayName: string;
+  url: string;
+  description: string;
+  createdDate: date;
+  lastModifiedDate: date;
+}
+
 interface Transaction {
   checking_id: string;
   pending: boolean;

@@ -19,6 +19,7 @@ import { PageLayout } from './components/PageLayout';
 // Import the pages
 import Login from './Login';
 import Feed from './Feed';
+import Automations from './Automations';
 import Users from './Users';
 import './App.css';
 import Rewards from './Rewards';
@@ -50,6 +51,7 @@ function Pages() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/feed" element={<Feed />} />
+      <Route path="/automations" element={<Automations />} />
       <Route path="/users" element={<Users />} />
       <Route path="/Rewards" element={<Rewards />} />
       <Route path="/Wallet" element={<Wallet />} />
