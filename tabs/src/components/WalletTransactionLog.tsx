@@ -37,7 +37,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
       : activeTab;
   console.log('activeTabForData: ', activeTabForData);
 
-  console.log('activeWalletTabName: ', activeWallet);
+  console.log('activeWallet: ', activeWallet);
 
   const getAllUsers = async () => {
     const users = await getUsers(adminKey, {});
@@ -160,7 +160,11 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
                 <div className={styles.userName}>
                   <p className={styles.lightHelightInItems}>
                     {' '}
-                    <b>{transaction.extra?.type ?? 'Regular transaction'}</b>
+                    <b>
+                      {transaction.extra?.tag === 'zap'
+                        ? 'Zap!'
+                        : transaction.extra?.tag ?? 'Regular transaction'}
+                    </b>
                   </p>
                   <div className={styles.lightHelightInItems}>
                     {' '}
