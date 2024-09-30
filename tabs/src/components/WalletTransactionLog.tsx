@@ -189,6 +189,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
             </div>
           </div>
         ))}
+      {zaps.length === 0 && <div>No transactions to show.</div>}
     </div>
   );
 };
