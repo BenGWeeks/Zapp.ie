@@ -345,7 +345,7 @@ async function messageRecipient(
     ) {
       // Inform the sender that the recipient hasn't installed the bot
       await context.sendActivity(
-        `Unable to send zap to ${receiver.displayName} because they haven't installed the bot - you should ping them and let them know to install Zapp.ie!`,
+        `I was unable to message ${receiver.displayName} the great news because they haven't installed the bot - you should ping them and let them know to install Zapp.ie!`,
       );
     } else {
       console.error('Error in messageRecipient:', error);
