@@ -77,7 +77,9 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
   timestamp,
 }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  //const [loading, setLoading] = useState<boolean>(true);
+
+  let summaryText = '';
 
   const fromDate = new Date(timestamp * 1000).toISOString().split('T')[0];
   const toDate = new Date().toISOString().split('T')[0];
@@ -126,37 +128,35 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
       } catch (error) {
         console.error('Error fetching zaps:', error);
       } finally {
-        setLoading(false);
+        //setLoading(false);
       }
     };
 
     fetchActivities();
   }, [lnKey, timestamp]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (activities.length === 0) {
-    return <div>No activity data available.</div>;
-  }
-
   return (
     <div className={styles.zapactivitychartbox}>
       <h2 className={styles.zapactivitycharttitle}>Zap activity</h2>
-      <ActivityCalendar
-        data={activities}
-        blockSize={12}
-        blockMargin={5}
-        fontSize={14}
-        theme={{
-          dark: ['#1F1F1F', '#492D16', '#BF6C21', '#E56C31', '#F2A900'],
-        }}
-        colorScheme="dark"
-        labels={{
-          totalCount: '{{count}} Sats zapped (up until yesterday)',
-        }}
-      />
+      {activities.length > 0 ? (
+        <ActivityCalendar
+          data={activities}
+          blockSize={12}
+          blockMargin={5}
+          fontSize={14}
+          theme={{
+            dark: ['#1F1F1F', '#492D16', '#BF6C21', '#E56C31', '#F2A900'],
+          }}
+          colorScheme="dark"
+          labels={{
+            totalCount: '{{count}} Sats zapped (up until yesterday)',
+          }}
+        />
+      ) : (
+        <div style={{ marginLeft: 0, marginRight: 'auto' }}>
+          Loading activity data ...
+        </div>
+      )}
     </div>
   );
 };
