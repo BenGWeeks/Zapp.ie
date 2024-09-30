@@ -153,7 +153,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
                 <div className={styles.userName}>
                   <p className={styles.lightHelightInItems}>
                     {' '}
-                    <b>Zap! </b>
+                    <b>{zap.extra?.type ?? 'Regular transaction'}</b>
                   </p>
                   <div className={styles.lightHelightInItems}>
                     {' '}
