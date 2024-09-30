@@ -55,14 +55,14 @@ const PurchasePopup: React.FC<PurchasePopupProps> = ({
           <button className={styles.closeButton} onClick={onClose}>
             Cancel
           </button>
-          <button
-            onClick={handleConfirmClick}
-            className={
-              hasEnoughSats ? styles.buyButton : styles.buyButtonDisabled
-            }
-          >
-            Confirm
-          </button>
+          {hasEnoughSats && (
+            <button
+              onClick={handleConfirmClick}
+              className={styles.buyButton}
+            >
+              Confirm
+            </button>
+          )}
         </div>
       </div>
     </div>
