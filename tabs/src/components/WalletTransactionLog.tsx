@@ -21,7 +21,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
   activeTab,
   activeWallet,
 }) => {
-  const [zaps, setZaps] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,12 +50,12 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
   const { accounts } = useMsal();
   const account = accounts[0];
 
-  const fetchZaps = async () => {
+  const fetchTransactions = async () => {
     console.log('Fetching payments since: ', paymentsSinceTimestamp);
     setLoading(true);
     setError(null);
 
-    let allZaps: Transaction[] = [];
+    let allTransactions: Transaction[] = [];
 
     try {
       const currentUserLNbitDetails = await getUsers(adminKey, {
@@ -88,23 +88,25 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
             filteredTransactions = transactions.filter(f => f.amount > 0);
           else filteredTransactions = transactions;
 
-          for (const zap of filteredTransactions) {
-            zap.extra.from = users.filter(
-              u => u.id === zap.extra?.from?.user,
+          for (const transaction of filteredTransactions) {
+            transaction.extra.from = users.filter(
+              u => u.id === transaction.extra?.from?.user,
             )[0];
-            zap.extra.to = users.filter(u => u.id === zap.extra?.to?.user)[0];
+            transaction.extra.to = users.filter(
+              u => u.id === transaction.extra?.to?.user,
+            )[0];
           }
 
-          allZaps = allZaps.concat(filteredTransactions);
-          console.log('Zaps: ', allZaps);
+          allTransactions = allTransactions.concat(filteredTransactions);
+          console.log('Transactions: ', allTransactions);
         }
       }
-      setZaps(prevState => [...prevState, ...allZaps]);
+      setTransactions(prevState => [...prevState, ...allTransactions]);
     } catch (error) {
       if (error instanceof Error) {
-        setError(`Failed to fetch users: ${error.message}`);
+        setError(`Failed to fetch transactions: ${error.message}`);
       } else {
-        setError('An unknown error occurred while fetching users');
+        setError('An unknown error occurred while fetching transactions');
       }
       console.error(error);
     } finally {
@@ -113,9 +115,9 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
   };
 
   useEffect(() => {
-    setZaps([]);
+    setTransactions([]);
     getAllUsers();
-    fetchZaps();
+    fetchTransactions();
   }, [activeTab, activeWallet]);
 
   if (loading) {
@@ -136,45 +138,57 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
 
   return (
     <div className={styles.feedlist}>
-      {zaps
+      {transactions
         ?.sort((a, b) => b.time - a.time)
-        .map((zap, index) => (
-          <div key={zap.checking_id || index} className={styles.bodycell}>
+        .map((transaction, index) => (
+          <div
+            key={transaction.checking_id || index}
+            className={styles.bodycell}
+          >
             <div className={styles.bodyContents}>
               <div className={styles.mainContentStack}>
                 <img
                   className={styles.avatarIcon}
                   alt=""
                   src={
-                    (zap.amount as number) < 0 ? ArrowOutgoing : ArrowIncoming
+                    (transaction.amount as number) < 0
+                      ? ArrowOutgoing
+                      : ArrowIncoming
                   }
                 />
 
                 <div className={styles.userName}>
                   <p className={styles.lightHelightInItems}>
                     {' '}
-                    <b>{zap.extra?.type ?? 'Regular transaction'}</b>
+                    <b>{transaction.extra?.type ?? 'Regular transaction'}</b>
                   </p>
                   <div className={styles.lightHelightInItems}>
                     {' '}
-                    {moment(moment.now()).diff(zap.time * 1000, 'days')} days
-                    ago from <b>{zap.extra?.from?.displayName ?? 'Unknown'} </b>
+                    {moment(moment.now()).diff(
+                      transaction.time * 1000,
+                      'days',
+                    )}{' '}
+                    days ago from{' '}
+                    <b>{transaction.extra?.from?.displayName ?? 'Unknown'} </b>
                   </div>
-                  <p className={styles.lightHelightInItems}>{zap.memo}</p>
+                  <p className={styles.lightHelightInItems}>
+                    {transaction.memo}
+                  </p>
                 </div>
               </div>
               <div
                 className={styles.transactionDetailsAllowance}
                 style={{
-                  color: (zap.amount as number) < 0 ? '#E75858' : '#00A14B',
+                  color:
+                    (transaction.amount as number) < 0 ? '#E75858' : '#00A14B',
                 }}
               >
                 <div className={styles.lightHelightInItems}>
                   {' '}
                   <b className={styles.b}>
-                    {zap.amount < 0
-                      ? zap.amount / 1000
-                      : '+' + zap.amount / 1000}
+                    {transaction.amount < 0
+                      ? transaction.amount / 1000
+                      : '+' + transaction.amount / 1000}
                   </b>{' '}
                   Sats{' '}
                 </div>
@@ -189,7 +203,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
             </div>
           </div>
         ))}
-      {zaps.length === 0 && <div>No transactions to show.</div>}
+      {transactions.length === 0 && <div>No transactions to show.</div>}
     </div>
   );
 };
