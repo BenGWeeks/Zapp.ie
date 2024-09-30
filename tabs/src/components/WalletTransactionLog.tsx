@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styles from './WalletTransactionLog.module.css';
 import {
   getUsers,
-  getUserWallets,
   getWalletTransactionsSince,
 } from '../services/lnbitsServiceLocal';
 import ArrowIncoming from '../images/ArrowIncoming.svg';
@@ -12,7 +11,7 @@ import { useMsal } from '@azure/msal-react';
 
 interface WalletTransactionLogProps {
   activeTab?: string;
-  activeWalletTabName?: string;
+  activeWallet?: string;
   filterZaps?: (activeTab: string) => void;
 }
 
@@ -20,7 +19,7 @@ const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
 const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
   activeTab,
-  activeWalletTabName,
+  activeWallet,
 }) => {
   const [zaps, setZaps] = useState<Transaction[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -38,7 +37,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
       : activeTab;
   console.log('activeTabForData: ', activeTabForData);
 
-  console.log('activeWalletTabName: ', activeWalletTabName);
+  console.log('activeWalletTabName: ', activeWallet);
 
   const getAllUsers = async () => {
     const users = await getUsers(adminKey, {});
@@ -68,35 +67,35 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
       if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
         let inkey: any = null;
 
-        if (activeWalletTabName === 'Your wallet') {
+        if (activeWallet === 'Private') {
           inkey = currentUserLNbitDetails[0].privateWallet?.inkey;
         } else {
           inkey = currentUserLNbitDetails[0].allowanceWallet?.inkey;
         }
 
         if (inkey) {
-          const zaps = await getWalletTransactionsSince(
+          const transactions = await getWalletTransactionsSince(
             inkey,
             paymentsSinceTimestamp,
             null, //{ tag: 'zap' }
           );
 
-          let filteredZapsBasedOntheActiveTab: any = null;
+          let filteredTransactions: any = null;
 
           if (activeTab === 'sent')
-            filteredZapsBasedOntheActiveTab = zaps.filter(f => f.amount < 0);
+            filteredTransactions = transactions.filter(f => f.amount < 0);
           else if (activeTab === 'received')
-            filteredZapsBasedOntheActiveTab = zaps.filter(f => f.amount > 0);
-          else filteredZapsBasedOntheActiveTab = zaps;
+            filteredTransactions = transactions.filter(f => f.amount > 0);
+          else filteredTransactions = transactions;
 
-          for (const zap of filteredZapsBasedOntheActiveTab) {
+          for (const zap of filteredTransactions) {
             zap.extra.from = users.filter(
               u => u.id === zap.extra?.from?.user,
             )[0];
             zap.extra.to = users.filter(u => u.id === zap.extra?.to?.user)[0];
           }
 
-          allZaps = allZaps.concat(filteredZapsBasedOntheActiveTab);
+          allZaps = allZaps.concat(filteredTransactions);
           console.log('Zaps: ', allZaps);
         }
       }
@@ -117,7 +116,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
     setZaps([]);
     getAllUsers();
     fetchZaps();
-  }, [activeTab, activeWalletTabName]);
+  }, [activeTab, activeWallet]);
 
   if (loading) {
     return <div>Loading...</div>;

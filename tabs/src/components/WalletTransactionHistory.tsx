@@ -8,7 +8,7 @@ interface WalletTransactionHistoryProps {
 }
 const WalletTransactionHistory: React.FC<WalletTransactionHistoryProps> = ({ activeMainTab }) => {
   const [activeTab, setActiveTab] = useState<string>('all');
-  const [activeWalletTabName, setActiveWalletTabName] = useState<string>('Your wallet');
+  const [activeWalletTabName, setActiveWalletTabName] = useState<string>('Private');
 
   const onHistoryTabClick = (tabName: string) => {
     setActiveTab(tabName);
@@ -66,17 +66,17 @@ const WalletTransactionHistory: React.FC<WalletTransactionHistoryProps> = ({ act
         </div>
       </div>
       
-        { activeWalletTabName === 'Your wallet' ? (
+        { activeWalletTabName === 'Private' ? (
           <WalletTransactionLog
         filterZaps={onHistoryTabClick}
         activeTab={activeTab}
-        activeWalletTabName={activeWalletTabName}
+        activeWallet={activeWalletTabName}
       />)
         : (
           <WalletTransactionLog
           filterZaps={onHistoryTabClick}
           activeTab={activeTab}
-          activeWalletTabName={activeWalletTabName}
+          activeWallet={activeWalletTabName}
         />
         )
       }
