@@ -96,6 +96,10 @@
         {
           "url": "https://${{BOT_DOMAIN}}/auth-end.html",
           "type": "Web"
+        },
+        {
+            "url": "http://localhost:3000",
+            "type": "spa"
         }
     ]
 }
