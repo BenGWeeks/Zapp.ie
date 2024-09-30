@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QrReader } from 'react-qr-reader';
 import styles from './SendReceivePayment.module.css';
 import qrCodeImage from '../images/QRCode.svg';
 import checkmarkIcon from '../images/CheckmarkCircleGreen.svg';
 import dismissIcon from '../images/DismissCircleRed.svg';
+import pasteInvoice from '../images/PasteInvoice.svg';
+import { createInvoice } from '../services/lnbitsServiceLocal';
 
 interface SendPopupProps {
     onClose: () => void;
 }
+
+interface QrResult {
+    getText: () => string;
+  }
 
 const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -24,6 +30,25 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
     const [isScanning, setIsScanning] = useState(false); // State to track scanning
     const [isQrScanTriggered, setIsQrScanTriggered] = useState(false); // State for handling the popup size and hiding textarea
     const isSendDisabled = !inputValue || !invoice;
+    const [qrData, setQRData] = useState('No QR code detected');
+    const [isValidQRCode, setIsValidQRCode] = useState(false);
+    const [invoiceData, setInvoiceData] = useState<string | null>(null); // Store the invoice response
+    const [loading, setLoading] = useState(false); // Loading state for invoice creation
+    
+    const lnKey = '4be8d48ae93247daad21c4c2363829bb'; // Replace with actual lnKey
+    const recipientWalletId = '668e09b5743c47729c902c94890cbc04'; // Replace with actual recipient wallet ID
+
+    const validateQRCode = (code: string) => {
+        return code.startsWith('lightning');
+      };
+      
+      useEffect(() => {
+        if (qrData !== 'No QR code detected') {
+          setIsValidQRCode(validateQRCode(qrData));
+        } else {
+          setIsValidQRCode(false);
+        }
+      }, [qrData]);
 
     const handleButtonClick = (value: string) => {
         setInputValue(value);
@@ -33,10 +58,34 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
         onClose();
     };
 
+    // Refactor handleResult to be used by both QR scan and manual data entry
+    const handleResult = async (amount: number, memo: string, extra: object = {}) => {
+        setLoading(true); // Show loading while creating the invoice
+        try {
+            // Use your imported createInvoice function
+            const paymentRequest = await createInvoice(lnKey, recipientWalletId, amount, memo, extra);
+            setInvoiceData(paymentRequest); // Store the generated invoice/payment request
+            setIsQrScanTriggered(false); // Close the QR scanner
+            console.log('Invoice created:', paymentRequest);
+        } catch (error) {
+            console.error('Error creating invoice:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleSendClick = () => {
         setIsSuccessFailurePopupVisible(true);
         setIsSendPopupVisible(true);
-        setIsPaymentSuccess(false); // true false based on the payment success
+        setIsPaymentSuccess(true); // true false based on the payment success// Adjust this based on actual payment success
+        const memo = sendAnonymously ? 'Anonymous Payment' : 'Payment'; // Adjust memo based on user selection
+
+        // Check if the user manually entered an amount
+        if (inputValue) {
+            const amount = parseFloat(inputValue); // Parse the input value as amount
+            handleResult(amount, memo); // Create invoice using the manually entered amount
+            console.log('Amount:', amount);
+        }
     };
 
     const handleChangeAmountClick = () => {
@@ -49,9 +98,8 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
     };
 
     const handlePasteInvoiceClick = () => {
-        const scannedData = "Scanned QR Code Data"; // Replace with actual scanned data
-        setInvoice(scannedData);
         setIsScanning(false);
+        setIsQrScanTriggered(false);
     };
 
     return (
@@ -80,7 +128,8 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
                                 <button onClick={() => handleButtonClick('25000')} className={styles.button}>25,000</button>
                             </div>
                         </div>
-                        <p className={styles.text}>Paste invoice</p>
+                        <p className={styles.text}>
+                            Paste invoice</p>
                         <textarea
                             value={invoice}
                             onChange={(e) => setInvoice(e.target.value)}
@@ -103,13 +152,13 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
 
                             <div className={styles.qrReaderContainer}>
                                 <QrReader
-                                    constraints={{ facingMode: 'user' }}  // Switch between 'user' (front) or 'environment' (back) camera
+                                    constraints={{ facingMode: 'user' }}
                                     scanDelay={300}                        // Add a slight delay between scans
                                     onResult={(result, error) => {
                                         if (result) {
                                             // Log the result for debugging
                                             console.log(result);
-                                            setInvoice(result.getText() || "");  // Depending on the result, you may have to use result.getText() or result.getData()
+                                            setInvoice(result.getText() || "");
                                             setIsQrScanTriggered(false);    // Hide the QR reader after scanning
                                         }
 
@@ -125,6 +174,7 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
 
                         </div>
                         <button type="button" className={styles.scanButton} onClick={handlePasteInvoiceClick}>
+                            <img src={pasteInvoice} alt="paste invoice" className={styles.qrIcon} />
                             Paste invoice
                         </button>
                     </React.Fragment>
@@ -200,3 +250,4 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
 };
 
 export default SendPayment;
+
