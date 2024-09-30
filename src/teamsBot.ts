@@ -128,6 +128,7 @@ export class TeamsBot extends TeamsActivityHandler {
             receiver,
             context.activity.value.zapMessage,
             context.activity.value.zapAmount,
+            context,
           );
 
           await context.sendActivity(
