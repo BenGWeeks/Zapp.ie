@@ -1,8 +1,9 @@
 // userService.ts
 
 /// <reference path="../../src/types/global.d.ts" />
+import { currentUser,setCurrentUser } from '../globalstate';
+import { ConsoleTranscriptLogger, TurnContext, TeamsInfo } from 'botbuilder';
 
-import { ConsoleTranscriptLogger, TurnContext } from 'botbuilder';
 import {
   getUsers,
   createUser,
@@ -13,11 +14,23 @@ import {
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
 
+interface CancellationToken {
+  isCancellationRequested: boolean;
+}
+
+function sanitizeString(str: string): string {
+  return str.replace(/[^a-zA-Z0-9]/g, '');
+}
+
+
+
 export class UserService {
   private static instance: UserService;
   private users: Map<string, User> = new Map(); // Simple in-memory cache
-
+  
   private constructor() {}
+
+
 
   public static getInstance(): UserService {
     if (!UserService.instance) {
@@ -27,7 +40,7 @@ export class UserService {
   }
 
   public async getUser(context: TurnContext): Promise<User> {
-    const userId = context.activity.from.id;
+        const userId = context.activity.from.id;
 
     // Check if the user is already in memory (in-session)
     if (this.users.has(userId)) {
@@ -36,29 +49,31 @@ export class UserService {
 
     // Otherwise, create or fetch the user from the external service
     let currentUser: User;
+    const userProfile = await this.getUserProfile(context, context.turnState.get('cancellationToken'));
+    console.log('User profile:', userProfile);
 
     // Fetch user details from LNBits (assuming LNBits is an external service)
     const users: User[] = await getUsers(adminKey, {
-      aadObjectId: context.activity.from.aadObjectId,
+      aadObjectId: userProfile.aadObjectId,
     });
 
     if (users.length < 1) {
       console.log('User does not exist ... creating a new one');
       const extra = {
-        aadObjectId: context.activity.from.aadObjectId,
+        aadObjectId: userProfile.aadObjectId,
         profileImg:
           'https://hiberniaevros.sharepoint.com/_layouts/15/userphoto.aspx?AccountName=' +
-          context.activity.from.properties?.email,
-        privateWalletId: null,
-        allowanceWalletId: null,
+          userProfile.userPrincipalName,
+        privateWalletId: "",
+        allowanceWalletId: "",
         userType: 'teammate',
       };
-
+      const sanitizedDisplayName = sanitizeString(context.activity.from.name);
       currentUser = await createUser(
         adminKey,
-        context.activity.from.name,
+        sanitizedDisplayName,
         'Private',
-        'someone@somewhere.com', // Placeholder for email
+        userProfile.email, 
         'password1',
         extra,
       );
@@ -81,5 +96,12 @@ export class UserService {
     this.users.set(userId, currentUser);
 
     return currentUser;
+  }
+  public async getUserProfile(
+    context: TurnContext,
+    cancellationToken: CancellationToken,
+  ): Promise<any> {
+    const member = await TeamsInfo.getMember(context, context.activity.from.id);
+    return member;
   }
 }
