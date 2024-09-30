@@ -127,7 +127,9 @@ const RewardsComponent: FunctionComponent<{
               />
               <h3 className={styles.cardTitle}>{reward.name}</h3>
               <p className={styles.cardDescription}>
-                {reward.shortDescription}
+                {reward.shortDescription.length > 140
+                  ? `${reward.shortDescription.substring(0, 140)}...`
+                  : reward.shortDescription}
               </p>
               {reward.link && reward.link.length > 0 && (
                 <p
@@ -136,7 +138,7 @@ const RewardsComponent: FunctionComponent<{
                 >
                   Product details</p>
               )}
-              <p>product image {reward.image}</p>
+
               <div className={styles.priceContainer}>
                 <p className={styles.price}>{formatPrice(reward.price)}</p>
                 <p className={styles.sats}>Sats</p>
