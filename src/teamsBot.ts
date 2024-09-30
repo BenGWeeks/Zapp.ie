@@ -124,8 +124,8 @@ export class TeamsBot extends TeamsActivityHandler {
           }
 
           await SendZap(
-            currentUser.allowanceWallet,
-            receiver.privateWallet,
+            currentUser,
+            receiver,
             context.activity.value.zapMessage,
             context.activity.value.zapAmount,
           );

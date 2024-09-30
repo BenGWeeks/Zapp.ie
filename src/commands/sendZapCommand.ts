@@ -53,8 +53,8 @@ function extractAmountFromMessage(text: string): number {
   */
 
 export async function SendZap(
-  sendersWallet: Wallet,
-  receiversWallet: Wallet,
+  sender: User,
+  receiver: User,
   zapMessage: string,
   zapAmount: number,
 ): Promise<void> {
@@ -63,15 +63,15 @@ export async function SendZap(
 
     // Extra information to be logged for tracking from which wallet the zap is sent from and to whom
     const extra = {
-      from: sendersWallet,
-      to: receiversWallet,
+      from: sender.allowanceWallet,
+      to: receiver.privateWallet,
       tag: 'zap',
     };
 
     // Create an invoice for the amount in the recipient's wallet
     const paymentRequest = await createInvoice(
-      receiversWallet.inkey,
-      receiversWallet.id,
+      receiver.privateWallet.inkey,
+      receiver.privateWallet.id,
       zapAmount,
       zapMessage,
       extra,
@@ -85,10 +85,10 @@ export async function SendZap(
 
     // Pay the invoice
 
-    console.log('sendersWallet: ', sendersWallet);
+    console.log('sendersWallet: ', sender.allowanceWallet);
 
     const result = await payInvoice(
-      sendersWallet.adminkey,
+      sender.allowanceWallet.adminkey,
       paymentRequest,
       extra,
     );
