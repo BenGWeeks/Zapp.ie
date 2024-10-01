@@ -9,7 +9,7 @@ import {
   createUser,
   createWallet,
   updateUser,
-  getUserWallets,
+  getUserWallets,topUpWallet
 } from './lnbitsService';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
@@ -84,6 +84,7 @@ export class UserService {
         currentUser.id,
         'Allowance',
       );
+      await topUpWallet(allowanceWallet.id, 20000);
       currentUser = await updateUser(adminKey, currentUser.id, {
         allowanceWalletId: allowanceWallet.id,
         privateWalletId: currentUser.privateWallet?.id,

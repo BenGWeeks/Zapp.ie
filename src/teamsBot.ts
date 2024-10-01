@@ -23,6 +23,7 @@ import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
 import { error } from 'console';
 import { getUser, getUsers, getWalletById ,createUser, createWallet, updateUser} from './services/lnbitsService';
+import { access } from 'fs';
 
 let globalWalletId: string | null = null;
 let currentUser: User | null = null;
@@ -307,6 +308,7 @@ export class TeamsBot extends TeamsActivityHandler {
             };
 
             setCurrentUser(currentUser);
+            console.log("Getting Users from lnbits");
             const lnBitsUsers = await getUsers(adminKey, { aadObjectId: userProfile.aadObjectId });
             let lnBitsUser = lnBitsUsers[0];
     
@@ -374,6 +376,8 @@ export class TeamsBot extends TeamsActivityHandler {
                 };
                 await updateUser(adminKey, lnBitsUser.id, userDict);
                 console.log('Allowance wallet created:', allowanceWallet);
+                // Top up the allowance wallet
+                
               }
     
               await context.sendActivity('Welcome to the bot! Your LNbits account and wallets are set up.');
