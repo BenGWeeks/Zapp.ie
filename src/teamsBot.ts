@@ -22,10 +22,14 @@ import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
 import { error } from 'console';
-import { getUser, getUsers, getWalletById } from './services/lnbitsService';
+import { getUser, getUsers, getWalletById ,createUser, createWallet, updateUser} from './services/lnbitsService';
 
 let globalWalletId: string | null = null;
 let currentUser: User | null = null;
+
+function sanitizeString(str: string): string {
+  return str.replace(/[^a-zA-Z0-9]/g, '');
+}
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
 interface CancellationToken {
@@ -59,7 +63,6 @@ export class TeamsBot extends TeamsActivityHandler {
 
     this.onMessage(async (context, next) => {
       console.log('Running onMessage ...');
-
       const botId = context.activity.recipient.id; // Bot's ID
       const senderId = context.activity.from.id; // Sender's ID
 
@@ -85,11 +88,11 @@ export class TeamsBot extends TeamsActivityHandler {
         if (lnBitsUser) {
           privateWallet = await getWalletById(
             adminKey,
-            lnBitsUser.extra.privateWalletId,
+            lnBitsUser.privateWallet.id,
           );
           allowanceWallet = await getWalletById(
             adminKey,
-            lnBitsUser.extra.allowanceWalletId,
+            lnBitsUser.allowanceWalle.id,
           );
         }
         const currentUser = {
@@ -290,13 +293,96 @@ export class TeamsBot extends TeamsActivityHandler {
       try {
         const membersAdded = context.activity.membersAdded;
         for (let cnt = 0; cnt < membersAdded.length; cnt++) {
-          if (membersAdded[cnt].id) {
-            await context.sendActivity('Welcome to the sso bot sample!');
-            break;
+          const member = membersAdded[cnt];
+          if (member.id) {
+            const userProfile = await this.getUserProfile(context, { isCancellationRequested: false });
+            const currentUser = {
+              id: null, // This id is from the lnbits user table
+              displayName: userProfile.name,
+              profileImg: userProfile.profile, // Add logic to set profile image if available
+              aadObjectId: userProfile.aadObjectId,
+              email: userProfile.email,
+              privateWallet: null,
+              allowanceWallet: null,
+            };
+
+            setCurrentUser(currentUser);
+            const lnBitsUsers = await getUsers(adminKey, { aadObjectId: userProfile.aadObjectId });
+            let lnBitsUser = lnBitsUsers[0];
+    
+            if (!lnBitsUser) {
+              // Create LNbits user
+              const sanitizedDisplayName = sanitizeString(userProfile.displayName);
+              lnBitsUser = await createUser(adminKey, sanitizedDisplayName, "Private", userProfile.email, "", userProfile);
+              console.log('LNbits user created:', lnBitsUser);
+    
+              // Check for private wallet
+              let privateWallet: Wallet | null = null;
+              if (lnBitsUser.privateWallet && lnBitsUser.privateWallet.id) {
+                privateWallet = await getWalletById(adminKey, lnBitsUser.privateWallet.id);
+              } else {
+                privateWallet = await createWallet(adminKey, lnBitsUser.id, 'Private Wallet');
+                lnBitsUser.privateWallet = {
+                  id: privateWallet.id,
+                  admin: privateWallet.admin,
+                  name: privateWallet.name,
+                  user: privateWallet.user,
+                  adminkey: privateWallet.adminkey,
+                  inkey: privateWallet.inkey,
+                  balance_msat: privateWallet.balance_msat,
+                  deleted: privateWallet.deleted,
+                };
+    
+                const userDict: { [key: string]: string } = {
+                  id: lnBitsUser.id,
+                  displayName: lnBitsUser.displayName,
+                  profileImg: lnBitsUser.profileImg,
+                  aadObjectId: lnBitsUser.aadObjectId,
+                  email: lnBitsUser.email,
+                  privateWalletId: lnBitsUser.privateWallet.id,
+                  allowanceWalletId: lnBitsUser.allowanceWallet ? lnBitsUser.allowanceWallet.id : '',
+                };
+                await updateUser(adminKey, lnBitsUser.id, userDict);
+                console.log('Private wallet created:', privateWallet);
+              }
+    
+              // Check for allowance wallet
+              let allowanceWallet: Wallet | null = null;
+              if (lnBitsUser.allowanceWallet && lnBitsUser.allowanceWallet.id) {
+                allowanceWallet = await getWalletById(adminKey, lnBitsUser.allowanceWallet.id);
+              } else {
+                allowanceWallet = await createWallet(adminKey, lnBitsUser.id, 'Allowance Wallet');
+                lnBitsUser.allowanceWallet = {
+                  id: allowanceWallet.id,
+                  admin: allowanceWallet.admin,
+                  name: allowanceWallet.name,
+                  user: allowanceWallet.user,
+                  adminkey: allowanceWallet.adminkey,
+                  inkey: allowanceWallet.inkey,
+                  balance_msat: allowanceWallet.balance_msat,
+                  deleted: allowanceWallet.deleted,
+                };
+    
+                const userDict: { [key: string]: string } = {
+                  id: lnBitsUser.id,
+                  displayName: lnBitsUser.displayName,
+                  profileImg: lnBitsUser.profileImg,
+                  aadObjectId: lnBitsUser.aadObjectId,
+                  email: lnBitsUser.email,
+                  privateWalletId: lnBitsUser.privateWallet.id,
+                  allowanceWalletId: lnBitsUser.allowanceWallet.id,
+                };
+                await updateUser(adminKey, lnBitsUser.id, userDict);
+                console.log('Allowance wallet created:', allowanceWallet);
+              }
+    
+              await context.sendActivity('Welcome to the bot! Your LNbits account and wallets are set up.');
+            }
           }
         }
       } catch (error) {
         console.error('Error in onMembersAdded handler:', error);
+        await context.sendActivity('An error occurred while setting up your account.');
       }
       await next();
     });
