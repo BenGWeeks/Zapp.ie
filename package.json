@@ -11,6 +11,7 @@
   "scripts": {
     "dev:teamsfx": "env-cmd --silent -f .localConfigs npm run dev",
     "dev": "nodemon --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
+    "build-manifest": "node build.js",
     "build": "tsc --build",
     "write-env": "cross-env TEAMSFX_ENV=local node scripts/writeEnv.js",
     "start": "node ./lib/src/index.js",

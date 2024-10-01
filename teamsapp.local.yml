@@ -38,6 +38,9 @@ provision:
       description: ""
       channels:
         - name: msteams
+  - uses: cli/runNpmCommand
+    with:
+      args: run write-env && npm run build-manifest
 
   - uses: aadApp/update
     with:
@@ -66,9 +69,6 @@ deploy:
   - uses: cli/runNpmCommand
     with:
       args: install --no-audit
-  - uses: cli/runNpmCommand
-    with:
-      args: run write-env
   - uses: file/createOrUpdateEnvironmentFile
     with:
       target: ./.localConfigs
