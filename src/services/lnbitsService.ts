@@ -960,11 +960,10 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
 };
 
 async function topUpWallet(walletId: string, amount: number): Promise<void> {
-  if (!accessToken) {
-    throw new Error('Access token is not available');
-  }
+  
+  const accessToken = await getAccessToken(`${userName}`, `${password}`);
 
-  const url = 'https://finickyoil0.lnbits.com/users/api/v1/topup';
+  const url = `${lnbiturl}/users/api/v1/topup`;
   const body = {
     amount: amount.toString(),
     id: walletId,
