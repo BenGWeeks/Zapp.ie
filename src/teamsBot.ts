@@ -54,12 +54,6 @@ export class TeamsBot extends TeamsActivityHandler {
     this.conversationState = new ConversationState(memoryStorage);
     this.userState = new UserState(memoryStorage);
 
-    // Create a property accessor for the user setup flag.
-    //this.userSetupFlagAccessor =
-    //  this.userState.createProperty<boolean>('userSetupFlag');
-    //this.userProfileAccessor =
-    //  this.userState.createProperty<User>('userProfile');
-
     // Register commands
     SSOCommandMap.register('send zap', new SendZapCommand());
     SSOCommandMap.register('show my balance', new ShowMyBalanceCommand());
