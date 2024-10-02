@@ -5,8 +5,8 @@ import qrCodeImage from '../images/QRCode.svg';
 import checkmarkIcon from '../images/CheckmarkCircleGreen.svg';
 import dismissIcon from '../images/DismissCircleRed.svg';
 import pasteInvoice from '../images/PasteInvoice.svg';
+import bolt11 from 'bolt11';
 import {
-  createInvoice,
   payInvoice,
   getWalletPayments,
   getWalletBalance,
@@ -33,6 +33,8 @@ const SendPayment: React.FC<SendPopupProps> = ({
   };
   const [inputValue, setInputValue] = useState('');
   const [invoice, setInvoice] = useState('');
+  const [invoiceDetails, setInvoiceDetails] = useState<any>();
+  const [error, setError] = useState<string | null>(null);
   const [sendAnonymously, setSendAnonymously] = useState(false);
   const [isSendPopupVisible, setIsSendPopupVisible] = useState(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
@@ -44,8 +46,6 @@ const SendPayment: React.FC<SendPopupProps> = ({
   const isSendDisabled = !inputValue || !invoice;
   const [qrData, setQRData] = useState('No QR code detected');
   const [isValidQRCode, setIsValidQRCode] = useState(false);
-  const [invoiceData, setInvoiceData] = useState<string | null>(null); // Store the invoice response
-  const [loading, setLoading] = useState(false); // Loading state for invoice creation
   const [paymentReceived, setPaymentReceived] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
 
@@ -64,117 +64,89 @@ const SendPayment: React.FC<SendPopupProps> = ({
     } else {
       setIsValidQRCode(false);
     }
-   
   }, [qrData]);
-
-  const handleButtonClick = (value: string) => {
-    setInputValue(value);
-  };
 
   const handleCancelClick = () => {
     onClose();
-  };
-
-  // Refactor handleResult to be used by both QR scan and manual data entry
-  const handleResult = async (
-    amount: number,
-    memo: string,
-    extra: object = {},
-  ) => {
-    setLoading(true); // Show loading while creating the invoice
-    try {
-      // Use your imported createInvoice function
-      const paymentRequest = await createInvoice(
-        lnKey,
-        recipientWalletId,
-        amount,
-        memo,
-      );
-      setInvoiceData(paymentRequest); // Store the generated invoice/payment request
-      setIsQrScanTriggered(false); // Close the QR scanner
-      console.log('Invoice created:', paymentRequest);
-    } catch (error) {
-      console.error('Error creating invoice:', error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleSendClick = () => {
     setIsSuccessFailurePopupVisible(true);
     setIsSendPopupVisible(true);
     setIsPaymentSuccess(true); // true false based on the payment success// Adjust this based on actual payment success
-    const memo = sendAnonymously ? 'Anonymous Payment' : 'Payment'; // Adjust memo based on user selection
-    console.log('Text Natalia3', invoice);
+    //     const memo = sendAnonymously ? 'Anonymous Payment' : 'Payment'; // Adjust memo based on user selection
+    //     console.log('Text Natalia3', invoice);
 
-    getInvoicePayment(
-        myLNbitDetails.allowanceWallet?.inkey || '',
-        'lnbc1u1pn06jaddqsf38yy6t5wvsyg32kxqrrsssp58qy2g5zx4egy2ruq3x4vh7st872pdv3jj2q7j2g688kg9pf7w0cqpp56s7pg68dlyudpgfyw9zqrgdc2hx5tew4rsk87f266kkdytx0g7fq9ec0f7kt47msne6njw05vhyw7az3jfupnxq59xs4ktyjk4meecu3zcwvuvwccwqvlz7t6gwumh63d0zfmnn3y3s0cuxdfrsr5vle69qqmth0t3',
-      ).then(payment => {
-        if (payment) {
-          console.log('Payment received 69999999999', payment);
-          setPaymentReceived(true);
-        }
-      });
+    //     getInvoicePayment(myLNbitDetails.privateWallet?.inkey || '', invoice)
+    //       .then(payment => {
+    //         if (payment) {
+    //           console.log('Natalia 4', payment);
+    //           setPaymentReceived(true);
+    //         }
+    //       })
+    //       .catch(error => {
+    //         console.error('Error getting invoice payment:', error);
+    //       });
 
-    if (myLNbitDetails) {
-      if (myLNbitDetails) {
-        payInvoice(
-          myLNbitDetails.privateWallet?.adminkey || '',
-            inputValue || '',
-        ).then(invoice => {
-          console.log(invoice);
-          setInvoice(invoice);
-          console.log('test invoice NATALIA4: ', invoice, parseInt(inputValue));
+    //     if (myLNbitDetails) {
+    //       payInvoice(
+    //         myLNbitDetails.privateWallet?.adminkey || '',
+    //         inputValue ? inputValue.split('lightning:').pop() || '' : '',
+    //       )
+    //         .then(invoice => {
+    //           console.log(invoice);
+    //           setInvoice(invoice);
+    //           console.log('test invoice NATALIA5: ', invoice, parseInt(inputValue));
 
-          // Record the current timestamp
-          const timestamp = Math.floor(Date.now() / 1000);
+    //           // Record the current timestamp
+    //           const timestamp = Math.floor(Date.now() / 1000);
 
-          // Start polling for payment
-          intervalId.current = setInterval(() => {
-            getWalletPayments(myLNbitDetails.privateWallet?.inkey || '').then(
-              payments => {
-                if (payments.length > 0) {
-                  console.log('Payment sent');
-                  setPaymentReceived(true);
-                  if (intervalId.current !== null) {
-                    window.clearInterval(intervalId.current);
-                  }
+    //           // Start polling for payment
+    //           intervalId.current = setInterval(() => {
+    //             getWalletPayments(myLNbitDetails.privateWallet?.inkey || '').then(
+    //               payments => {
+    //                 if (payments.length > 0) {
+    //                   console.log('Payment sent', 'natalia6');
+    //                   setPaymentReceived(true);
+    //                   if (intervalId.current !== null) {
+    //                     window.clearInterval(intervalId.current);
+    //                   }
 
-                  console.log(
-                    'Update the wallet balance in the context balance',
-                  );
-                  // Update the wallet balance in the context balance
-                  getWalletBalance(
-                    myLNbitDetails.allowanceWallet?.inkey || '',
-                  ).then(balance => {
-                    console.log('getWalletBalance:', balance);
-                    // Use the new function to set the balance
-                    if (balance !== null) {
-                      console.log('setWalletBalance to ', balance);
-                      setWalletBalance(balance);
-                    } else {
-                      // Handle the case when balance is null
-                      // For example, set a default value or show an error message
-                      setWalletBalance(0);
-                    }
-                  });
-                }
-              },
-            );
-          }, 5000); // Check every 5 seconds
-        });
-      } else {
-        console.error('Wallet inkey is not defined yet.');
-      }
-    }
+    //                   console.log(
+    //                     'Update the wallet balance in the context balance',
+    //                   );
+    //                   // Update the wallet balance in the context balance
+    //                   getWalletBalance(
+    //                     myLNbitDetails.privateWallet?.inkey || '',
+    //                   ).then(balance => {
+    //                     console.log('getWalletBalance:', balance);
+    //                     // Use the new function to set the balance
+    //                     if (balance !== null) {
+    //                       console.log('setWalletBalance to ', balance);
+    //                       setWalletBalance(balance);
+    //                     } else {
+    //                       // Handle the case when balance is null
+    //                       // For example, set a default value or show an error message
+    //                       setWalletBalance(0);
+    //                     }
+    //                   });
+    //                 }
+    //               },
+    //             );
+    //           }, 5000); // Check every 5 seconds
+    //         })
+    //         .catch(error => {
+    //           console.error('Error paying invoice:', error);
+    //         });
+    //     } else {
+    //       console.error('Wallet inkey is not defined yet.');
+    //     }
 
-    // Check if the user manually entered an amount
-    if (inputValue) {
-      const amount = parseFloat(inputValue); // Parse the input value as amount
-      handleResult(amount, memo); // Create invoice using the manually entered amount
-      console.log('Amount:', amount);
-    }
+    //     // Check if the user manually entered an amount
+    //     if (inputValue) {
+    //       const amount = parseFloat(inputValue); // Parse the input value as amount
+    //       console.log('Amount:', amount);
+    //     }
   };
 
   const handleChangeAmountClick = () => {
@@ -214,30 +186,19 @@ const SendPayment: React.FC<SendPopupProps> = ({
                   className={styles.inputField}
                   placeholder="Specify amount"
                 />
-                <button
-                  onClick={() => handleButtonClick('5000')}
-                  className={styles.button}
-                >
-                  5,000
-                </button>
-                <button
-                  onClick={() => handleButtonClick('10000')}
-                  className={styles.button}
-                >
-                  10,000
-                </button>
-                <button
-                  onClick={() => handleButtonClick('25000')}
-                  className={styles.button}
-                >
-                  25,000
-                </button>
               </div>
             </div>
             <p className={styles.text}>Paste invoice</p>
             <textarea
               value={invoice}
-              onChange={e => setInvoice(e.target.value)}
+              onChange={e => {
+                const inputValue = e.target.value;
+                const processedValue = inputValue
+                  ? inputValue.split('lightning:').pop()
+                  : '';
+                console.log('QRCode changed Natalia1', processedValue);
+                setInvoice(processedValue || '');
+              }}
               className={styles.textarea}
               placeholder="Paste your invoice here"
             />
@@ -268,8 +229,24 @@ const SendPayment: React.FC<SendPopupProps> = ({
                   onResult={(result, error) => {
                     if (result) {
                       // Log the result for debugging
-                      console.log(result);
-                      setInvoice(result.getText() || '');
+                      console.log(result); // Remove "lightning:" prefix from the scanned QR code result
+                      const processedInvoice = result.getText()
+                        ? result.getText().split('lightning:').pop() // Remove "lightning:" prefix
+                        : '';
+                      console.log('QRCode scanned Natalia2', processedInvoice);
+                      if (processedInvoice) {
+                        try {
+                          const decoded = bolt11.decode(invoice);
+                          console.log('QRCode decoded Natalia3', decoded);
+                          setInvoiceDetails(decoded);
+                          setError(null);
+                        } catch (err) {
+                          setError('Invalid invoice');
+                          setInvoiceDetails(null);
+                        }
+                      }
+
+                      setInvoice(processedInvoice || '');
                       setIsQrScanTriggered(false); // Hide the QR reader after scanning
                     }
 
