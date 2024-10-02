@@ -12,17 +12,10 @@ import {
   ChannelAccount,
   TeamsActivityHandler,
 } from 'botbuilder';
-import {
-  ConnectorClient,
-  MicrosoftAppCredentials,
-} from 'botframework-connector';
-import {
-  getUsers,
-  payInvoice,
-  getWalletIdByUserId,
-  createInvoice,
-} from '../services/lnbitsService';
+import { ConnectorClient } from 'botframework-connector';
+import { getUsers, payInvoice, createInvoice } from '../services/lnbitsService';
 import { error } from 'console';
+import { UserService } from '../services/userService';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
 
@@ -49,14 +42,6 @@ export class SendZapCommand extends SSOCommand {
     }
   }
 }
-
-/*
-// Helper function to extract the amount from the message text
-function extractAmountFromMessage(text: string): number {
-  const amountMatch = text.match(/(\d+)/);
-  return amountMatch ? parseInt(amountMatch[0], 10) : 0;
-}
-  */
 
 export async function SendZap(
   sender: User,
@@ -209,8 +194,20 @@ async function createZapCard() {
 async function populateWalletChoices() {
   console.log('Populating wallet choices ...');
   const users = await getUsers(adminKey, null);
-  if (users) {
-    return users.map((user: any) => ({
+
+  // Get the current user
+  const userService = UserService.getInstance();
+  const currentUser = userService.getCurrentUser();
+
+  let filteresUsers = users;
+  if (currentUser) {
+    filteresUsers = users.filter(
+      user => user?.aadObjectId !== userService.getCurrentUser().aadObjectId,
+    );
+  }
+
+  if (filteresUsers) {
+    return filteresUsers.map((user: any) => ({
       title: user.displayName,
       value: user.id,
     }));
@@ -345,7 +342,7 @@ async function messageRecipient(
     ) {
       // Inform the sender that the recipient hasn't installed the bot
       await context.sendActivity(
-        `I was unable to message ${receiver.displayName} the great news because they haven't installed the bot - you should ping them and let them know to install Zapp.ie!`,
+        `FYI I wasn't able to message ${receiver.displayName} that have received your zap because they don't have me installed yet - maybe you could ping them and let them know to install Zapp.ie!`,
       );
     } else {
       console.error('Error in messageRecipient:', error);
