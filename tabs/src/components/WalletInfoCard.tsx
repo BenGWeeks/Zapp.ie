@@ -97,7 +97,9 @@ const WalletYourWalletInfoCard: React.FC = () => {
         {isSendPopupOpen && (
           <div className="overlay" onClick={handleCloseSendPopup}>
             <div className="popup" onClick={(e) => e.stopPropagation()}>
-              <SendPayment onClose={handleCloseSendPopup} />
+              <SendPayment 
+              onClose={handleCloseSendPopup} 
+              currentUserLNbitDetails={myLNbitDetails!}/>
               <button className="close-btn" onClick={handleCloseSendPopup}>Close</button>
             </div>
           </div>

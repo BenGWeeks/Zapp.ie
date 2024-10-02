@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext, useEffect } from 'react';
-import QRCodeSVG from 'qrcode.react'; 
+import QRCode from 'react-qr-code';
 import styles from './SendReceivePayment.module.css';
 import copyDoc from '../images/DocumentCopy.svg';
 import copySuccess from '../images/CheckmarkCircleGreen.svg';
@@ -45,13 +45,11 @@ const ReceivePayment: React.FC<ReceivePopupProps> = ({ onClose, currentUserLNbit
 
     const handleNextClick = () => {
         setIsSuccessFailurePopupVisible(true);
-        console.log('walletInKey NATALIA:', myLNbitDetails);
         if (myLNbitDetails) {
             if (myLNbitDetails) {
                 createInvoice(myLNbitDetails.privateWallet?.inkey || '', myLNbitDetails.privateWallet?.id || '', parseInt(inputValue) || 0, '').then(invoice => {
                     console.log(invoice);
                     setInvoice(invoice);
-                    console.log("test invoice NATALIA2: ", invoice, parseInt(inputValue));
 
                     // Record the current timestamp
                     const timestamp = Math.floor(Date.now() / 1000);
@@ -150,22 +148,26 @@ const ReceivePayment: React.FC<ReceivePopupProps> = ({ onClose, currentUserLNbit
                         <p className={styles.text}>Create an invoice to allow others to send you some zaps</p>
                         <div className={styles.sendQrCodeContainer}>
                             <div className={styles.qrCode}>
-                                {/* <QRCodeSVG value={invoice} size={200} /> */}
+                                <QRCode value={invoice} size={200} />
                             </div>
                             <div className={styles.txtContainer}>
                                 <div className={styles.title}>Lightning invoice</div>
                                 <div className={styles.txtContainer}>
-                                    {invoice.length > 200 ? `${invoice.substring(0, 140)}...` : invoice}
+                                    {!invoice ? 'Loading...' : (invoice.length > 140 ? `${invoice.substring(0, 140)}...` : invoice)}
                                 </div>
-                                <div className={styles.receiveButtonContainer}>
-                                    <button className={styles.copyButton} onClick={handleCopyClick}>
-                                        <img
-                                            src={buttonText === 'Copy' ? copyDoc : copySuccess}
-                                            alt={buttonText === 'Copy' ? 'Copy Code' : 'Copy Success'}
-                                            className={styles.copyIcon}
-                                        />{buttonText}</button>
-                                    <button className={styles.closeButton} onClick={handleCloseClick}>Close</button>
-                                </div>
+                                {invoice && (
+                                    <div className={styles.receiveButtonContainer}>
+                                        <button className={styles.copyButton} onClick={handleCopyClick}>
+                                            <img
+                                                src={buttonText === 'Copy' ? copyDoc : copySuccess}
+                                                alt={buttonText === 'Copy' ? 'Copy Code' : 'Copy Success'}
+                                                className={styles.copyIcon}
+                                            />
+                                            {buttonText}
+                                        </button>
+                                        <button className={styles.closeButton} onClick={handleCloseClick}>Close</button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

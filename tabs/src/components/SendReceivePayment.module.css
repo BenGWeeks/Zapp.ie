@@ -435,19 +435,22 @@
     flex-direction: row;
     align-items: flex-start;
     padding: 0px;
+    left: 10px;
     gap: 40px;
     width: 625px;
     height: 232px;
-    flex: none;
     order: 1;
     flex-grow: 0;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 
 .qrCode {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    padding: 11px 13px;
+    padding: 16px;
     gap: 0px;
     width: 234px;
     height: 232px;
