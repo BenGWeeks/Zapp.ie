@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useContext, useEffect } from 'react';
+import QRCodeSVG from 'qrcode.react'; 
 import styles from './SendReceivePayment.module.css';
 import copyDoc from '../images/DocumentCopy.svg';
 import copySuccess from '../images/CheckmarkCircleGreen.svg';
+import { createInvoice, getWalletPayments, getWalletBalance } from '../services/lnbitsServiceLocal';
 
 interface ReceivePopupProps {
     onClose: () => void;
+    currentUserLNbitDetails: User;
 }
 
-const ReceivePayment: React.FC<ReceivePopupProps> = ({ onClose }) => {
+const ReceivePayment: React.FC<ReceivePopupProps> = ({ onClose, currentUserLNbitDetails }) => {
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
             onClose();
@@ -18,6 +21,19 @@ const ReceivePayment: React.FC<ReceivePopupProps> = ({ onClose }) => {
     const [buttonText, setButtonText] = useState('Copy');
     const [isSuccessFailurePopupVisible, setIsSuccessFailurePopupVisible] = useState(false);
     const isSendDisabled = !inputValue;
+    const myLNbitDetails = currentUserLNbitDetails;
+    const [invoice, setInvoice] = useState('');
+    const [paymentReceived, setPaymentReceived] = useState(false);
+    const [walletBalance, setWalletBalance] = useState(0);
+    const intervalId = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        setPaymentReceived(false);
+    }, [currentUserLNbitDetails]);
+
+    useEffect(() => {
+        console.log('walletBalance changed:', walletBalance);
+    }, [walletBalance]);
 
     const handleButtonClick = (value: string) => {
         setInputValue(value);
@@ -27,13 +43,59 @@ const ReceivePayment: React.FC<ReceivePopupProps> = ({ onClose }) => {
         onClose();
     };
 
-    const handleSendClick = () => {
+    const handleNextClick = () => {
         setIsSuccessFailurePopupVisible(true);
+        console.log('walletInKey NATALIA:', myLNbitDetails);
+        if (myLNbitDetails) {
+            if (myLNbitDetails) {
+                createInvoice(myLNbitDetails.privateWallet?.inkey || '', myLNbitDetails.privateWallet?.id || '', parseInt(inputValue) || 0, '').then(invoice => {
+                    console.log(invoice);
+                    setInvoice(invoice);
+                    console.log("test invoice NATALIA2: ", invoice, parseInt(inputValue));
+
+                    // Record the current timestamp
+                    const timestamp = Math.floor(Date.now() / 1000);
+
+                    // Start polling for payment
+                    intervalId.current = setInterval(() => {
+                        getWalletPayments(myLNbitDetails.privateWallet?.inkey || '')
+                            .then(payments => {
+                                if (payments.length > 0) {
+                                    console.log('Payment received');
+                                    setPaymentReceived(true);
+                                    if (intervalId.current !== null) {
+                                        window.clearInterval(intervalId.current);
+                                    }
+
+                                    console.log(
+                                        'Update the wallet balance in the context balance',
+                                    );
+                                    // Update the wallet balance in the context balance
+                                    getWalletBalance(myLNbitDetails.privateWallet?.inkey || '').then(balance => {
+                                        console.log('getWalletBalance:', balance);
+                                        // Use the new function to set the balance
+                                        if (balance !== null) {
+                                            console.log('setWalletBalance to ', balance);
+                                            setWalletBalance(balance);
+                                        } else {
+                                            // Handle the case when balance is null
+                                            // For example, set a default value or show an error message
+                                            setWalletBalance(0);
+                                        }
+                                    });
+                                }
+                            });
+                    }, 5000); // Check every 5 seconds
+                });
+            } else {
+                console.error('Wallet inkey is not defined yet.');
+            }
+        }
     };
 
     const handleCopyClick = () => {
         // Logic to copy the text to clipboard
-        const textToCopy = "lnbc1pjzw7k0pp54vsv2efpkg4xhp3gnf70uq0jst3380x5h3ljhscy2k2cpllv88jsdqu2askcmr9wssx7e3q2dshgmmndp5scqzpgxqyz5vqsp560g2pj806uqm9kv...";
+        const textToCopy = invoice;
         navigator.clipboard.writeText(textToCopy);
         console.log("Text copied to clipboard: ", textToCopy);
         setButtonText('Copied');
@@ -71,7 +133,7 @@ const ReceivePayment: React.FC<ReceivePopupProps> = ({ onClose }) => {
                     <button onClick={handleCancelClick} className={styles.cancelButton}>Cancel</button>
                     <div className={styles.sendOptions}>
                         <button
-                            onClick={handleSendClick}
+                            onClick={handleNextClick}
                             className={isSendDisabled ? styles.sendButton : styles.sendButtonEnabled}
                             disabled={isSendDisabled}
                         >
@@ -88,11 +150,13 @@ const ReceivePayment: React.FC<ReceivePopupProps> = ({ onClose }) => {
                         <p className={styles.text}>Create an invoice to allow others to send you some zaps</p>
                         <div className={styles.sendQrCodeContainer}>
                             <div className={styles.qrCode}>
-                                {/* QR code content goes here */}
+                                {/* <QRCodeSVG value={invoice} size={200} /> */}
                             </div>
                             <div className={styles.txtContainer}>
                                 <div className={styles.title}>Lightning invoice</div>
-                                <div className={styles.txtContainer}>lnbc1pjzw7k0pp54vsv2efpkg4xhp3gnf70uq0jst3380x5h3ljhscy2k2cpllv88jsdqu2askcmr9wssx7e3q2dshgmmndp5scqzpgxqyz5vqsp560g2pj806uqm9kv...</div>
+                                <div className={styles.txtContainer}>
+                                    {invoice.length > 200 ? `${invoice.substring(0, 140)}...` : invoice}
+                                </div>
                                 <div className={styles.receiveButtonContainer}>
                                     <button className={styles.copyButton} onClick={handleCopyClick}>
                                         <img

@@ -68,7 +68,7 @@ const WalletYourWalletInfoCard: React.FC = () => {
           {isReceivePopupOpen && (
         <div className="overlay" onClick={handleCloseReceivePopup}>
           <div className="popup" onClick={(e) => e.stopPropagation()}>
-            <ReceivePayment onClose={handleCloseReceivePopup} />
+            {/* <ReceivePayment onClose={handleCloseReceivePopup} currentUserLNbitDetails={currentUserLNbitDetails}/> */}
             <button className="close-btn" onClick={handleCloseReceivePopup}>Close</button>
           </div>
         </div>

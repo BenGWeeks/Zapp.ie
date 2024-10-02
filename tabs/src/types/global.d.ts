@@ -38,9 +38,12 @@ interface User {
   profileImg: string;
   aadObjectId: string;
   email: string;
+  type: UserType;
   privateWallet: Wallet | null;
   allowanceWallet: Wallet | null;
 }
+
+type UserType = 'Teammate' | 'Copilot' | 'Guest';
 
 type WalletType = 'Allowance' | 'Private';
 
@@ -53,6 +56,21 @@ interface Transaction {
   time: number; // Unix timestamp
   extra: { [key: string]: any }; // JSON object
   wallet_id: string;
+}
+
+interface Allowance {
+  id: string;
+  name: string;
+  wallet: string;
+  toWallet: string;
+  amount: number;
+  startDate: date;
+  endDate: date | null;
+  frequency: AllowanceFrequency;
+  nextPaymentDate: date;
+  lastPaymentDate: date | null;
+  memo: string | null;
+  active: boolean;
 }
 
 declare module '*.module.css' {
@@ -68,4 +86,10 @@ declare module '*.svg' {
 declare module '*.png' {
   const content: any;
   export default content;
+}
+
+declare module 'qrcode.react' {
+  import { ComponentType } from 'react';
+  const QRCode: ComponentType<any>;
+  export default QRCode;
 }

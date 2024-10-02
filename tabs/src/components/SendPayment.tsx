@@ -13,7 +13,7 @@ interface SendPopupProps {
 
 interface QrResult {
     getText: () => string;
-  }
+}
 
 const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -34,21 +34,21 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
     const [isValidQRCode, setIsValidQRCode] = useState(false);
     const [invoiceData, setInvoiceData] = useState<string | null>(null); // Store the invoice response
     const [loading, setLoading] = useState(false); // Loading state for invoice creation
-    
+
     const lnKey = '4be8d48ae93247daad21c4c2363829bb'; // Replace with actual lnKey
     const recipientWalletId = '668e09b5743c47729c902c94890cbc04'; // Replace with actual recipient wallet ID
 
     const validateQRCode = (code: string) => {
         return code.startsWith('lightning');
-      };
-      
-      useEffect(() => {
+    };
+
+    useEffect(() => {
         if (qrData !== 'No QR code detected') {
-          setIsValidQRCode(validateQRCode(qrData));
+            setIsValidQRCode(validateQRCode(qrData));
         } else {
-          setIsValidQRCode(false);
+            setIsValidQRCode(false);
         }
-      }, [qrData]);
+    }, [qrData]);
 
     const handleButtonClick = (value: string) => {
         setInputValue(value);
@@ -63,7 +63,7 @@ const SendPayment: React.FC<SendPopupProps> = ({ onClose }) => {
         setLoading(true); // Show loading while creating the invoice
         try {
             // Use your imported createInvoice function
-            const paymentRequest = await createInvoice(lnKey, recipientWalletId, amount, memo, extra);
+            const paymentRequest = await createInvoice(lnKey, recipientWalletId, amount, memo);
             setInvoiceData(paymentRequest); // Store the generated invoice/payment request
             setIsQrScanTriggered(false); // Close the QR scanner
             console.log('Invoice created:', paymentRequest);

@@ -1,15 +1,18 @@
-
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from 'react-router-dom';
 // Fluent UI imports
 import { ThemeProvider, Stack } from '@fluentui/react';
 import React from 'react';
-
-
 
 // MSAL imports
 import { MsalProvider } from '@azure/msal-react';
 import { IPublicClientApplication } from '@azure/msal-browser';
 import { CustomNavigationClient } from './utils/NavigationClient';
+import RequireAuth from './components/RequireAuth'; 
 
 // Sample app imports
 import { PageLayout } from './components/PageLayout';
@@ -21,9 +24,6 @@ import Users from './Users';
 import './App.css';
 import Rewards from './Rewards';
 import Wallet from './Wallet';
-import YourWallet from './YourWallet';
-
-
 
 type AppProps = {
   pca: IPublicClientApplication;
@@ -37,13 +37,11 @@ function App({ pca }: AppProps) {
 
   return (
     <MsalProvider instance={pca}>
-
-        <PageLayout>
-          <Stack horizontalAlign="center">
-            <Pages />
-          </Stack>
-        </PageLayout>
-
+      <PageLayout>
+        <Stack horizontalAlign="center">
+          <Pages />
+        </Stack>
+      </PageLayout>
     </MsalProvider>
   );
 }
@@ -51,15 +49,13 @@ function App({ pca }: AppProps) {
 function Pages() {
   return (
     <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/feed" element={<Feed />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/Rewards" element={<Rewards />} />
-            <Route path="/Wallet" element={<Wallet />} />
-            <Route path="/YourWallet" element={<YourWallet />} />
-          </Routes>
-
- );
+      <Route path="/" element={<Login />} />
+      <Route path="/feed" element={<RequireAuth><Feed /></RequireAuth>} />
+      <Route path="/users" element={<RequireAuth><Users /></RequireAuth>} />
+      <Route path="/Rewards" element={<RequireAuth><Rewards /></RequireAuth>} />
+      <Route path="/Wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
+    </Routes>
+  );
 }
 
 export default App;
