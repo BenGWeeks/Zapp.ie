@@ -1,6 +1,4 @@
 /// <reference path="./types/global.d.ts" />
-import { setCurrentUser } from './globalstate';
-
 import {
   TeamsActivityHandler,
   TurnContext,
@@ -22,7 +20,15 @@ import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
 import { error } from 'console';
-import { getUser, getUsers, getWalletById ,createUser, createWallet, updateUser} from './services/lnbitsService';
+import {
+  getUser,
+  getUsers,
+  getWalletById,
+  createUser,
+  createWallet,
+  updateUser,
+} from './services/lnbitsService';
+import { UserService } from './services/userService';
 import { access } from 'fs';
 
 let globalWalletId: string | null = null;
@@ -75,41 +81,6 @@ export class TeamsBot extends TeamsActivityHandler {
       }
 
       try {
-        const userProfile = await this.getUserProfile(
-          context,
-          context.turnState.get('cancellationToken'),
-        );
-        console.log('User Profile:', userProfile);
-        const lnBitsUser = await getUsers(adminKey, {
-          aadObjectId: userProfile.aadObjectId,
-        })[0];
-        console.log('LNBits User:', lnBitsUser);
-        let privateWallet = null;
-        let allowanceWallet = null;
-        if (lnBitsUser) {
-          privateWallet = await getWalletById(
-            adminKey,
-            lnBitsUser.privateWallet.id,
-          );
-          allowanceWallet = await getWalletById(
-            adminKey,
-            lnBitsUser.allowanceWalle.id,
-          );
-        }
-        const currentUser = {
-          id: null, // This id is from the lnbits user table
-          displayName: userProfile.name,
-          profileImg: userProfile.profile, // Add logic to set profile image if available
-          aadObjectId: userProfile.aadObjectId,
-          email: userProfile.email,
-          privateWallet: privateWallet,
-          allowanceWallet: allowanceWallet,
-        };
-
-        setCurrentUser(currentUser);
-        let mentions = TurnContext.getMentions(context.activity);
-        //console.log('context.activity:', context.activity);
-
         if (
           context.activity.value &&
           context.activity.value.action === 'submitZaps'
@@ -291,114 +262,28 @@ export class TeamsBot extends TeamsActivityHandler {
     });
 
     this.onMembersAdded(async (context, next) => {
+      //this.onCommand(async (context, next) => {
+      console.log('Running onCommand ...');
       try {
-        const membersAdded = context.activity.membersAdded;
-        for (let cnt = 0; cnt < membersAdded.length; cnt++) {
-          const member = membersAdded[cnt];
-          if (member.id) {
-            const userProfile = await this.getUserProfile(context, { isCancellationRequested: false });
-            const currentUser = {
-              id: null, // This id is from the lnbits user table
-              displayName: userProfile.name,
-              profileImg: userProfile.profile, // Add logic to set profile image if available
-              aadObjectId: userProfile.aadObjectId,
-              email: userProfile.email,
-              privateWallet: null,
-              allowanceWallet: null,
-            };
+        const command = context.activity.text.trim().toLowerCase();
+        console.log('Command:', command);
 
-            setCurrentUser(currentUser);
-            console.log("Getting Users from lnbits");
-            const lnBitsUsers = await getUsers(adminKey, { aadObjectId: userProfile.aadObjectId });
-            let lnBitsUser = lnBitsUsers[0];
-    
-            if (!lnBitsUser) {
-              // Create LNbits user
-              const sanitizedDisplayName = sanitizeString(userProfile.displayName);
-              lnBitsUser = await createUser(adminKey, sanitizedDisplayName, "Private", userProfile.email, "", userProfile);
-              console.log('LNbits user created:', lnBitsUser);
-    
-              // Check for private wallet
-              let privateWallet: Wallet | null = null;
-              if (lnBitsUser.privateWallet && lnBitsUser.privateWallet.id) {
-                privateWallet = await getWalletById(adminKey, lnBitsUser.privateWallet.id);
-              } else {
-                privateWallet = await createWallet(adminKey, lnBitsUser.id, 'Private Wallet');
-                lnBitsUser.privateWallet = {
-                  id: privateWallet.id,
-                  admin: privateWallet.admin,
-                  name: privateWallet.name,
-                  user: privateWallet.user,
-                  adminkey: privateWallet.adminkey,
-                  inkey: privateWallet.inkey,
-                  balance_msat: privateWallet.balance_msat,
-                  deleted: privateWallet.deleted,
-                };
-    
-                const userDict: { [key: string]: string } = {
-                  id: lnBitsUser.id,
-                  displayName: lnBitsUser.displayName,
-                  profileImg: lnBitsUser.profileImg,
-                  aadObjectId: lnBitsUser.aadObjectId,
-                  email: lnBitsUser.email,
-                  privateWalletId: lnBitsUser.privateWallet.id,
-                  allowanceWalletId: lnBitsUser.allowanceWallet ? lnBitsUser.allowanceWallet.id : '',
-                };
-                await updateUser(adminKey, lnBitsUser.id, userDict);
-                console.log('Private wallet created:', privateWallet);
-              }
-    
-              // Check for allowance wallet
-              let allowanceWallet: Wallet | null = null;
-              if (lnBitsUser.allowanceWallet && lnBitsUser.allowanceWallet.id) {
-                allowanceWallet = await getWalletById(adminKey, lnBitsUser.allowanceWallet.id);
-              } else {
-                allowanceWallet = await createWallet(adminKey, lnBitsUser.id, 'Allowance Wallet');
-                lnBitsUser.allowanceWallet = {
-                  id: allowanceWallet.id,
-                  admin: allowanceWallet.admin,
-                  name: allowanceWallet.name,
-                  user: allowanceWallet.user,
-                  adminkey: allowanceWallet.adminkey,
-                  inkey: allowanceWallet.inkey,
-                  balance_msat: allowanceWallet.balance_msat,
-                  deleted: allowanceWallet.deleted,
-                };
-    
-                const userDict: { [key: string]: string } = {
-                  id: lnBitsUser.id,
-                  displayName: lnBitsUser.displayName,
-                  profileImg: lnBitsUser.profileImg,
-                  aadObjectId: lnBitsUser.aadObjectId,
-                  email: lnBitsUser.email,
-                  privateWalletId: lnBitsUser.privateWallet.id,
-                  allowanceWalletId: lnBitsUser.allowanceWallet.id,
-                };
-                await updateUser(adminKey, lnBitsUser.id, userDict);
-                console.log('Allowance wallet created:', allowanceWallet);
-                // Top up the allowance wallet
-                
-              }
-    
-              await context.sendActivity('Welcome to the bot! Your LNbits account and wallets are set up.');
-            }
-          }
-        }
+        // Everytime a user sends a command, let's  check they are setup correctly.
+        const member = await TeamsInfo.getMember(
+          context,
+          context.activity.from.id,
+        );
+
+        const userService = UserService.getInstance();
+        const currentUser = await userService.ensureUserSetup(member);
+        userService.setCurrentUser(currentUser);
       } catch (error) {
-        console.error('Error in onMembersAdded handler:', error);
-        await context.sendActivity('An error occurred while setting up your account.');
+        console.error('Error in onCommand handler:', error);
+        await context.sendActivity(
+          'Mmmm ... an error occurred while setting up your account!',
+        );
       }
-      await next();
     });
-  }
-
-  // Insert the getUserProfile method here
-  private async getUserProfile(
-    context: TurnContext,
-    cancellationToken: CancellationToken,
-  ): Promise<any> {
-    const member = await TeamsInfo.getMember(context, context.activity.from.id);
-    return member;
   }
 
   async run(context: TurnContext) {

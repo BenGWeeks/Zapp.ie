@@ -16,6 +16,7 @@ import {
   getWalletIdByUserId,
   createInvoice,
 } from '../services/lnbitsService';
+import { UserService } from '../services/userService';
 import { error } from 'console';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
@@ -194,6 +195,15 @@ async function createZapCard() {
 async function populateWalletChoices() {
   console.log('Populating wallet choices ...');
   const users = await getUsers(adminKey, null);
+
+  // Get the current user
+  const userService = UserService.getInstance();
+  const currentUser = userService.getCurrentUser();
+
+  //  const filteresUsers = users.filter(
+  //    user => user?.aadObjectId !== userService.getCurrentUser().aadObjectId,
+  //  );
+
   if (users) {
     return users.map((user: any) => ({
       title: user.displayName,
