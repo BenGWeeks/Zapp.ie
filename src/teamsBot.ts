@@ -11,6 +11,7 @@ import {
   Middleware,
   MessageFactory,
   TeamsInfo,
+  StatePropertyAccessor,
 } from 'botbuilder';
 import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
 import { Client } from '@microsoft/microsoft-graph-client';
@@ -19,7 +20,6 @@ import { SendZapCommand, SendZap } from './commands/sendZapCommand';
 import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
-import { error } from 'console';
 import {
   getUser,
   getUsers,
@@ -31,26 +31,18 @@ import {
 import { UserService } from './services/userService';
 import { access } from 'fs';
 
-let globalWalletId: string | null = null;
-let currentUser: User | null = null;
-
-function sanitizeString(str: string): string {
-  return str.replace(/[^a-zA-Z0-9]/g, '');
-}
-
 const adminKey = process.env.LNBITS_ADMINKEY as string;
 interface CancellationToken {
   isCancellationRequested: boolean;
 }
 
-// Define global variables
-let globalZapAmount: number;
-let globalMentionedUserId: string;
-let globalMentionedUserName: string;
+let userSetupFlag = false;
 
 export class TeamsBot extends TeamsActivityHandler {
   conversationState: ConversationState;
   userState: UserState;
+  //userSetupFlagAccessor: StatePropertyAccessor<boolean>;
+  userProfileAccessor: StatePropertyAccessor<User>;
 
   constructor() {
     super();
@@ -61,6 +53,13 @@ export class TeamsBot extends TeamsActivityHandler {
     // Create conversation and user state with in-memory storage provider.
     this.conversationState = new ConversationState(memoryStorage);
     this.userState = new UserState(memoryStorage);
+
+    // Create a property accessor for the user setup flag.
+    //this.userSetupFlagAccessor =
+    //  this.userState.createProperty<boolean>('userSetupFlag');
+
+    this.userProfileAccessor =
+      this.userState.createProperty<User>('userProfile');
 
     // Register commands
     SSOCommandMap.register('send zap', new SendZapCommand());
@@ -91,7 +90,7 @@ export class TeamsBot extends TeamsActivityHandler {
           const receiver = await getUser(adminKey, receiverId);
 
           if (!currentUser.allowanceWallet.id) {
-            throw new error('No sending wallet found.');
+            throw new Error('No sending wallet found.');
           }
 
           if (!receiver.privateWallet) {
@@ -259,29 +258,39 @@ export class TeamsBot extends TeamsActivityHandler {
         console.error('Error in onMessage handler:', error);
       }
         */
+      await next();
     });
 
-    this.onMembersAdded(async (context, next) => {
-      //this.onCommand(async (context, next) => {
-      console.log('Running onCommand ...');
-      try {
-        const command = context.activity.text.trim().toLowerCase();
-        console.log('Command:', command);
+    //this.onMembersAdded(async (context, next) => {
+    this.onCommand(async (context, next) => {
+      // Retrieve the per-user setup flag
+      const currentUser = await this.userProfileAccessor.get(context);
+      if (!currentUser) {
+        console.log('Lets make sure the user is setup ...');
 
-        // Everytime a user sends a command, let's  check they are setup correctly.
-        const member = await TeamsInfo.getMember(
-          context,
-          context.activity.from.id,
-        );
-
-        const userService = UserService.getInstance();
-        const currentUser = await userService.ensureUserSetup(member);
-        userService.setCurrentUser(currentUser);
-      } catch (error) {
-        console.error('Error in onCommand handler:', error);
         await context.sendActivity(
-          'Mmmm ... an error occurred while setting up your account!',
+          `Let me just check you're all setup. Bear with me a few seconds please ...`,
         );
+
+        try {
+          // Let's  check they are setup correctly.
+          const member = await TeamsInfo.getMember(
+            context,
+            context.activity.from.id,
+          );
+
+          const userService = UserService.getInstance();
+          const currentUser = await userService.ensureUserSetup(member);
+          //userService.setCurrentUser(currentUser);
+          await this.userProfileAccessor.set(context, currentUser);
+          await this.userState.saveChanges(context);
+          userSetupFlag = true; // OK, all done, we shouldn't need to do this again.
+        } catch (error) {
+          console.error('Error in onCommand handler:', error);
+          await context.sendActivity(
+            'Mmmm ... an error occurred while setting up your account!',
+          );
+        }
       }
     });
   }
