@@ -185,14 +185,15 @@ async function populateWalletChoices() {
   const userService = UserService.getInstance();
   const currentUser = userService.getCurrentUser();
 
+  let filteresUsers = users;
   if (currentUser) {
-    const filteresUsers = users.filter(
+    filteresUsers = users.filter(
       user => user?.aadObjectId !== userService.getCurrentUser().aadObjectId,
     );
   }
 
-  if (users) {
-    return users.map((user: any) => ({
+  if (filteresUsers) {
+    return filteresUsers.map((user: any) => ({
       title: user.displayName,
       value: user.id,
     }));
