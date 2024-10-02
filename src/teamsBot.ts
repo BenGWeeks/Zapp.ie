@@ -42,7 +42,7 @@ export class TeamsBot extends TeamsActivityHandler {
   conversationState: ConversationState;
   userState: UserState;
   //userSetupFlagAccessor: StatePropertyAccessor<boolean>;
-  userProfileAccessor: StatePropertyAccessor<User>;
+  //userProfileAccessor: StatePropertyAccessor<User>;
 
   constructor() {
     super();
@@ -57,9 +57,8 @@ export class TeamsBot extends TeamsActivityHandler {
     // Create a property accessor for the user setup flag.
     //this.userSetupFlagAccessor =
     //  this.userState.createProperty<boolean>('userSetupFlag');
-
-    this.userProfileAccessor =
-      this.userState.createProperty<User>('userProfile');
+    //this.userProfileAccessor =
+    //  this.userState.createProperty<User>('userProfile');
 
     // Register commands
     SSOCommandMap.register('send zap', new SendZapCommand());
@@ -264,7 +263,11 @@ export class TeamsBot extends TeamsActivityHandler {
     //this.onMembersAdded(async (context, next) => {
     this.onCommand(async (context, next) => {
       // Retrieve the per-user setup flag
-      const currentUser = await this.userProfileAccessor.get(context);
+      //const currentUser = await this.userProfileAccessor.get(context);
+      const userService = UserService.getInstance();
+      const currentUser = userService.getCurrentUser();
+      console.log('Current User:', currentUser);
+
       if (!currentUser) {
         console.log('Lets make sure the user is setup ...');
 
@@ -281,9 +284,11 @@ export class TeamsBot extends TeamsActivityHandler {
 
           const userService = UserService.getInstance();
           const currentUser = await userService.ensureUserSetup(member);
-          //userService.setCurrentUser(currentUser);
-          await this.userProfileAccessor.set(context, currentUser);
-          await this.userState.saveChanges(context);
+
+          userService.setCurrentUser(currentUser);
+          //await this.userProfileAccessor.set(context, currentUser);
+          //await this.userState.saveChanges(context);
+
           userSetupFlag = true; // OK, all done, we shouldn't need to do this again.
         } catch (error) {
           console.error('Error in onCommand handler:', error);
