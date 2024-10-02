@@ -81,7 +81,8 @@ export class UserService {
         {
           aadObjectId: teamsChannelAccount.aadObjectId,
           userType: 'teammate',
-          profileImg: `https://hiberniaevros.sharepoint.com/_layouts/15/userphoto.aspx?AccountName='${teamsChannelAccount.userPrincipalName}`,
+          profileImg: `https://hiberniaevros.sharepoint.com/_layouts/15/userphoto.aspx?AccountName='${teamsChannelAccount.userPrincipalName}`, // TODO: Get the user's profile image from Teams
+          //profileImg: teamsChannelAccount.properties
         }, // We'll check and update this when when they have both wallets anyway.
       );
 
@@ -91,7 +92,19 @@ export class UserService {
         user.id,
         'Allowance',
       );
-      await topUpWallet(allowanceWallet.id, 25000); // Give them an initial top-up so they can zap!
+      // TODO: Put this into a function (re-use below)
+      const initialAllowanceStr = process.env.LNBITS_INITIAL_ALLOWANCE;
+      if (initialAllowanceStr) {
+        const initialAllowance = parseInt(initialAllowanceStr); // Parse as a floating-point number
+        if (!isNaN(initialAllowance)) {
+          await topUpWallet(allowanceWallet.id, initialAllowance);
+        } else {
+          console.error(
+            'Invalid initial allowance value:',
+            initialAllowanceStr,
+          );
+        }
+      }
       user = await updateUser(adminKey, user.id, {
         allowanceWalletId: allowanceWallet.id,
       }); // Update the user with the allowance wallet id
@@ -117,13 +130,37 @@ export class UserService {
       // But first, we should check if they have a wallet by that name already
       let userWallets = await getUserWallets(adminKey, user.id);
       let allowanceWallet = userWallets.find(w => w.name === 'Allowance');
-      if (allowanceWallet.balance_msat < 25000000) {
-        // If they have less than 25000 sats, top them up
-        await topUpWallet(allowanceWallet.id, 25000);
+      if (allowanceWallet.balance_msat < 1) {
+        // If the orphaned wallet we found is empty, let's top them up so they can zap!
+        // TODO: Separate this out into a function
+        const initialAllowanceStr = process.env.LNBITS_INITIAL_ALLOWANCE;
+        if (initialAllowanceStr) {
+          const initialAllowance = parseInt(initialAllowanceStr); // Parse as a floating-point number
+          if (!isNaN(initialAllowance)) {
+            await topUpWallet(allowanceWallet.id, initialAllowance);
+          } else {
+            console.error(
+              'Invalid initial allowance value:',
+              initialAllowanceStr,
+            );
+          }
+        }
       }
       if (!allowanceWallet) {
         allowanceWallet = await createWallet(adminKey, user.id, 'Allowance');
-        await topUpWallet(allowanceWallet.id, 25000); // Give them an initial top-up so they can zap!
+        // TODO: Put this into a function (re-use below)
+        const initialAllowanceStr = process.env.LNBITS_INITIAL_ALLOWANCE;
+        if (initialAllowanceStr) {
+          const initialAllowance = parseInt(initialAllowanceStr); // Parse as a floating-point number
+          if (!isNaN(initialAllowance)) {
+            await topUpWallet(allowanceWallet.id, initialAllowance);
+          } else {
+            console.error(
+              'Invalid initial allowance value:',
+              initialAllowanceStr,
+            );
+          }
+        }
       }
       user = await updateUser(adminKey, user.id, {
         allowanceWalletId: allowanceWallet.id,
