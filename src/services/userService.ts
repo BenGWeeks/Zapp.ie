@@ -105,6 +105,7 @@ export class UserService {
     let allowanceWallet = null;
 
     if (user.allowanceWallet) {
+      console.log('Setting  allowance wallet');
       allowanceWallet = await getWalletById(user.id, user.allowanceWallet.id);
       if (allowanceWallet.deleted) {
         throw new Error(
@@ -117,7 +118,7 @@ export class UserService {
       // But first, we should check if they have a wallet by that name already
       let userWallets = await getUserWallets(adminKey, user.id);
       let allowanceWallet = userWallets.find(w => w.name === 'Allowance');
-      if (allowanceWallet.balance_msat < 25000000) {
+      if (allowanceWallet.balance_msat = 0) {
         // If they have less than 25000 sats, top them up
         await topUpWallet(allowanceWallet.id, 25000);
       }
