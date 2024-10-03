@@ -5,12 +5,12 @@ import qrCodeImage from '../images/QRCode.svg';
 import checkmarkIcon from '../images/CheckmarkCircleGreen.svg';
 import dismissIcon from '../images/DismissCircleRed.svg';
 import pasteInvoice from '../images/PasteInvoice.svg';
+import loaderGif from '../images/Loader.gif';
 // import bolt11 from 'bolt11';
 import {
   payInvoice,
   getWalletPayments,
   getWalletBalance,
-  getInvoicePayment,
 } from '../services/lnbitsServiceLocal';
 
 interface SendPopupProps {
@@ -18,28 +18,23 @@ interface SendPopupProps {
   currentUserLNbitDetails: User;
 }
 
-interface QrResult {
-  getText: () => string;
-}
+// interface QrResult {
+//   getText: () => string;
+// }
 
 const SendPayment: React.FC<SendPopupProps> = ({
   onClose,
   currentUserLNbitDetails,
 }) => {
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
   const [inputValue, setInputValue] = useState('');
   const [invoice, setInvoice] = useState('');
-  const [invoiceDetails, setInvoiceDetails] = useState<any>();
-  const [error, setError] = useState<string | null>(null);
   const [sendAnonymously, setSendAnonymously] = useState(false);
   const [isSendPopupVisible, setIsSendPopupVisible] = useState(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
+  const [isPaymentFailed, setIsPaymentFailed] = useState(false);
   const [isSuccessFailurePopupVisible, setIsSuccessFailurePopupVisible] =
     useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const myLNbitDetails = currentUserLNbitDetails;
   const [isScanning, setIsScanning] = useState(false); // State to track scanning
   const [isQrScanTriggered, setIsQrScanTriggered] = useState(false); // State for handling the popup size and hiding textarea
@@ -48,108 +43,101 @@ const SendPayment: React.FC<SendPopupProps> = ({
   const [isValidQRCode, setIsValidQRCode] = useState(false);
   const [paymentReceived, setPaymentReceived] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
-
-  const lnKey = '4be8d48ae93247daad21c4c2363829bb'; // Replace with actual lnKey
-  const recipientWalletId = '668e09b5743c47729c902c94890cbc04'; // Replace with actual recipient wallet ID
-
+  const [failureMessage, setFailureMessage] = useState('');
   const intervalId = useRef<NodeJS.Timeout | null>(null);
+
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handlePaymentFailure = (message: string) => {
+    setFailureMessage(message);
+    setIsPaymentSuccess(false);
+    setIsPaymentFailed(true);
+    setIsSuccessFailurePopupVisible(true);
+    setIsLoading(false);
+    console.log(message);
+  };
 
   const validateQRCode = (code: string) => {
     return code.startsWith('lightning');
   };
 
   useEffect(() => {
-    if (qrData !== 'No QR code detected') {
-      setIsValidQRCode(validateQRCode(qrData));
-    } else {
-      setIsValidQRCode(false);
-    }
+    setIsValidQRCode(validateQRCode(qrData));
   }, [qrData]);
 
   const handleCancelClick = () => {
+    setIsLoading(true);
+    setIsPaymentSuccess(false);
+    setIsPaymentFailed(false);
+    setIsSendPopupVisible(false);
+    setIsSuccessFailurePopupVisible(false);
     onClose();
   };
 
   const handleSendClick = () => {
-    setIsSuccessFailurePopupVisible(true);
-    setIsSendPopupVisible(true);
-    setIsPaymentSuccess(true); // true false based on the payment success
+    setIsLoading(true);
     const memo = sendAnonymously ? 'Anonymous Payment' : 'Payment'; // Adjust memo based on user selection
-    console.log('Text Natalia3', invoice);
-  
-    if (myLNbitDetails && myLNbitDetails.privateWallet && myLNbitDetails.privateWallet.balance_msat >= parseInt(inputValue)) {
-      payInvoice(
-        myLNbitDetails.privateWallet?.adminkey || '',
-        inputValue ? inputValue.split('lightning:').pop() || '' : '',
-      )
+    console.log('handleSendClick. Start. Invoice link: ', invoice);
+
+    if (!myLNbitDetails) {
+      handlePaymentFailure('Something wrong with your wallet');
+    } else if (!myLNbitDetails.privateWallet) {
+      handlePaymentFailure('Something wrong with your Private wallet');
+    } else if (
+      myLNbitDetails.privateWallet.balance_msat < parseInt(inputValue)
+    ) {
+      handlePaymentFailure('You do not have enough Sats on your wallet');
+    } else {
+      payInvoice(myLNbitDetails.privateWallet?.adminkey || '', invoice)
         .then(invoice => {
           console.log(invoice);
           setInvoice(invoice);
-          console.log('test invoice NATALIA5: ', invoice, parseInt(inputValue));
-  
-          // Record the current timestamp
-          const timestamp = Math.floor(Date.now() / 1000);
-  
-          // Start polling for payment
-          intervalId.current = setInterval(() => {
-            getWalletPayments(myLNbitDetails.privateWallet?.inkey || '').then(
-              payments => {
-                if (payments.length > 0) {
-                  console.log('Payment sent', 'natalia6');
-                  setPaymentReceived(true);
-                  if (intervalId.current !== null) {
-                    window.clearInterval(intervalId.current);
-                  }
-  
-                  console.log(
-                    'Update the wallet balance in the context balance',
-                  );
-                  // Update the wallet balance in the context balance
-                  getWalletBalance(
-                    myLNbitDetails.privateWallet?.inkey || '',
-                  ).then(balance => {
-                    console.log('getWalletBalance:', balance);
-                    // Use the new function to set the balance
-                    if (balance !== null) {
-                      console.log('setWalletBalance to ', balance);
-                      setWalletBalance(balance);
-                    } else {
-                      // Handle the case when balance is null
-                      // For example, set a default value or show an error message
-                      setWalletBalance(0);
-                    }
-                  });
-                }
-              },
-            );
-          }, 5000); // Check every 5 seconds
+          setIsPaymentSuccess(true);
+          setIsPaymentFailed(false);
+          setIsSendPopupVisible(true);
+          setIsSuccessFailurePopupVisible(true); // Show the success popup
+          setIsLoading(false);
+          startPollingPayments(); // Start polling for payments
         })
         .catch(error => {
           console.error('Error paying invoice:', error);
+          handlePaymentFailure(
+            'Error paying invoice. The link might be expired or you do not have enough Sats on your wallet',
+          ); // Condition 4
         });
-    } else {
-      console.error('Wallet inkey is not defined yet or balance is not enough');
-      console.log("You do not have enough coins to send");
-      setIsPaymentSuccess(false);
     }
-  
-    getInvoicePayment(myLNbitDetails.privateWallet?.inkey || '', invoice)
-    .then(payment => {
-      if (payment) {
-        console.log('Natalia 4', payment);
-        setPaymentReceived(true);
-      }
-    })
-    .catch(error => {
-      console.error('Error getting invoice payment:', error);
-      setIsPaymentSuccess(false);
-    });
-  
-    // Check if the user manually entered an amount
-    if (inputValue) {
-      const amount = parseFloat(inputValue); // Parse the input value as amount
-      console.log('Amount:', amount);
-    }
+  };
+
+  const startPollingPayments = () => {
+    intervalId.current = setInterval(() => {
+      getWalletPayments(myLNbitDetails.privateWallet?.inkey || '').then(
+        payments => {
+          if (payments.length > 0) {
+            setPaymentReceived(true);
+            if (intervalId.current !== null) {
+              window.clearInterval(intervalId.current);
+            }
+            updateWalletBalance();
+          }
+        },
+      );
+    }, 5000); // Poll every 5 seconds
+  };
+
+  const updateWalletBalance = () => {
+    getWalletBalance(myLNbitDetails.privateWallet?.inkey || '').then(
+      balance => {
+        if (balance !== null) {
+          setWalletBalance(balance);
+        } else {
+          setWalletBalance(0); // Handle the case when balance is null
+        }
+      },
+    );
   };
 
   const handleChangeAmountClick = () => {
@@ -170,7 +158,7 @@ const SendPayment: React.FC<SendPopupProps> = ({
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div
         className={styles.popup}
-        style={{ height: isQrScanTriggered ? '520px' : '400px' }} // Dynamically change popup height
+        style={{ height: isQrScanTriggered ? '520px' : '420px' }} // Dynamically change popup height
       >
         <p className={styles.title}>Send payment</p>
         <p className={styles.text}>
@@ -180,17 +168,6 @@ const SendPayment: React.FC<SendPopupProps> = ({
 
         {!isQrScanTriggered && ( // Hide this when QR scan is triggered
           <>
-            <div className={styles.container}>
-              <div className={styles.inputRow}>
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={e => setInputValue(e.target.value)}
-                  className={styles.inputField}
-                  placeholder="Specify amount"
-                />
-              </div>
-            </div>
             <p className={styles.text}>Paste invoice</p>
             <textarea
               value={invoice}
@@ -199,7 +176,6 @@ const SendPayment: React.FC<SendPopupProps> = ({
                 const processedValue = inputValue
                   ? inputValue.split('lightning:').pop()
                   : '';
-                console.log('QRCode changed Natalia1', processedValue);
                 setInvoice(processedValue || '');
               }}
               className={styles.textarea}
@@ -217,6 +193,17 @@ const SendPayment: React.FC<SendPopupProps> = ({
                 />
                 Scan QR code
               </button>
+            </div>
+            <div className={styles.container}>
+              <div className={styles.inputRow}>
+                <input
+                  type="number"
+                  value={inputValue}
+                  onChange={e => setInputValue(e.target.value)}
+                  className={styles.inputField}
+                  placeholder="Specify amount"
+                />
+              </div>
             </div>
           </>
         )}
@@ -236,11 +223,11 @@ const SendPayment: React.FC<SendPopupProps> = ({
                       const processedInvoice = result.getText()
                         ? result.getText().split('lightning:').pop() // Remove "lightning:" prefix
                         : '';
-                      console.log('QRCode scanned Natalia2', processedInvoice);
-                      if (processedInvoice) {
+                      console.log('QRCode scanned', processedInvoice);
+                      //TODO this code should give us amount from invoice (before paying), but for now is breaking the app
+                      /*if (processedInvoice) {
                         try {
-                          //TODO this code should give us amount from invoice, but for now is breaking the app
-                          // const decoded = bolt11.decode(invoice);  
+                          // const decoded = bolt11.decode(invoice);
                           // console.log('QRCode decoded Natalia3', decoded);
                           // setInvoiceDetails(decoded);
                           setError(null);
@@ -248,7 +235,7 @@ const SendPayment: React.FC<SendPopupProps> = ({
                           setError('Invalid invoice');
                           setInvoiceDetails(null);
                         }
-                      }
+                      }*/
 
                       setInvoice(processedInvoice || '');
                       setIsQrScanTriggered(false); // Hide the QR reader after scanning
@@ -306,9 +293,14 @@ const SendPayment: React.FC<SendPopupProps> = ({
           </div>
         </div>
       </div>
-
+      {isLoading && (
+        <div className={styles.loaderOverlay}>
+          <img src={loaderGif} alt="Loading..." className={styles.loaderIcon} />
+          <p>Processing payment...</p>
+        </div>
+      )}
       {/* Success or failure popup, only visible based on isSuccessFailurePopupVisible */}
-      {isSuccessFailurePopupVisible && isPaymentSuccess && (
+      {!isLoading && isSuccessFailurePopupVisible && isPaymentSuccess && (
         <div className={styles.overlay} onClick={handleOverlayClick}>
           <div className={styles.sendPopupSuccess}>
             <div className={styles.sendPopupHeader}>
@@ -324,7 +316,7 @@ const SendPayment: React.FC<SendPopupProps> = ({
           </div>
         </div>
       )}
-      {isSuccessFailurePopupVisible && !isPaymentSuccess && (
+      {!isLoading && isSuccessFailurePopupVisible && !isPaymentSuccess && (
         <div className={styles.overlay} onClick={handleOverlayClick}>
           <div className={styles.sendPopupFailed}>
             <div className={styles.sendPopupHeader}>
@@ -335,9 +327,7 @@ const SendPayment: React.FC<SendPopupProps> = ({
               />
               <div className={styles.sendPopupText}>Payment cannot be sent</div>
             </div>
-            <div className={styles.sendPopupSubText}>
-              You do not have enough Sats on your wallet or the link is expired
-            </div>
+            <div className={styles.sendPopupSubText}>{failureMessage}</div>
             <div className={styles.buttonContainerSmallPopup}>
               <button
                 className={styles.cancelButton}
