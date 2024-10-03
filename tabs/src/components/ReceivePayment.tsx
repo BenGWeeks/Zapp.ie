@@ -137,12 +137,12 @@ const ReceivePayment: React.FC<ReceivePopupProps> = ({
             />
           </div>
         </div>
-        <p className={styles.text}>Note/memo</p>
+        <p className={styles.text}>Note</p>
         <textarea
           value={inputNotes}
           onChange={e => setInputNotes(e.target.value)}
           className={styles.textarea}
-          placeholder="Specify note/memo"
+          placeholder=""
         />
         <p></p>
 

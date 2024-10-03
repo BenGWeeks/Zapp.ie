@@ -5,7 +5,7 @@ import qrCodeImage from '../images/QRCode.svg';
 import checkmarkIcon from '../images/CheckmarkCircleGreen.svg';
 import dismissIcon from '../images/DismissCircleRed.svg';
 import pasteInvoice from '../images/PasteInvoice.svg';
-import bolt11 from 'bolt11';
+// import bolt11 from 'bolt11';
 import {
   payInvoice,
   getWalletPayments,
