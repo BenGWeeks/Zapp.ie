@@ -269,7 +269,10 @@ const SendPayment: React.FC<SendPopupProps> = ({
             Cancel
           </button>
           <div className={styles.sendOptions}>
-            <div className={styles.checkboxContainer}>
+            <div
+              className={styles.checkboxContainer}
+              style={{ display: 'none' }}
+            >
               <input
                 type="checkbox"
                 id="sendAnonymously"
