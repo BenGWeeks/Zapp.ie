@@ -29,7 +29,7 @@
   .receive-btn, .send-btn {
     padding: 10px 20px;
     border: none;
-    background-color: #f0a500;
+    /* background-color: #f0a500; */
     color: #fff;
     cursor: pointer;
     border-radius: 5px;
@@ -40,7 +40,7 @@
     color: #f0a500;
   }
   .horizontal-container h1 {
-    color: #f0a500;
+    color: rgba(255, 255, 255, 1);
     font-size: 48px;
   }
 

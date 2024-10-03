@@ -80,9 +80,9 @@ const WalletYourWalletInfoCard: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="row wallet-buttons">
-        <div className="col-md-3"> <button onClick={handleOpenReceivePopup} className="receive-btn">Receive</button></div>
-        <div className="col-md-3"><button onClick={handleOpenSendPopup} className="send-btn">Send</button></div>
+      <div className="wallet-buttons">
+        <div> <button onClick={handleOpenReceivePopup} className="receive-btn">Receive</button></div>
+        <div ><button onClick={handleOpenSendPopup} className="send-btn">Send</button></div>
         {isReceivePopupOpen && (
           <div className="overlay" onClick={handleCloseReceivePopup}>
             <div className="popup" onClick={(e) => e.stopPropagation()}>

@@ -73,80 +73,83 @@ const SendPayment: React.FC<SendPopupProps> = ({
   const handleSendClick = () => {
     setIsSuccessFailurePopupVisible(true);
     setIsSendPopupVisible(true);
-    setIsPaymentSuccess(true); // true false based on the payment success// Adjust this based on actual payment success
-    //     const memo = sendAnonymously ? 'Anonymous Payment' : 'Payment'; // Adjust memo based on user selection
-    //     console.log('Text Natalia3', invoice);
-
-    //     getInvoicePayment(myLNbitDetails.privateWallet?.inkey || '', invoice)
-    //       .then(payment => {
-    //         if (payment) {
-    //           console.log('Natalia 4', payment);
-    //           setPaymentReceived(true);
-    //         }
-    //       })
-    //       .catch(error => {
-    //         console.error('Error getting invoice payment:', error);
-    //       });
-
-    //     if (myLNbitDetails) {
-    //       payInvoice(
-    //         myLNbitDetails.privateWallet?.adminkey || '',
-    //         inputValue ? inputValue.split('lightning:').pop() || '' : '',
-    //       )
-    //         .then(invoice => {
-    //           console.log(invoice);
-    //           setInvoice(invoice);
-    //           console.log('test invoice NATALIA5: ', invoice, parseInt(inputValue));
-
-    //           // Record the current timestamp
-    //           const timestamp = Math.floor(Date.now() / 1000);
-
-    //           // Start polling for payment
-    //           intervalId.current = setInterval(() => {
-    //             getWalletPayments(myLNbitDetails.privateWallet?.inkey || '').then(
-    //               payments => {
-    //                 if (payments.length > 0) {
-    //                   console.log('Payment sent', 'natalia6');
-    //                   setPaymentReceived(true);
-    //                   if (intervalId.current !== null) {
-    //                     window.clearInterval(intervalId.current);
-    //                   }
-
-    //                   console.log(
-    //                     'Update the wallet balance in the context balance',
-    //                   );
-    //                   // Update the wallet balance in the context balance
-    //                   getWalletBalance(
-    //                     myLNbitDetails.privateWallet?.inkey || '',
-    //                   ).then(balance => {
-    //                     console.log('getWalletBalance:', balance);
-    //                     // Use the new function to set the balance
-    //                     if (balance !== null) {
-    //                       console.log('setWalletBalance to ', balance);
-    //                       setWalletBalance(balance);
-    //                     } else {
-    //                       // Handle the case when balance is null
-    //                       // For example, set a default value or show an error message
-    //                       setWalletBalance(0);
-    //                     }
-    //                   });
-    //                 }
-    //               },
-    //             );
-    //           }, 5000); // Check every 5 seconds
-    //         })
-    //         .catch(error => {
-    //           console.error('Error paying invoice:', error);
-    //         });
-    //     } else {
-    //       console.error('Wallet inkey is not defined yet.');
-    //     }
-
-    //     // Check if the user manually entered an amount
-    //     if (inputValue) {
-    //       const amount = parseFloat(inputValue); // Parse the input value as amount
-    //       console.log('Amount:', amount);
-    //     }
+    setIsPaymentSuccess(true); // true false based on the payment success
+    const memo = sendAnonymously ? 'Anonymous Payment' : 'Payment'; // Adjust memo based on user selection
+    console.log('Text Natalia3', invoice);
+  
+    if (myLNbitDetails && myLNbitDetails.privateWallet && myLNbitDetails.privateWallet.balance_msat >= parseInt(inputValue)) {
+      payInvoice(
+        myLNbitDetails.privateWallet?.adminkey || '',
+        inputValue ? inputValue.split('lightning:').pop() || '' : '',
+      )
+        .then(invoice => {
+          console.log(invoice);
+          setInvoice(invoice);
+          console.log('test invoice NATALIA5: ', invoice, parseInt(inputValue));
+  
+          // Record the current timestamp
+          const timestamp = Math.floor(Date.now() / 1000);
+  
+          // Start polling for payment
+          intervalId.current = setInterval(() => {
+            getWalletPayments(myLNbitDetails.privateWallet?.inkey || '').then(
+              payments => {
+                if (payments.length > 0) {
+                  console.log('Payment sent', 'natalia6');
+                  setPaymentReceived(true);
+                  if (intervalId.current !== null) {
+                    window.clearInterval(intervalId.current);
+                  }
+  
+                  console.log(
+                    'Update the wallet balance in the context balance',
+                  );
+                  // Update the wallet balance in the context balance
+                  getWalletBalance(
+                    myLNbitDetails.privateWallet?.inkey || '',
+                  ).then(balance => {
+                    console.log('getWalletBalance:', balance);
+                    // Use the new function to set the balance
+                    if (balance !== null) {
+                      console.log('setWalletBalance to ', balance);
+                      setWalletBalance(balance);
+                    } else {
+                      // Handle the case when balance is null
+                      // For example, set a default value or show an error message
+                      setWalletBalance(0);
+                    }
+                  });
+                }
+              },
+            );
+          }, 5000); // Check every 5 seconds
+        })
+        .catch(error => {
+          console.error('Error paying invoice:', error);
+        });
+    } else {
+      console.error('Wallet inkey is not defined yet or balance is not enough');
+      console.log("You do not have enough coins to send");
+      setIsPaymentSuccess(false);
+    }
+  
+    getInvoicePayment(myLNbitDetails.privateWallet?.inkey || '', invoice)
+    .then(payment => {
+      if (payment) {
+        console.log('Natalia 4', payment);
+        setPaymentReceived(true);
+      }
+    })
+    .catch(error => {
+      console.error('Error getting invoice payment:', error);
+      setIsPaymentSuccess(false);
+    });
+  
+    // Check if the user manually entered an amount
+    if (inputValue) {
+      const amount = parseFloat(inputValue); // Parse the input value as amount
+      console.log('Amount:', amount);
+    }
   };
 
   const handleChangeAmountClick = () => {
@@ -169,7 +172,7 @@ const SendPayment: React.FC<SendPopupProps> = ({
         className={styles.popup}
         style={{ height: isQrScanTriggered ? '520px' : '400px' }} // Dynamically change popup height
       >
-        <p className={styles.title}>Send some zaps</p>
+        <p className={styles.title}>Send payment</p>
         <p className={styles.text}>
           Show gratitude, thanks, and recognizing awesomeness to others in your
           team
@@ -315,7 +318,7 @@ const SendPayment: React.FC<SendPopupProps> = ({
                 className={styles.checkmarkIcon}
               />
               <div className={styles.sendPopupText}>
-                Zaps sent successfully!
+                Payment sent successfully!
               </div>
             </div>
           </div>
@@ -330,10 +333,10 @@ const SendPayment: React.FC<SendPopupProps> = ({
                 alt="Dismiss"
                 className={styles.checkmarkIcon}
               />
-              <div className={styles.sendPopupText}>Zaps cannot be sent</div>
+              <div className={styles.sendPopupText}>Payment cannot be sent</div>
             </div>
             <div className={styles.sendPopupSubText}>
-              You do not have enough Sats on your wallet
+              You do not have enough Sats on your wallet or the link is expired
             </div>
             <div className={styles.buttonContainerSmallPopup}>
               <button
