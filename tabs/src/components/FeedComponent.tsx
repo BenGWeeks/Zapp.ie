@@ -22,7 +22,10 @@ const FeedComponent: FunctionComponent = () => {
   };
 
   const handlePeriodClick = (days: number) => {
-    setTimestamp(Math.floor(Date.now() / 1000 - days * 24 * 60 * 60));
+    // setTimestamp(Math.floor(Date.now() / 1000 - days * 24 * 60 * 60));
+    const newTimestamp = Math.floor(Date.now() / 1000 - days * 24 * 60 * 60);
+    console.log(`Period clicked: ${days} days, new timestamp: ${newTimestamp}`);
+    setTimestamp(newTimestamp);
     setActivePeriod(days);
   };
 
