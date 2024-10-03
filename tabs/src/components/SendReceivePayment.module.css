@@ -28,7 +28,7 @@
 
 .popupReceive {
     width: 688px;
-    height: 218px;
+    height: 345px;
     padding: 28px 32px 32px 32px;
     gap: 20px;
     opacity: 1;
@@ -198,7 +198,7 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 .cancelButton {
@@ -545,3 +545,15 @@
     background-color: #1F1F1F;
     position: relative;
 }
+
+/* Hide arrows in Chrome, Safari, Edge, and Opera */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+/* Hide arrows in Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+  }

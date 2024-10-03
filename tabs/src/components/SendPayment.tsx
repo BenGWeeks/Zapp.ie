@@ -236,9 +236,10 @@ const SendPayment: React.FC<SendPopupProps> = ({
                       console.log('QRCode scanned Natalia2', processedInvoice);
                       if (processedInvoice) {
                         try {
-                          const decoded = bolt11.decode(invoice);
-                          console.log('QRCode decoded Natalia3', decoded);
-                          setInvoiceDetails(decoded);
+                          //TODO this code should give us amount from invoice, but for now is breaking the app
+                          // const decoded = bolt11.decode(invoice);  
+                          // console.log('QRCode decoded Natalia3', decoded);
+                          // setInvoiceDetails(decoded);
                           setError(null);
                         } catch (err) {
                           setError('Invalid invoice');
