@@ -1,7 +1,8 @@
-import { FunctionComponent, useCallback, useState } from 'react';
+import { FunctionComponent, useCallback, useState, lazy, Suspense } from 'react';
 import styles from './FeedComponent.module.css';
 import FeedList from './FeedList';
-import Leaderboard from './Leaderboard';
+
+const Leaderboard = lazy(() => import('./Leaderboard'));
 
 const FeedComponent: FunctionComponent = () => {
   const [timestamp, setTimestamp] = useState(
@@ -92,7 +93,9 @@ const FeedComponent: FunctionComponent = () => {
       {showFeed ? (
         <FeedList timestamp={timestamp} />
       ) : (
-        <Leaderboard timestamp={timestamp} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Leaderboard timestamp={timestamp} />
+        </Suspense>
       )}
     </div>
   );
