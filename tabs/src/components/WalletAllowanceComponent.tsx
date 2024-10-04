@@ -4,11 +4,10 @@ import BatteryImageDisplay from './BatteryImageDisplay';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import Calendar from '../images/Calendar.svg';
 import {
-  getAllowance,
   getUsers,
-  getUserWallets,
 } from '../services/lnbitsServiceLocal';
 import { useMsal } from '@azure/msal-react';
+import { getAllowance } from '../services/userService';
 
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
@@ -23,7 +22,7 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({}) => {
   const [allowance, setAllowance] = useState<Allowance | null>(null);
   const [spentSats, setSpentSats] = useState<number>(0);
 
-  const { instance, accounts } = useMsal();
+  const { accounts } = useMsal();
   const account = accounts[0];
 
   const fetchAmountReceived = async () => {

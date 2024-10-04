@@ -910,36 +910,6 @@ const getUserWalletTransactions = async (
   }
 };
 
-const getAllowance = async (
-  adminKey: string,
-  userId: string,
-): Promise<Allowance | null> => {
-  console.log(
-    `getNostrRewards starting ... (adminKey: ${adminKey}, stallId: ${userId})`,
-  );
-  try {
-    // TODO: Implement the actual API call to fetch the allowance
-    const allowance: Allowance = {
-      id: '123',
-      name: 'Allowance',
-      wallet: '123456789',
-      toWallet: '123456789',
-      amount: 25000,
-      startDate: new Date(),
-      endDate: null,
-      frequency: 'Monthly',
-      nextPaymentDate: new Date(new Date().setDate(new Date().getDate() + 7)),
-      lastPaymentDate: new Date(new Date().setDate(new Date().getDate() - 7)),
-      memo: "Don't spend it all at once",
-      active: true,
-    };
-    return allowance;
-  } catch (error) {
-    console.error(`Error fetching allowances for ${userId}:`, error);
-    throw error; // Re-throw the error to handle it in the parent function
-  }
-};
-
 export {
   getUser,
   getUsers,
@@ -959,5 +929,4 @@ export {
   getUserWallets,
   getNostrRewards,
   getUserWalletTransactions,
-  getAllowance,
 };

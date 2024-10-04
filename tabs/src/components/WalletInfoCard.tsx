@@ -13,7 +13,7 @@ const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 const WalletYourWalletInfoCard: React.FC = () => {
   const [balance, setBalance] = useState<number>();
 
-  const { instance, accounts } = useMsal();
+  const { accounts } = useMsal();
   const account = accounts[0];
 
   const fetchAmountReceived = async () => {
