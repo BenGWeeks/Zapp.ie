@@ -2,7 +2,7 @@
 env/.env.*.user
 env/.env.local
 env/.env.test
-env/.env.Prod
+env/.env.prod
 .localConfigs
 appPackage/build
 
