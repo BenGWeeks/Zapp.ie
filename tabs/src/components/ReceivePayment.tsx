@@ -173,7 +173,7 @@ const ReceivePayment: React.FC<ReceivePopupProps> = ({
             </p>
             <div className={styles.sendQrCodeContainer}>
               <div className={styles.qrCode}>
-                <QRCode value={invoice} size={200} />
+                {invoice && <QRCode value={invoice} size={200} />}
               </div>
               <div className={styles.txtContainer}>
                 <div className={styles.title}>Lightning invoice</div>
