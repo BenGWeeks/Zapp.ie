@@ -38,10 +38,12 @@ const SendPayment: React.FC<SendPopupProps> = ({
   const intervalId = useRef<NodeJS.Timeout | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const isMounted = useRef<boolean>(true);
-  const [invoiceAmount, setInvoiceAmount] = useState<number | undefined>();
-  const [invoiceMemo, setInvoiceMemo] = useState<string | undefined>();
+  const [invoiceAmount, setInvoiceAmount] = useState<number | null>();
+  const [invoiceMemo, setInvoiceMemo] = useState<string | null>();
   const [isAmountReadOnly, setIsAmountReadOnly] = useState<boolean>(true);
   const [scannerPaused, setScannerPaused] = useState(true); // Make sure scanner starts paused
+  const [qrError, setQrError] = useState<string | null>(null);
+
 
   // Effect for controlling scanner state
   useEffect(() => {
@@ -76,7 +78,7 @@ const SendPayment: React.FC<SendPopupProps> = ({
 
   const handleSendClick = () => {
     setIsLoading(true);
-    const memo = 'Payment'; // Static memo (no anonymous option in this version)
+    const memo = 'Payment'; // Static memo (no anonymous option in this version) //TODO
 
     if (!myLNbitDetails || !myLNbitDetails.privateWallet) {
       handlePaymentFailure('Something wrong with your wallet');
@@ -162,8 +164,8 @@ const SendPayment: React.FC<SendPopupProps> = ({
       setIsAmountReadOnly(true); // Make input read-only if needed
     } catch (err) {
       console.error('Error decoding invoice:', err);
-      setInvoiceAmount(undefined);
-      setInvoiceMemo(undefined);
+      setInvoiceAmount(null);
+      setInvoiceMemo(null);
     }
   };
 
@@ -183,15 +185,27 @@ const SendPayment: React.FC<SendPopupProps> = ({
   }, 500);
 
   const handleError = (error: any) => {
-    console.error('QR Scan Error:', error);
-    if (error.name === 'NotAllowedError') {
-      alert(
-        'Camera access was denied. Please enable camera permissions in your browser settings.',
-      );
-    } else {
-      alert('An error occurred while accessing the camera. Please try again.');
+    // Suppress the error to prevent it from throwing an uncaught runtime error
+    try {
+      console.error('QR Scan Error:', error);
+      if (error.name === 'NotAllowedError') {
+        setQrError('Camera access was denied. Please enable camera permissions in your browser settings.');
+      } else {
+        setQrError('An error occurred while accessing the camera. Please try again.');
+      }
+    } catch (err) {
+      // If any other unexpected error occurs, log it but do not throw it to the console
+      console.warn('Suppressed error:', err);
+      setQrError('An unexpected error occurred. Please try again.');
     }
   };
+
+  window.addEventListener('unhandledrejection', function (event) {
+    if (event.reason.message.includes('Permission denied')) {
+      // Prevent the error from being logged as uncaught
+      event.preventDefault();
+    }
+  });
 
   return (
     <div className={styles.overlay} onClick={handleOverlayClick}>
@@ -360,6 +374,18 @@ const SendPayment: React.FC<SendPopupProps> = ({
           </div>
         </div>
       )}
+      {qrError && (
+  <div className={styles.overlay} onClick={handleOverlayClick}>
+    <div className={styles.errorPopup}>
+      <div className={styles.sendPopupHeader}>
+        <img src={dismissIcon} alt="Error" className={styles.checkmarkIcon} />
+        <div className={styles.sendPopupText}>
+          {qrError}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
