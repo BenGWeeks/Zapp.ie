@@ -8,7 +8,7 @@ provision:
     with:
       name: Zapp.ie-aad
       generateClientSecret: true
-      signInAudience: "AzureADMyOrg"
+      signInAudience: 'AzureADMyOrg'
     writeToEnvironmentFile:
       clientId: AAD_APP_CLIENT_ID
       clientSecret: SECRET_AAD_APP_CLIENT_SECRET
@@ -35,12 +35,12 @@ provision:
       botId: ${{BOT_ID}}
       name: Zapp.ie
       messagingEndpoint: ${{BOT_ENDPOINT}}/api/messages
-      description: ""
+      description: ''
       channels:
         - name: msteams
-  #- uses: cli/runNpmCommand
-  #  with:
-  #    args: run write-env && npm run build-manifest
+  - uses: cli/runNpmCommand
+    with:
+      args: run write-env && npm run build-manifest
 
   - uses: aadApp/update
     with:
