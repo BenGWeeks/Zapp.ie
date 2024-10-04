@@ -6,10 +6,6 @@ import { useMsal } from '@azure/msal-react';
 import SendPayment from './SendPayment';
 import ReceivePayment from './ReceivePayment';
 
-// interface WalletYourWalletInfoCardProps {
-//   totalSats: number;
-// }
-
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
 const WalletYourWalletInfoCard: React.FC = () => {
@@ -26,8 +22,6 @@ const WalletYourWalletInfoCard: React.FC = () => {
     const currentUserLNbitDetails = await getUsers(adminKey, {
       aadObjectId: account.localAccountId,
     });
-
-
 
     if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
       setMyLNbitDetails(currentUserLNbitDetails[0]);
@@ -57,6 +51,10 @@ const WalletYourWalletInfoCard: React.FC = () => {
   const handleCloseSendPopup = () => {
     setIsSendPopupOpen(false);
   };
+
+  // Buttons should be disabled if balance is undefined (still loading)
+  const isLoading = balance === undefined;
+
   return (
     <div className="wallet-info">
       <h4>Your wallet</h4>
@@ -81,32 +79,56 @@ const WalletYourWalletInfoCard: React.FC = () => {
         </div>
       </div>
       <div className="wallet-buttons">
-        <div> <button onClick={handleOpenReceivePopup} className="receive-btn">Receive</button></div>
-        <div ><button onClick={handleOpenSendPopup} className="send-btn">Send</button></div>
+        <div>
+          {' '}
+          <button
+            onClick={handleOpenReceivePopup}
+            className="receive-btn"
+            disabled={isLoading}
+          >
+            Receive
+          </button>
+        </div>
+        <div>
+          <button
+            onClick={handleOpenSendPopup}
+            className="send-btn"
+            disabled={isLoading}
+          >
+            Send
+          </button>
+        </div>
         {isReceivePopupOpen && (
           <div className="overlay" onClick={handleCloseReceivePopup}>
-            <div className="popup" onClick={(e) => e.stopPropagation()}>
+            <div className="popup" onClick={e => e.stopPropagation()}>
               <ReceivePayment
                 onClose={handleCloseReceivePopup}
-                currentUserLNbitDetails={myLNbitDetails!} />
-              <button className="close-btn" onClick={handleCloseReceivePopup}>Close</button>
+                currentUserLNbitDetails={myLNbitDetails!}
+              />
+              <button className="close-btn" onClick={handleCloseReceivePopup}>
+                Close
+              </button>
             </div>
           </div>
         )}
 
         {isSendPopupOpen && (
           <div className="overlay" onClick={handleCloseSendPopup}>
-            <div className="popup" onClick={(e) => e.stopPropagation()}>
-              <SendPayment 
-              onClose={handleCloseSendPopup} 
-              currentUserLNbitDetails={myLNbitDetails!}/>
-              <button className="close-btn" onClick={handleCloseSendPopup}>Close</button>
+            <div className="popup" onClick={e => e.stopPropagation()}>
+              <SendPayment
+                onClose={handleCloseSendPopup}
+                currentUserLNbitDetails={myLNbitDetails!}
+              />
+              <button className="close-btn" onClick={handleCloseSendPopup}>
+                Close
+              </button>
             </div>
           </div>
         )}
-        <div className="col-md-6"><span></span></div>
+        <div className="col-md-6">
+          <span></span>
+        </div>
       </div>
-
     </div>
   );
 };
