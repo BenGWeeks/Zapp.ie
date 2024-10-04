@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { QrReader } from 'react-qr-reader';
+//import { QrReader } from 'react-qr-reader';
+import { Scanner } from '@yudiel/react-qr-scanner'; // New scanner than 'react-qr-scanner' and looks to be maintained here: https://github.com/yudielcurbelo/react-qr-scanner
+import { IDetectedBarcode } from '@yudiel/react-qr-scanner'; // Import the type if needed
 import styles from './SendReceivePayment.module.css';
 import qrCodeImage from '../images/QRCode.svg';
 import checkmarkIcon from '../images/CheckmarkCircleGreen.svg';
 import dismissIcon from '../images/DismissCircleRed.svg';
 import pasteInvoice from '../images/PasteInvoice.svg';
 import loaderGif from '../images/Loader.gif';
-// import bolt11 from 'bolt11';
+//import { decodePaymentRequest } from 'ln-service';
+//import bolt11 from 'bolt11';
+import { decode } from 'light-bolt11-decoder'; // Lightweight decoder for bolt11 invoices from fiatjaf
 import {
   payInvoice,
   getWalletPayments,
@@ -36,8 +40,6 @@ const SendPayment: React.FC<SendPopupProps> = ({
     useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const myLNbitDetails = currentUserLNbitDetails;
-  const [isScanning, setIsScanning] = useState(false); // State to track scanning
-  const [isQrScanTriggered, setIsQrScanTriggered] = useState(false); // State for handling the popup size and hiding textarea
   const isSendDisabled = !inputValue || !invoice;
   const [qrData, setQRData] = useState('No QR code detected');
   const [isValidQRCode, setIsValidQRCode] = useState(false);
@@ -45,6 +47,20 @@ const SendPayment: React.FC<SendPopupProps> = ({
   const [walletBalance, setWalletBalance] = useState(0);
   const [failureMessage, setFailureMessage] = useState('');
   const intervalId = useRef<NodeJS.Timeout | null>(null);
+  const [decodedInvoice, setDecodedInvoice] = useState<any>(null);
+  const [isScanning, setIsScanning] = useState<boolean>(false);
+  const isMounted = useRef<boolean>(true);
+  const [invoiceAmount, setInvoiceAmount] = useState<number>();
+  const [isAmountReadOnly, setIsAmountReadOnly] = useState<boolean>(false);
+
+  useEffect(() => {
+    isMounted.current = true;
+
+    // Return cleanup function to handle component unmounting
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
@@ -65,9 +81,11 @@ const SendPayment: React.FC<SendPopupProps> = ({
     return code.startsWith('lightning');
   };
 
+  /*
   useEffect(() => {
     setIsValidQRCode(validateQRCode(qrData));
   }, [qrData]);
+  */
 
   const handleCancelClick = () => {
     setIsLoading(true);
@@ -145,20 +163,68 @@ const SendPayment: React.FC<SendPopupProps> = ({
   };
 
   const handleScanButtonClick = () => {
-    setIsQrScanTriggered(true); // Set the state to true when scan button is clicked
     setIsScanning(true);
   };
 
   const handlePasteInvoiceClick = () => {
     setIsScanning(false);
-    setIsQrScanTriggered(false);
   };
+
+  const handleScan = async (detectedCodes: IDetectedBarcode[]) => {
+    if (!isMounted.current) return; // Ensure component is mounted
+
+    if (detectedCodes.length > 0) {
+      const data = detectedCodes[0].rawValue; // Assuming you want to process the first detected code
+      const processedInvoice = data.split('lightning:').pop() || '';
+      console.log('QRCode scanned', processedInvoice);
+      if (processedInvoice) {
+        try {
+          const decodedInvoice = decode(processedInvoice);
+          console.log('QRCode decoded', decodedInvoice);
+
+          const amountSection = decodedInvoice.sections.find(
+            (section: any) => section.name === 'amount',
+          ) as { name: string; value: string };
+
+          // Access the amount value safely
+          const amountValue = parseInt(amountSection?.value ?? null);
+
+          console.log('Invoice amount (milliSats): ', amountValue); // Outputs: '181537000'
+
+          // Only set state if the component is still mounted
+          if (isMounted.current) {
+            setDecodedInvoice(decodedInvoice);
+            if (decodedInvoice && amountValue) {
+              setInvoiceAmount(amountValue / 1000);
+              setIsAmountReadOnly(true);
+            }
+          }
+        } catch (err) {
+          console.error('Error decoding invoice:', err);
+          if (isMounted.current) {
+            setDecodedInvoice(null);
+          }
+        }
+      }
+
+      if (isMounted.current) {
+        setInvoice(processedInvoice || '');
+        setIsScanning(false);
+      }
+    }
+  };
+
+  const handleError = (error: any) => {
+    console.error('QR Scan Error:', error);
+  };
+
+  const setInvoiceDetails = (decoded: any) => {};
 
   return (
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div
         className={styles.popup}
-        style={{ height: isQrScanTriggered ? '520px' : '420px' }} // Dynamically change popup height
+        style={{ height: isScanning ? '604px' : '420px' }} // Dynamically change popup height
       >
         <p className={styles.title}>Send payment</p>
         <p className={styles.text}>
@@ -166,7 +232,7 @@ const SendPayment: React.FC<SendPopupProps> = ({
           team
         </p>
 
-        {!isQrScanTriggered && ( // Hide this when QR scan is triggered
+        {!isScanning && ( // Hide this when QR scan is triggered
           <>
             <p className={styles.text}>Paste invoice</p>
             <textarea
@@ -198,7 +264,8 @@ const SendPayment: React.FC<SendPopupProps> = ({
               <div className={styles.inputRow}>
                 <input
                   type="number"
-                  value={inputValue}
+                  value={invoiceAmount}
+                  readOnly={isAmountReadOnly}
                   onChange={e => setInputValue(e.target.value)}
                   className={styles.inputField}
                   placeholder="Specify amount"
@@ -208,44 +275,27 @@ const SendPayment: React.FC<SendPopupProps> = ({
           </>
         )}
 
-        {isQrScanTriggered && ( // Show this when QR scan is triggered
+        {isScanning && ( // Show this when QR scan is triggered
           <React.Fragment>
             <p className={styles.text}>Scan QR code</p>
             <div className={styles.qrReaderForm}>
               <div className={styles.qrReaderContainer}>
-                <QrReader
-                  constraints={{ facingMode: 'user' }}
-                  scanDelay={300} // Add a slight delay between scans
-                  onResult={(result, error) => {
-                    if (result) {
-                      // Log the result for debugging
-                      console.log(result); // Remove "lightning:" prefix from the scanned QR code result
-                      const processedInvoice = result.getText()
-                        ? result.getText().split('lightning:').pop() // Remove "lightning:" prefix
-                        : '';
-                      console.log('QRCode scanned', processedInvoice);
-                      //TODO this code should give us amount from invoice (before paying), but for now is breaking the app
-                      /*if (processedInvoice) {
-                        try {
-                          // const decoded = bolt11.decode(invoice);
-                          // console.log('QRCode decoded Natalia3', decoded);
-                          // setInvoiceDetails(decoded);
-                          setError(null);
-                        } catch (err) {
-                          setError('Invalid invoice');
-                          setInvoiceDetails(null);
-                        }
-                      }*/
-
-                      setInvoice(processedInvoice || '');
-                      setIsQrScanTriggered(false); // Hide the QR reader after scanning
-                    }
-
-                    if (error) {
-                      console.error('QR Scan Error:', error); // Log errors for debugging
-                    }
+                <Scanner
+                  //constraints={{ facingMode: 'user' }}
+                  scanDelay={100} //scanDelay={300} // Add a slight delay between scans
+                  onError={handleError} // Log errors for debugging
+                  components={{ finder: false }} // Disable the red finder box
+                  paused={!isMounted.current || !isScanning} // Pause scanning when unmounted or when scanning is not active
+                  //onResult={(result, error) => {
+                  onScan={handleScan} // Handle the scan result
+                  styles={{
+                    video: {
+                      objectFit: 'cover', // Make the video fill the parent container
+                      width: '100%',
+                      height: '100%',
+                    },
                   }}
-                  containerStyle={{ width: '100%' }} // Ensure the QR reader takes full width
+                  //containerStyle={{ width: '100%' }} // Ensure the QR reader takes full width
                 />
               </div>
             </div>
