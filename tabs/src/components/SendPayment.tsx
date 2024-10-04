@@ -31,19 +31,19 @@ const SendPayment: React.FC<SendPopupProps> = ({
     useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const myLNbitDetails = currentUserLNbitDetails;
-  const isSendDisabled = !invoice;
+  const [invoiceAmount, setInvoiceAmount] = useState<number | null>();
+  const isSendDisabled = !invoice || !invoiceAmount;
   const [paymentReceived, setPaymentReceived] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
   const [failureMessage, setFailureMessage] = useState('');
   const intervalId = useRef<NodeJS.Timeout | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const isMounted = useRef<boolean>(true);
-  const [invoiceAmount, setInvoiceAmount] = useState<number | null>();
+
   const [invoiceMemo, setInvoiceMemo] = useState<string | null>();
-  const [isAmountReadOnly, setIsAmountReadOnly] = useState<boolean>(true);
+  const [isAmountReadOnly, setIsAmountReadOnly] = useState<boolean>(false);
   const [scannerPaused, setScannerPaused] = useState(true); // Make sure scanner starts paused
   const [qrError, setQrError] = useState<string | null>(null);
-
 
   // Effect for controlling scanner state
   useEffect(() => {
@@ -148,20 +148,26 @@ const SendPayment: React.FC<SendPopupProps> = ({
       const decodedInvoice = decode(processedInvoice);
       const amountSection = decodedInvoice.sections.find(
         (section: any) => section.name === 'amount',
-      ) as { name: string; value: string } | undefined;
+      ) as { name: string; value: string } | null;
 
       const amountValue = amountSection ? parseInt(amountSection.value) : null;
-      const invoiceAmountInSatoshis = amountValue ? amountValue / 1000 : undefined;
+      const invoiceAmountInSatoshis = amountValue
+        ? amountValue / 1000
+        : null;
 
       const memoSection = decodedInvoice.sections.find(
         (section: any) => section.name === 'description',
-      ) as { name: string; value: string } | undefined;
+      ) as { name: string; value: string } | null;
       const memoValue = memoSection ? String(memoSection.value) : undefined;
 
-      setInvoiceAmount(invoiceAmountInSatoshis);
+      setInvoiceAmount(invoiceAmountInSatoshis !== null ? parseInt(invoiceAmountInSatoshis.toString()) : null);
       setInvoiceMemo(memoValue);
       setInvoice(processedInvoice);
-      setIsAmountReadOnly(true); // Make input read-only if needed
+      if (invoiceAmountInSatoshis) {
+        setIsAmountReadOnly(true);
+      } else {
+        setIsAmountReadOnly(false);
+      } // Make input read-only if needed
     } catch (err) {
       console.error('Error decoding invoice:', err);
       setInvoiceAmount(null);
@@ -189,9 +195,13 @@ const SendPayment: React.FC<SendPopupProps> = ({
     try {
       console.error('QR Scan Error:', error);
       if (error.name === 'NotAllowedError') {
-        setQrError('Camera access was denied. Please enable camera permissions in your browser settings.');
+        setQrError(
+          'Camera access was denied. Please enable camera permissions in your browser settings.',
+        );
       } else {
-        setQrError('An error occurred while accessing the camera. Please try again.');
+        setQrError(
+          'An error occurred while accessing the camera. Please try again.',
+        );
       }
     } catch (err) {
       // If any other unexpected error occurs, log it but do not throw it to the console
@@ -253,15 +263,24 @@ const SendPayment: React.FC<SendPopupProps> = ({
             </div>
             <div className={styles.container}>
               <div className={styles.inputRow}>
+              {isAmountReadOnly && (
                 <input
-                  type="text"
-                  value={`${invoiceAmount !== undefined ? invoiceAmount : ''} Sats ${
-                    invoiceMemo ? `Note: ${invoiceMemo}` : ''
+                  type={'text'}
+                  value={`${invoiceAmount !== null ? invoiceAmount : ''} ${
+                    invoiceMemo ? ` Sats. Note: ${invoiceMemo}` : ''
                   }`}
                   readOnly={isAmountReadOnly}
                   className={styles.inputField}
-                  placeholder="Specify amount"
-                />
+                />)}
+                {!isAmountReadOnly && (
+                  <input
+                    type="number"
+                    value={invoiceAmount ?? ''}
+                    onChange={e => setInvoiceAmount(parseInt(e.target.value))}
+                    className={styles.inputField}
+                    placeholder="Specify amount"
+                  />
+                )}
               </div>
             </div>
           </>
@@ -352,9 +371,7 @@ const SendPayment: React.FC<SendPopupProps> = ({
                 alt="Dismiss"
                 className={styles.checkmarkIcon}
               />
-              <div className={styles.sendPopupText}>
-                Payment cannot be sent
-              </div>
+              <div className={styles.sendPopupText}>Payment cannot be sent</div>
             </div>
             <div className={styles.sendPopupSubText}>{failureMessage}</div>
             <div className={styles.buttonContainerSmallPopup}>
@@ -375,17 +392,19 @@ const SendPayment: React.FC<SendPopupProps> = ({
         </div>
       )}
       {qrError && (
-  <div className={styles.overlay} onClick={handleOverlayClick}>
-    <div className={styles.errorPopup}>
-      <div className={styles.sendPopupHeader}>
-        <img src={dismissIcon} alt="Error" className={styles.checkmarkIcon} />
-        <div className={styles.sendPopupText}>
-          {qrError}
+        <div className={styles.overlay} onClick={handleOverlayClick}>
+          <div className={styles.errorPopup}>
+            <div className={styles.sendPopupHeader}>
+              <img
+                src={dismissIcon}
+                alt="Error"
+                className={styles.checkmarkIcon}
+              />
+              <div className={styles.sendPopupText}>{qrError}</div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 };

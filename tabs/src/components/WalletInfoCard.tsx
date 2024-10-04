@@ -53,7 +53,7 @@ const WalletYourWalletInfoCard: React.FC = () => {
   };
 
   // Buttons should be disabled if balance is undefined (still loading)
-  const isLoading = balance === undefined;
+  const isLoading = false; // balance === undefined;
 
   return (
     <div className="wallet-info">
@@ -105,9 +105,6 @@ const WalletYourWalletInfoCard: React.FC = () => {
                 onClose={handleCloseReceivePopup}
                 currentUserLNbitDetails={myLNbitDetails!}
               />
-              <button className="close-btn" onClick={handleCloseReceivePopup}>
-                Close
-              </button>
             </div>
           </div>
         )}
@@ -119,9 +116,6 @@ const WalletYourWalletInfoCard: React.FC = () => {
                 onClose={handleCloseSendPopup}
                 currentUserLNbitDetails={myLNbitDetails!}
               />
-              <button className="close-btn" onClick={handleCloseSendPopup}>
-                Close
-              </button>
             </div>
           </div>
         )}
