@@ -1,15 +1,12 @@
-import { FunctionComponent, useCallback, useState, useEffect } from 'react';
+import { FunctionComponent, useState, useEffect } from 'react';
 import styles from './TotalZapsComponent.module.css';
 //import lnbitsService from '../services/lnbitsServiceLocal';
 /// <reference path = "../global.d.ts" />
 import {
-  getWallets,
   getUserWallets,
   getUsers,
   getWalletTransactionsSince,
 } from '../services/lnbitsServiceLocal';
-import { getUserName } from '../utils/walletUtilities';
-
 export interface ZapSent {
   totalZaps: number;
   averagePerUser: number;
@@ -22,11 +19,9 @@ export interface ZapSent {
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
 const TotalZapsComponent: FunctionComponent = () => {
-  const [activePeriod, setActivePeriod] = useState<number | null>(null);
   const [zaps, setZaps] = useState<Transaction[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [totalZaps, setTotalZaps] = useState<number>(0);
-  const [totalUsers, setTotalUsers] = useState<number>(0);
   const [averagePerDay, setAveragePerDay] = useState<number>(0); // State for average per day
   const [biggestZap, setBiggestZap] = useState<number>(0); // State for biggest zap
   const [averagePerUser, setAveragePerUser] = useState<number>(0); // State for average per user
@@ -41,8 +36,6 @@ const TotalZapsComponent: FunctionComponent = () => {
     zapsFromCopilots: 0,
     zapsToCopilots: 0,
   };
-
-  const today = new Date();
 
   useEffect(() => {
     const fetchZaps = async () => {
@@ -127,7 +120,7 @@ const TotalZapsComponent: FunctionComponent = () => {
           : 0) / 1000;
       setBiggestZap(Math.floor(maxZap)); // Already positive
     }
-  }, [zaps]); // This effect runs whenever zaps changes
+  }, [zaps, users]); // This effect runs whenever zaps changes
 
   if (error) {
     return <div className={styles.sentcomponent}>{error}</div>;
