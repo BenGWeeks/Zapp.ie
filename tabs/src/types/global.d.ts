@@ -87,3 +87,14 @@ declare module '*.png' {
   const content: any;
   export default content;
 }
+
+declare module 'qrcode.react' {
+  import { ComponentType } from 'react';
+  const QRCode: ComponentType<any>;
+  export default QRCode;
+}
+
+declare module '*.gif' {
+  const value: string;
+  export default value;
+}

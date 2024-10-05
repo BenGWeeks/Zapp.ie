@@ -682,11 +682,11 @@ const createInvoice = async (
   recipientWalletId: string,
   amount: number,
   memo: string,
-  extra: object,
+  // extra: object,
 ) => {
-  /*console.log(
-    `createInvoice starting ... (lnKey: ${lnKey}, recipientWalletId: ${recipientWalletId}, amount: ${amount}, memo: ${memo}, extra: ${extra})`,
-  );*/
+  console.log(
+    // `createInvoice starting ... (lnKey: ${lnKey}, recipientWalletId: ${recipientWalletId}, amount: ${amount}, memo: ${memo}, extra: ${extra})`,
+  );
 
   try {
     const response = await fetch(`${nodeUrl}/api/v1/payments`, {
@@ -699,7 +699,7 @@ const createInvoice = async (
         out: false,
         amount: amount,
         memo: memo,
-        extra: extra,
+        // extra: extra,
       }),
     });
 
