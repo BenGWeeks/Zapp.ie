@@ -24,7 +24,7 @@ const centeredImageStyle: IRawStyle = {
 };
 
 export function Login() {
-  const { accounts } = useMsal();
+  const { instance, accounts } = useMsal();
   const [graphData, setGraphData] = useState(null);
   const navigate = useNavigate();
 
