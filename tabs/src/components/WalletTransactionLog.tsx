@@ -82,6 +82,8 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
 
           let filteredTransactions: any = null;
 
+          console.log('Transactions AKASH: ', transactions);
+
           if (activeTab === 'sent')
             filteredTransactions = transactions.filter(f => f.amount < 0);
           else if (activeTab === 'received')
@@ -172,8 +174,14 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
                       transaction.time * 1000,
                       'days',
                     )}{' '}
-                    days ago from{' '}
-                    <b>{transaction.extra?.from?.displayName ?? 'Unknown'} </b>
+                    days ago{' '}
+                    {(transaction.amount as number) < 0 ? 'to' : 'from'}{' '}
+                    <b>
+                      {(transaction.amount as number) < 0
+                        ? transaction.extra?.to?.displayName ?? 'Unknown'
+                        : transaction.extra?.from?.displayName ??
+                          'Unknown'}{' '}
+                    </b>
                   </div>
                   <p className={styles.lightHelightInItems}>
                     {transaction.memo}

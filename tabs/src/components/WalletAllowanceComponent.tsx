@@ -3,12 +3,12 @@ import './WalletAllowanceComponent.css'; // Assuming you'll use CSS for styling
 import BatteryImageDisplay from './BatteryImageDisplay';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import Calendar from '../images/Calendar.svg';
+import { getUsers } from '../services/lnbitsServiceLocal';
+import { useMsal } from '@azure/msal-react';
 import {
   getAllowance,
-  getUsers,
-  getUserWallets,
+  getWalletTransactionsSince,
 } from '../services/lnbitsServiceLocal';
-import { useMsal } from '@azure/msal-react';
 
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
@@ -23,7 +23,7 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({}) => {
   const [allowance, setAllowance] = useState<Allowance | null>(null);
   const [spentSats, setSpentSats] = useState<number>(0);
 
-  const { instance, accounts } = useMsal();
+  const { accounts } = useMsal();
   const account = accounts[0];
 
   const fetchAmountReceived = async () => {
@@ -31,25 +31,51 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({}) => {
 
     console.log('account.localAccountId:', account.localAccountId);
 
-    const user = await getUsers(adminKey, {
+    const users = await getUsers(adminKey, {
       aadObjectId: account.localAccountId,
     });
 
-    console.log('User:', user);
+    console.log('User:', users);
 
-    if (user && user.length > 0) {
-      const balance = (user[0].allowanceWallet?.balance_msat ?? 0) / 1000;
+    if (users && users.length > 0) {
+      const user = users[0];
+      const balance = (user.allowanceWallet?.balance_msat ?? 0) / 1000;
       setBalance(balance);
 
-      const allowance = await getAllowance(adminKey, user[0].id);
+      const allowance = await getAllowance(adminKey, user.id);
       console.log('Allowance:', allowance);
 
       if (allowance) {
+        //const spentFromAllowance = allowance?.amount - balance;
+        //setSpentSats(spentFromAllowance);
         setAllowance(allowance);
         setBatteryPercentage((allowance?.amount - balance / balance) * 100);
       } else {
         setAllowance(null);
         setBatteryPercentage(0);
+      }
+
+      if (user) {
+        if (user.allowanceWallet?.inkey) {
+          const timestamp = Math.floor(
+            allowance?.lastPaymentDate.getTime() / 1000,
+          ); // Convert to seconds
+          const transactions = await getWalletTransactionsSince(
+            user.allowanceWallet?.inkey,
+            timestamp,
+            null,
+          );
+
+          // Sum the amounts of the transactions where the amount is negative
+          const spentSinceLastPayment = transactions
+            .filter(transaction => transaction.amount < 0)
+            .reduce(
+              (total, transaction) => total + transaction.amount / 1000,
+              0,
+            );
+
+          setSpentSats(Math.abs(spentSinceLastPayment));
+        }
       }
     }
   };
@@ -75,7 +101,7 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({}) => {
                 {balance?.toLocaleString() ?? '0'}
               </div>
               <div>Sats</div>
-              <div style={{ paddingLeft: '20px' }}>
+              <div style={{ paddingLeft: '20px', display: 'none' }}>
                 <button className="refreshImageIcon">
                   <img
                     src={ArrowClockwise}

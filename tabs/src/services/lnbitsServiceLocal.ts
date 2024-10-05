@@ -919,6 +919,17 @@ const getAllowance = async (
   );
   try {
     // TODO: Implement the actual API call to fetch the allowance
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+    const daysUntilNextMonday = (8 - dayOfWeek) % 7 || 7; // Calculate days until next Monday
+    const nextPaymentDate = new Date(
+      today.setDate(today.getDate() + daysUntilNextMonday),
+    );
+    const daysSinceLastMonday = (dayOfWeek + 6) % 7; // Calculate days since last Monday
+    const lastPaymentDate = new Date(
+      today.setDate(today.getDate() - daysSinceLastMonday),
+    );
+
     const allowance: Allowance = {
       id: '123',
       name: 'Allowance',
@@ -928,8 +939,8 @@ const getAllowance = async (
       startDate: new Date(),
       endDate: null,
       frequency: 'Monthly',
-      nextPaymentDate: new Date(new Date().setDate(new Date().getDate() + 7)),
-      lastPaymentDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+      nextPaymentDate: nextPaymentDate,
+      lastPaymentDate: lastPaymentDate,
       memo: "Don't spend it all at once",
       active: true,
     };
