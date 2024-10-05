@@ -3,11 +3,9 @@ import './WalletAllowanceComponent.css'; // Assuming you'll use CSS for styling
 import BatteryImageDisplay from './BatteryImageDisplay';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import Calendar from '../images/Calendar.svg';
-import {
-  getUsers,
-} from '../services/lnbitsServiceLocal';
+import { getUsers } from '../services/lnbitsServiceLocal';
 import { useMsal } from '@azure/msal-react';
-import { getAllowance } from '../services/userService';
+import { getAllowance } from '../services/lnbitsServiceLocal';
 
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 

@@ -910,6 +910,47 @@ const getUserWalletTransactions = async (
   }
 };
 
+const getAllowance = async (
+  adminKey: string,
+  userId: string,
+): Promise<Allowance | null> => {
+  console.log(
+    `getNostrRewards starting ... (adminKey: ${adminKey}, stallId: ${userId})`,
+  );
+  try {
+    // TODO: Implement the actual API call to fetch the allowance
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Sunday) to 6 (Saturday)
+    const daysUntilNextMonday = (8 - dayOfWeek) % 7 || 7; // Calculate days until next Monday
+    const nextPaymentDate = new Date(
+      today.setDate(today.getDate() + daysUntilNextMonday),
+    );
+    const daysSinceLastMonday = (dayOfWeek + 6) % 7; // Calculate days since last Monday
+    const lastPaymentDate = new Date(
+      today.setDate(today.getDate() - daysSinceLastMonday),
+    );
+
+    const allowance: Allowance = {
+      id: '123',
+      name: 'Allowance',
+      wallet: '123456789',
+      toWallet: '123456789',
+      amount: 25000,
+      startDate: new Date(),
+      endDate: null,
+      frequency: 'Monthly',
+      nextPaymentDate: nextPaymentDate,
+      lastPaymentDate: lastPaymentDate,
+      memo: "Don't spend it all at once",
+      active: true,
+    };
+    return allowance;
+  } catch (error) {
+    console.error(`Error fetching allowances for ${userId}:`, error);
+    throw error; // Re-throw the error to handle it in the parent function
+  }
+};
+
 export {
   getUser,
   getUsers,
@@ -929,4 +970,5 @@ export {
   getUserWallets,
   getNostrRewards,
   getUserWalletTransactions,
+  getAllowance,
 };
