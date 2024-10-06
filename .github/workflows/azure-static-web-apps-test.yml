@@ -13,6 +13,9 @@ jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     environment: Test
     name: Build and Deploy Job
     steps:
@@ -64,5 +67,3 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: 'close'
           app_location: '/tabs'
-          api_location: ''
-          output_location: 'build'
