@@ -6,7 +6,7 @@ additionalMetadata:
 provision:
   - uses: aadApp/create
     with:
-      name: Zapp.ie-aad
+      name: Alice-aad
       generateClientSecret: true
       signInAudience: 'AzureADMyOrg'
     writeToEnvironmentFile:
@@ -19,13 +19,13 @@ provision:
 
   - uses: teamsApp/create
     with:
-      name: Zapp.ie (${{APP_NAME_SUFFIX}})
+      name: Alice (${{APP_NAME_SUFFIX}})
     writeToEnvironmentFile:
       teamsAppId: TEAMS_APP_ID
 
   - uses: botAadApp/create
     with:
-      name: Zapp.ie (${{APP_NAME_SUFFIX}})
+      name: Alice (${{APP_NAME_SUFFIX}})
     writeToEnvironmentFile:
       botId: BOT_ID
       botPassword: SECRET_BOT_PASSWORD
@@ -33,7 +33,7 @@ provision:
   - uses: botFramework/create
     with:
       botId: ${{BOT_ID}}
-      name: Zapp.ie
+      name: Alice
       messagingEndpoint: ${{BOT_ENDPOINT}}/api/messages
       description: ''
       channels:
