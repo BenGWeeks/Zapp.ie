@@ -15,9 +15,8 @@ const FooterComponent: React.FC<FooterComponentProps> = ({ hidden }) => {
   return (
     <footer className={styles.footer}>
       <Link to="/feed">Feed</Link>&nbsp;|&nbsp;
-      <Link to="/users">Users</Link>&nbsp;|&nbsp; 
-      <Link to="/rewards">Rewards</Link>&nbsp;|&nbsp;
-      <Link to="/wallet">Wallet</Link>&nbsp;|&nbsp;      
+      <Link to="/reports">Reports</Link>&nbsp;|&nbsp; 
+   
       <SignInSignOutButton />
     </footer>
     

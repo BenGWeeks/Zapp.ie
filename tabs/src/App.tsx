@@ -18,7 +18,7 @@ import RequireAuth from './components/RequireAuth';
 import { PageLayout } from './components/PageLayout';
 
 // Import the pages
-import Login from './Login';
+
 import Feed from './Feed';
 import Users from './Users';
 import './App.css';
@@ -49,8 +49,7 @@ function App({ pca }: AppProps) {
 function Pages() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/feed" element={<RequireAuth><Feed /></RequireAuth>} />
+      <Route path="/" element={<RequireAuth><Feed /></RequireAuth>} />
       <Route path="/users" element={<RequireAuth><Users /></RequireAuth>} />
       <Route path="/Rewards" element={<RequireAuth><Rewards /></RequireAuth>} />
       <Route path="/Wallet" element={<RequireAuth><Wallet /></RequireAuth>} />

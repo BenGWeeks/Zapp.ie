@@ -16,12 +16,12 @@
         "outline": "outline.png"
     },
     "name": {
-        "short": "Zapp.ie (${{APP_NAME_SUFFIX}})",
-        "full": "Zapp.ie the zapster"
+        "short": "Alice (${{APP_NAME_SUFFIX}})",
+        "full": "Alice for Accounts"
     },
     "description": {
-        "short": "Zapp.ie: Integrate Bitcoin rewards and AI for enhanced collaboration in Teams",
-        "full": "Zapp.ie seamlessly integrates into Microsoft Teams, bringing a unique blend of Bitcoin micro-transactions and AI automation to enhance team collaboration and recognition. With Zapp.ie, you can effortlessly send Bitcoin-based rewards (Sats) to colleagues as a token of appreciation, automate recognition for positive behavior, and foster a more engaged and motivated workplace. Transform how your team acknowledges great work and builds a culture of gratitude directly within Teams."
+        "short": "Alice: Automates invoicing processing and reporting",
+        "full": "Alice seamlessly integrates into Microsoft Teams, automating invoicing processing and reporting. Alice is a digital assistant that helps you manage your finances and keep track of your expenses."
     },
     "accentColor": "#002A5B",
     "bots": [
