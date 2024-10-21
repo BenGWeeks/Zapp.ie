@@ -20,7 +20,7 @@ const WalletYourWalletInfoCard: React.FC = () => {
 
   const fetchAmountReceived = async () => {
     console.log('Fetching your wallet ...');
-
+    
     const currentUserLNbitDetails = await getUsers(adminKey, {
       aadObjectId: account.localAccountId,
     });
