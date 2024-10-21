@@ -10,18 +10,11 @@ import {
   Middleware,
   MessageFactory,
 } from 'botbuilder';
-import {
-  getWallets,
-  ensureMatchingUserWallet,
-  payInvoice,
-  getWalletIdByUserId,
-  createInvoice,
-} from '../services/lnbitsService';
 
 export class WithdrawFundsCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
     try {
-      await context.sendActivity('Withdrawing zaps...');
+      await context.sendActivity('Ah! Steady on cowboy ... coming soon!');
     } catch (error) {
       console.error('Error in WithdrawZapsCommand:', error);
     }

@@ -1,23 +1,23 @@
 import { SSOCommand, SSOCommandMap } from './SSOCommandMap';
 import {
-  TeamsActivityHandler,
   TurnContext,
-  SigninStateVerificationQuery,
-  MemoryStorage,
-  ConversationState,
-  UserState,
+  ActivityTypes,
+  Activity,
+  TeamsInfo,
   CardFactory,
-  Middleware,
   MessageFactory,
+  CloudAdapter,
+  ConversationReference,
+  ConversationParameters,
+  ChannelAccount,
+  TeamsActivityHandler,
 } from 'botbuilder';
-import {
-  getWallets,
-  ensureMatchingUserWallet,
-  payInvoice,
-  getWalletIdByUserId,
-  createInvoice,
-} from '../services/lnbitsService';
+import { ConnectorClient } from 'botframework-connector';
+import { getUsers, payInvoice, createInvoice } from '../services/lnbitsService';
 import { error } from 'console';
+import { UserService } from '../services/userService';
+
+const adminKey = process.env.LNBITS_ADMINKEY as string;
 
 export class SendZapCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
@@ -43,34 +43,27 @@ export class SendZapCommand extends SSOCommand {
   }
 }
 
-/*
-// Helper function to extract the amount from the message text
-function extractAmountFromMessage(text: string): number {
-  const amountMatch = text.match(/(\d+)/);
-  return amountMatch ? parseInt(amountMatch[0], 10) : 0;
-}
-  */
-
 export async function SendZap(
-  sendersWallet: Wallet,
-  receiversWallet: Wallet,
+  sender: User,
+  receiver: User,
   zapMessage: string,
   zapAmount: number,
+  context: TurnContext,
 ): Promise<void> {
   try {
     console.log('Sending zap ...');
 
     // Extra information to be logged for tracking from which wallet the zap is sent from and to whom
     const extra = {
-      from: sendersWallet,
-      to: receiversWallet,
-      type: 'zap',
+      from: sender.allowanceWallet,
+      to: receiver.privateWallet,
+      tag: 'zap',
     };
 
     // Create an invoice for the amount in the recipient's wallet
     const paymentRequest = await createInvoice(
-      receiversWallet.inkey,
-      receiversWallet.id,
+      receiver.privateWallet.inkey,
+      receiver.privateWallet.id,
       zapAmount,
       zapMessage,
       extra,
@@ -83,7 +76,26 @@ export async function SendZap(
     }
 
     // Pay the invoice
-    const result = await payInvoice(sendersWallet.adminkey, paymentRequest);
+
+    console.log('sendersWallet: ', sender.allowanceWallet);
+
+    const result = await payInvoice(
+      sender.allowanceWallet.adminkey,
+      paymentRequest,
+      extra,
+    );
+
+    console.log('Payment Result:', result);
+
+    try {
+      await messageRecipient(sender, receiver, zapAmount, zapMessage, context);
+    } catch (error) {
+      console.error(
+        'Failed to send a message to the recipient. (' + error.message + ')',
+      );
+    }
+
+    // TODO: Errors here are not being caught for some reason. Need to fix this. Mario.
 
     /*
     if (result && result.payment_hash) {
@@ -119,7 +131,7 @@ async function createZapCard() {
     {
       type: 'Input.ChoiceSet',
       label: 'Receiver',
-      id: 'zapReceiverWalletId',
+      id: 'zapReceiverId',
       placeholder: 'Select a recipient wallet',
       choices: walletChoices,
       isRequired: true,
@@ -181,12 +193,160 @@ async function createZapCard() {
 // Function to populate choices
 async function populateWalletChoices() {
   console.log('Populating wallet choices ...');
-  const wallets = await getWallets('Receiving');
-  if (wallets) {
-    return wallets.map((wallet: any) => ({
-      title: wallet.name,
-      value: wallet.id,
+  const users = await getUsers(adminKey, null);
+
+  // Get the current user
+  const userService = UserService.getInstance();
+  const currentUser = userService.getCurrentUser();
+
+  let filteresUsers = users;
+  if (currentUser) {
+    filteresUsers = users.filter(
+      user => user?.aadObjectId !== userService.getCurrentUser().aadObjectId,
+    );
+  }
+
+  if (filteresUsers) {
+    return filteresUsers.map((user: any) => ({
+      title: user.displayName,
+      value: user.id,
     }));
   }
   return [];
+}
+
+// This method will only work if:
+// 1. The user has installed the bot, the admin admin has installed the bot for that user.
+// And possibly:
+// 2. The user has sent a message to the bot (not sure if "continueConversationAsync" will work if the user has not sent a message to the bot).
+// Ref: https://github.com/OfficeDev/microsoft-teams-apps-company-communicator/blob/207013db2ad64ac5c3d365fd4db1a25fd2d703cf/Source/CompanyCommunicator.Common/Services/Teams/Conversations/ConversationService.cs#L70
+async function messageRecipient(
+  sender: User,
+  receiver: User,
+  zapAmount: number,
+  zapMessage: string,
+  context: TurnContext,
+): Promise<void> {
+  try {
+    // Get the bot's App ID, name, and credentials
+    const botAppId =
+      process.env.MicrosoftAppId || context.activity.recipient.id;
+    const botName = context.activity.recipient.name;
+    //const botCredentials = (context.adapter as any).credentials;
+
+    /*
+    console.log(
+      ' process.env.SECRET_AAD_APP_CLIENT_SECRET:',
+      process.env.SECRET_AAD_APP_CLIENT_SECRET,
+    );
+
+    // Create the credentials using MicrosoftAppCredentials
+    const botCredentials = new MicrosoftAppCredentials(
+      botAppId,
+      process.env.SECRET_AAD_APP_CLIENT_SECRET, // Is this password encrypted?
+    );*/
+
+    console.log('Bot App ID:', botAppId);
+    console.log('Bot Name:', botName);
+
+    // Construct the Teams user ID using the AAD Object ID
+    const receiverTeamsId = `29:${receiver.aadObjectId}`;
+
+    // Clone the existing activity and modify it
+    const reference = TurnContext.getConversationReference(context.activity);
+    const botMessage: Partial<Activity> =
+      TurnContext.applyConversationReference(
+        {
+          type: ActivityTypes.Message,
+          text: `You have received ${zapAmount} Sats from ${sender.displayName} with a message: "${zapMessage}"`,
+        },
+        reference,
+        true,
+      );
+
+    // Modify the message to set the recipient as the receiver and clear irrelevant fields
+    botMessage.recipient = {
+      id: receiverTeamsId,
+      name: receiver.displayName,
+      aadObjectId: receiver.aadObjectId,
+    };
+    botMessage.from = {
+      id: botAppId,
+      name: botName,
+    };
+    botMessage.conversation = undefined; // Clear conversation ID as it will be set upon conversation creation
+    botMessage.replyToId = undefined;
+
+    // Create the ConnectorClient
+    /*
+    const connectorClient = new ConnectorClient(botCredentials, {
+      baseUri: context.activity.serviceUrl,
+    });*/
+    //const connectorClient = await context.adapter.createConnectorClient(context.activity.serviceUrl);
+    /*
+    const adapter = context.adapter as CloudAdapter;
+    const connectorClient = await adapter.createConnectorClient(
+      context.activity.serviceUrl,
+    );*/
+
+    const connectorClient = context.turnState.get(
+      context.adapter.ConnectorClientKey,
+    ) as ConnectorClient;
+
+    if (!connectorClient) {
+      throw new Error('ConnectorClient is not available in turn state.');
+    }
+
+    // Create a conversation with the recipient
+    const conversationParameters: ConversationParameters = {
+      isGroup: false,
+      bot: {
+        id: botAppId,
+        name: botName,
+      },
+      members: [
+        {
+          id: receiverTeamsId,
+          name: receiver.displayName,
+          aadObjectId: receiver.aadObjectId,
+        },
+      ],
+      tenantId: context.activity.conversation.tenantId,
+      channelData: {
+        tenant: {
+          id: context.activity.conversation.tenantId,
+        },
+      },
+      activity: botMessage as Activity, // Include the initial message here
+    };
+
+    // Create the conversation ... or Adapter.CreateConversationAsync????
+    const response = await connectorClient.conversations.createConversation(
+      conversationParameters,
+    );
+
+    // Create the message
+    const message = MessageFactory.text(
+      `You have received ${zapAmount} Sats from ${sender.displayName} with a message: "${zapMessage}"`,
+    );
+
+    // Send the message to the new conversation
+    await connectorClient.conversations.sendToConversation(
+      response.id,
+      message,
+    );
+  } catch (error) {
+    if (
+      error.statusCode === 403 ||
+      error.message.includes('Bot not in conversation roster')
+    ) {
+      // Inform the sender that the recipient hasn't installed the bot
+      await context.sendActivity(
+        `FYI I wasn't able to message ${receiver.displayName} that they have a zap from you because they don't have me installed yet - maybe you could ping them, and let them know to install Zapp.ie!`,
+      );
+    } else {
+      console.error('Error in messageRecipient:', error);
+      throw error;
+    }
+  }
 }

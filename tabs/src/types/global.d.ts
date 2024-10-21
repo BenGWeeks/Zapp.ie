@@ -1,18 +1,19 @@
 // src/types/global.d.ts
-interface Zap {
+
+interface Reward {
   id: string;
-  bolt11: string;
-  from: string | null;
-  to: string | null;
-  memo: string;
-  amount: number;
-  wallet_id: string;
-  time: number;
+  image: string;
+  name: string;
+  shortDescription: string;
+  link: string;
+  price: number;
 }
 
-interface User {
-  displayName: string;
-  aadObjectId: string;
+interface UserAccount {
+  id: string;
+  is_super_user: boolean;
+  is_admin: boolean;
+  username: string;
   email: string;
   receivingWallet: Wallet;
   sendingWallet: Wallet;
@@ -21,10 +22,13 @@ interface User {
 
 interface Wallet {
   id: string;
+  admin: string;
   name: string;
+  user: string;
   adminkey: string;
   inkey: string;
   balance_msat: number;
+  deleted: boolean;
 }
 
 

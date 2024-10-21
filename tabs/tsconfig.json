@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "outDir": "./dist", // Set the output directory to 'dist'
+    "rootDir": "./src", // Set the root directory to 'src'
+    "sourceMap": true,
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -19,5 +22,5 @@
     
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }

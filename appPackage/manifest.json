@@ -1,14 +1,15 @@
 {
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
     "manifestVersion": "1.16",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "id": "${{TEAMS_APP_ID}}",
     "packageName": "com.microsoft.teams.extension",
     "developer": {
         "name": "eir evo",
         "websiteUrl": "https://www.example.com",
         "privacyUrl": "https://www.example.com/privacy",
-        "termsOfUseUrl": "https://www.example.com/termofuse"
+        "termsOfUseUrl": "https://www.example.com/termofuse",
+        "mpnId": "506002"
     },
     "icons": {
         "color": "color.png",
@@ -47,15 +48,15 @@
                         },
                         {
                             "title": "Show my balance",
-                            "description": "See your balance in your receiving and sending wallets"
+                            "description": "See your balance in your allowance and private wallet"
                         },
                         {
                             "title": "Show Leaderboard",
-                            "description": "Show the leaderboard of users receiving wallets"
+                            "description": "Show the leaderboard of users private wallets"
                         },
                         {
                             "title": "Withdraw my Zaps",
-                            "description": "Withdraw funds from your receiving wallet to your own personal wallet"
+                            "description": "Withdraw funds from your private wallet to your own personal wallet"
                         }
                     ]
                 }
@@ -76,8 +77,8 @@
                 "channelTab"
             ], 
             "name": "Feed", 
-            "contentUrl": "https://zappie-dev-esbrfvguadd5f2hu.northeurope-01.azurewebsites.net/", 
-            "websiteUrl": "https://zappie-dev-esbrfvguadd5f2hu.northeurope-01.azurewebsites.net/"
+            "contentUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net", 
+            "websiteUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net"
         }, 
         { 
             "entityId": "usersTab", 
@@ -90,8 +91,35 @@
                 "channelTab"
             ], 
             "name": "Users", 
-            "contentUrl": "http://localhost:3000/Users", 
-            "websiteUrl": "http://localhost:3000/Users"
+            "contentUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/users", 
+            "websiteUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/users"
+        } ,       { 
+            "entityId": "rewardsTab", 
+            "scopes": [       
+                "team",
+                "personal"
+            ], 
+            "context": [ 
+                "personalTab",
+                "channelTab"
+            ], 
+            "name": "Rewards", 
+            "contentUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/rewards", 
+            "websiteUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/rewards"
+        },
+               { 
+            "entityId": "walletTab", 
+            "scopes": [       
+                "team",
+                "personal"
+            ], 
+            "context": [ 
+                "personalTab",
+                "channelTab"
+            ], 
+            "name": "Wallet", 
+            "contentUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/wallet", 
+            "websiteUrl": "https://ashy-pond-00441c81e.5.azurestaticapps.net/wallet"
         }
     ],
     "permissions": [
@@ -99,7 +127,9 @@
         "messageTeamMembers"
     ],
     "validDomains": [
-        "${{BOT_DOMAIN}}"
+        "${{BOT_DOMAIN}}",
+        "*.azurestaticapps.net",
+        "*.microsoft.com"
     ],
     "webApplicationInfo": {
         "id": "${{AAD_APP_CLIENT_ID}}",

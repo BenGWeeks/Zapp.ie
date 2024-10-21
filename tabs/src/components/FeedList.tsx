@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import styles from './FeedList.module.css';
+import React, { useState } from 'react';
 import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
 import { getUserName } from '../utils/walletUtilities';
 import ZapIcon from '../images/ZapIcon.svg';
@@ -11,16 +12,23 @@ interface FeedListProps {
   timestamp?: number | null;
 }
 
+interface ZapTransaction {
+  from: User | null;
+  to: User | null;
+  transaction: Transaction;
+}
+
+const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
+
 const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
-  const [zaps, setZaps] = useState<Zap[]>([]);
+  const [zaps, setZaps] = useState<ZapTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const initialRender = useRef(true);
 
-  // Calculate the timestamp for 7 days ago
-  const sevenDaysAgo = Date.now() / 1000 - 7 * 24 * 60 * 60;
-
-  // Use the provided timestamp or default to 7 days ago
   const paymentsSinceTimestamp =
     timestamp === null || timestamp === undefined || timestamp === 0
-      ? sevenDaysAgo
+      ? 0
       : timestamp;
 
   const fetchZaps = async () => {
@@ -37,7 +45,6 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
           paymentsSinceTimestamp,
         );
 
-        // Loop through all the payments for the current wallet
         for (const payment of payments) {
           const zap: Zap = {
             id: payment.checking_id,
@@ -54,19 +61,18 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
         }
       }
     }
-
-    setZaps(allZaps);
+    //setZaps(zaps);
+    setZaps(prevState => [...prevState, ...allZaps]);
   };
 
   // Debounce the fetchZaps function
   const debouncedFetchZaps = useCallback(debounce(fetchZaps, 300), [fetchZaps]);
 
   useEffect(() => {
-    debouncedFetchZaps();
-    return () => {
-      debouncedFetchZaps.cancel();
-    };
-  }, [debouncedFetchZaps]);
+    // Clear the zaps
+    setZaps([]);
+    fetchZaps();
+  }, [timestamp]);
 
   return (
     <div className={styles.feedlist}>
@@ -82,18 +88,24 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
         </div>
       </div>
       {zaps
-        ?.sort((a, b) => b.time - a.time)
+        ?.sort((a, b) => b.transaction.time - a.transaction.time)
         .map((zap, index) => (
-          <div key={zap.id || index} className={styles.bodycell}>
+          <div
+            key={zap.transaction.checking_id || index}
+            className={styles.bodycell}
+          >
             <div className={styles.bodyContents}>
               <div className={styles.mainContentStack}>
                 <div className={styles.personDetails}>
                   <div className={styles.userName}>
-                    {new Date(zap.time * 1000).toLocaleDateString()}{' '}
-                    {new Date(zap.time * 1000).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {new Date(zap.transaction.time * 1000).toLocaleDateString()}{' '}
+                    {new Date(zap.transaction.time * 1000).toLocaleTimeString(
+                      [],
+                      {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      },
+                    )}
                   </div>
                 </div>
                 <div className={styles.personDetails}>
@@ -103,7 +115,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
                     src="avatar.png"
                     style={{ display: 'none' }}
                   />
-                  <div className={styles.userName}>{zap.from}</div>
+                  <div className={styles.userName}>{zap.from?.displayName}</div>
                 </div>
                 <div className={styles.personDetails}>
                   <img
@@ -112,12 +124,18 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
                     src="avatar.png"
                     style={{ display: 'none' }}
                   />
-                  <div className={styles.userName}>{zap.to}</div>
+                  <div className={styles.userName}>{zap.to?.displayName}</div>
                 </div>
-                <div className={styles.userName}>{zap.memo}</div>
+                <div className={styles.userName} title={zap.transaction.memo}>
+                  {zap.transaction.memo}
+                </div>
               </div>
               <div className={styles.transactionDetails}>
-                <b className={styles.b}>{zap.amount}</b>
+                <b className={styles.b}>
+                  {Math.abs(
+                    Math.floor(zap.transaction.amount / 1000),
+                  ).toLocaleString()}
+                </b>
                 <img className={styles.icon} alt="" src={ZapIcon} />
               </div>
             </div>

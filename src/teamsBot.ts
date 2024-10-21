@@ -1,5 +1,4 @@
 /// <reference path="./types/global.d.ts" />
-
 import {
   TeamsActivityHandler,
   TurnContext,
@@ -7,9 +6,12 @@ import {
   MemoryStorage,
   ConversationState,
   UserState,
+  TeamInfo,
   CardFactory,
   Middleware,
   MessageFactory,
+  TeamsInfo,
+  StatePropertyAccessor,
 } from 'botbuilder';
 import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
 import { Client } from '@microsoft/microsoft-graph-client';
@@ -19,35 +21,38 @@ import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
 import {
-  getWallets,
-  ensureMatchingUserWallet,
-  payInvoice,
-  getWalletIdByUserId,
-  createInvoice,
-  getWalletId,
+  getUser,
+  getUsers,
+  getWalletById,
+  createUser,
+  createWallet,
+  updateUser,
 } from './services/lnbitsService';
-import { error } from 'console';
+import { UserService } from './services/userService';
+import { access } from 'fs';
 
-let globalWalletId: string | null = null;
+const adminKey = process.env.LNBITS_ADMINKEY as string;
+interface CancellationToken {
+  isCancellationRequested: boolean;
+}
 
-// Define global variables
-let globalZapAmount: number;
-let globalMentionedUserId: string;
-let globalMentionedUserName: string;
+let userSetupFlag = false;
 
 export class TeamsBot extends TeamsActivityHandler {
   conversationState: ConversationState;
   userState: UserState;
+  //userSetupFlagAccessor: StatePropertyAccessor<boolean>;
+  //userProfileAccessor: StatePropertyAccessor<User>;
 
   constructor() {
     super();
 
     // Define the state store for your bot.
     const memoryStorage = new MemoryStorage();
-
     // Create conversation and user state with in-memory storage provider.
     this.conversationState = new ConversationState(memoryStorage);
     this.userState = new UserState(memoryStorage);
+
 
     // Register commands
     SSOCommandMap.register('send zap', new SendZapCommand());
@@ -57,7 +62,6 @@ export class TeamsBot extends TeamsActivityHandler {
 
     this.onMessage(async (context, next) => {
       console.log('Running onMessage ...');
-
       const botId = context.activity.recipient.id; // Bot's ID
       const senderId = context.activity.from.id; // Sender's ID
 
@@ -69,44 +73,29 @@ export class TeamsBot extends TeamsActivityHandler {
       }
 
       try {
-        let mentions = TurnContext.getMentions(context.activity);
-        console.log('context.activity:', context.activity);
-
         if (
           context.activity.value &&
           context.activity.value.action === 'submitZaps'
         ) {
-          const userAadObjectId = context.activity.from.aadObjectId;
-          const userName = context.activity.from.name;
+          const currentUser = context.turnState.get('user');
 
-          const zapReceiverWalletId =
-            context.activity.value.zapReceiverWalletId;
-          const senderWallet = await ensureMatchingUserWallet(
-            userAadObjectId,
-            userName,
-            'Sending',
-          );
-          const zapMessage = context.activity.value.zapMessage;
-          const zapAmount = context.activity.value.zapAmount;
+          const receiverId = context.activity.value.zapReceiverId;
+          const receiver = await getUser(adminKey, receiverId);
 
-          if (!senderWallet) {
-            throw new error('No sending wallet found.');
+          if (!currentUser.allowanceWallet.id) {
+            throw new Error('No sending wallet found.');
           }
 
-          const receiverWallets = await getWallets(null, zapReceiverWalletId);
-
-          if (receiverWallets.length != 1) {
-            throw new Error(
-              'Expected exactly one receiving wallet, but found ' +
-                receiverWallets.length,
-            );
+          if (!receiver.privateWallet) {
+            throw new Error('Receiver wallet not found.');
           }
 
           await SendZap(
-            senderWallet,
-            receiverWallets[0],
-            zapMessage,
-            zapAmount,
+            currentUser,
+            receiver,
+            context.activity.value.zapMessage,
+            context.activity.value.zapAmount,
+            context,
           );
 
 const receiverName = context.activity.value.zapReceiverName;
@@ -135,7 +124,7 @@ message.entities = [mention];
       } catch (error) {
         console.error('Error in onMessage handler:', error.message);
         await context.sendActivity(
-          `Oops! Unable to send zap (${error.message}`,
+          `Oops! Unable to send zap (${error.message})`,
         );
       }
 
@@ -213,7 +202,7 @@ message.entities = [mention];
         // Log user information
         console.log(`Zap from userId: ${userId}`);
         console.log(`Zap from userName: ${userName}`);
-        const { receivingWalletId, sendingWalletId } = await ensureUserWallet(
+        const { privateWalletId, allowanceWalletId } = await ensureUserWallet(
           userId,
           userName,
         );
@@ -282,21 +271,46 @@ message.entities = [mention];
         console.error('Error in onMessage handler:', error);
       }
         */
+      await next();
     });
 
-    this.onMembersAdded(async (context, next) => {
-      try {
-        const membersAdded = context.activity.membersAdded;
-        for (let cnt = 0; cnt < membersAdded.length; cnt++) {
-          if (membersAdded[cnt].id) {
-            await context.sendActivity('Welcome to the sso bot sample!');
-            break;
-          }
+    //this.onMembersAdded(async (context, next) => {
+    this.onCommand(async (context, next) => {
+      // Retrieve the per-user setup flag
+      //const currentUser = await this.userProfileAccessor.get(context);
+      const userService = UserService.getInstance();
+      const currentUser = userService.getCurrentUser();
+      console.log('Current User:', currentUser);
+
+      if (!currentUser) {
+        console.log('Lets make sure the user is setup ...');
+
+        await context.sendActivity(
+          `Let me just check you're all setup. Bear with me a few seconds please ...`,
+        );
+
+        try {
+          // Let's  check they are setup correctly.
+          const member = await TeamsInfo.getMember(
+            context,
+            context.activity.from.id,
+          );
+
+          const userService = UserService.getInstance();
+          const currentUser = await userService.ensureUserSetup(member);
+
+          userService.setCurrentUser(currentUser);
+          //await this.userProfileAccessor.set(context, currentUser);
+          //await this.userState.saveChanges(context);
+
+          userSetupFlag = true; // OK, all done, we shouldn't need to do this again.
+        } catch (error) {
+          console.error('Error in onCommand handler:', error);
+          await context.sendActivity(
+            'Mmmm ... an error occurred while setting up your account!',
+          );
         }
-      } catch (error) {
-        console.error('Error in onMembersAdded handler:', error);
       }
-      await next();
     });
   }
 
@@ -345,6 +359,7 @@ message.entities = [mention];
       console.log(`User ID: ${userId}, User Name: ${userName}`);
 
       // Ensure the user has a wallet and get the wallet ID
+      /*
       const wallet = await ensureMatchingUserWallet(
         userId,
         userName,
@@ -356,6 +371,7 @@ message.entities = [mention];
       } else {
         await context.sendActivity('Failed to ensure wallet.');
       }
+        */
     } catch (error) {
       console.error('Error in onSignInInvoke:', error);
       await context.sendActivity('An error occurred during sign-in.');

@@ -1,7 +1,8 @@
 .stringTabTitle {
     position: relative;
     line-height: 20px;
-}
+    padding-bottom: 15px;
+    }
 .stringBadgeIconStack {
     display: flex;
     flex-direction: row;
@@ -483,3 +484,7 @@
     font-family: Inter;
 }
 
+.stringTabTitle.active {
+    border-bottom: 2px solid #5b5fc7;
+    font-weight: bold;
+  }

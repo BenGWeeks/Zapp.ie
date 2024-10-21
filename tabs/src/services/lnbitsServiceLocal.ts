@@ -1,45 +1,74 @@
 // lnbitsService.ts
 
-const userName = process.env.REACT_APP_LNBITS_USERNAME;
-const password = process.env.REACT_APP_LNBITS_PASSWORD;
-//const adminkey = process.env.LNBITS_ADMINKEY as string; // This changes per wallet!
-
 // LNBits API is documented here:
 // https://demo.lnbits.com/docs/
 
-const getAccessToken = async (username: string, password: string): Promise<string> => {
-  try {
-    const response = await fetch('/api/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    });
+const userName = process.env.REACT_APP_LNBITS_USERNAME;
+const password = process.env.REACT_APP_LNBITS_PASSWORD;
+const nodeUrl = process.env.REACT_APP_LNBITS_NODE_URL;
 
-    if (!response.ok) {
-      throw new Error(`Error creating access token (status: ${response.status})`);
-    }
+// Store token in localStorage (persists between page reloads)
+let accessToken = localStorage.getItem('accessToken');
+let accessTokenPromise: Promise<string> | null = null; // To cache the pending token request
 
-    const data = await response.json();
-    return data.access_token;
-  } catch (error) {
-    console.error('Failed to fetch access token:', error);
-    throw error;
+export async function getAccessToken(
+  username: string,
+  password: string,
+): Promise<string> {
+  /*console.log(
+    `getAccessToken starting ... (username: ${username}, filterById: ${password}))`,
+  );*/
+  if (accessToken) {
+    //console.log('Using cached access token: ' + accessToken);
+    return accessToken;
+  } else {
+    console.log('No cached access token found');
   }
-};
+
+  // If there's already a token request in progress, return the existing promise
+  if (accessTokenPromise) {
+    console.log('Returning ongoing access token request');
+    return accessTokenPromise;
+  }
+
+  // No access token and no request in progress, create a new one
+  console.log('No cached access token found, requesting a new one');
+
+  // Store the promise of the request
+  accessTokenPromise = (async (): Promise<string> => {
+    try {
+      const response = await fetch(`${nodeUrl}/api/v1/auth`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      //console.log('Request URL:', response.url);
+      //console.log('Request Status:', response.status);
+      //console.log('Request Headers:', response.headers);
+
+  if (!response.ok) {
+    throw new Error(`Error creating access token (status: ${response.status})`);
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
 
 const getWallets = async (
   filterByName?: string,
   filterById?: string,
 ): Promise<Wallet[] | null> => {
-  console.log(
+  /*console.log(
     `getWallets starting ... (filterByName: ${filterByName}, filterById: ${filterById}))`,
-  );
+  );*/
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
-    const response = await fetch(`/usermanager/api/v1/wallets`, {
+    const response = await fetch(`/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -61,12 +90,12 @@ const getWallets = async (
 };
 
 const getWalletDetails = async (inKey: string, walletId: string) => {
-  console.log(
+  /*console.log(
     `getWalletDetails starting ... (inKey: ${inKey}, walletId: ${walletId}))`,
-  );
+  );*/
 
   try {
-    const response = await fetch(`/api/v1/wallets/${walletId}`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallets/${walletId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -90,10 +119,10 @@ const getWalletDetails = async (inKey: string, walletId: string) => {
 };
 
 const getWalletBalance = async (inKey: string) => {
-  console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
+  //console.log(`getWalletBalance starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/wallet`, {
+    const response = await fetch(`${nodeUrl}/api/v1/wallet`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -116,11 +145,206 @@ const getWalletBalance = async (inKey: string) => {
   }
 };
 
-const getWalletName = async (inKey: string) => {
-  console.log(`getWalletName starting ... (inKey: ${inKey})`);
+const getUserWallets = async (
+  adminKey: string,
+  userId: string,
+): Promise<Wallet[] | null> => {
+  /*console.log(
+    `getUserWallets starting ... (adminKey: ${adminKey}, userId: ${userId})`,
+  );*/
 
   try {
-    const response = await fetch(`/api/v1/wallet`, {
+    const accessToken = await getAccessToken(`${userName}`, `${password}`);
+    const response = await fetch(
+      `${nodeUrl}/users/api/v1/user/${userId}/wallet`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+          //'X-Api-Key': adminKey,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Error getting users wallets response (status: ${response.status})`,
+      );
+    }
+
+    const data: Wallet[] = await response.json();
+
+    // Map the wallets to match the Wallet interface
+    let walletData: Wallet[] = data.map((wallet: any) => ({
+      id: wallet.id,
+      admin: wallet.admin || '', // TODO: To be implemented. Ref: https://t.me/lnbits/90188
+      name: wallet.name,
+      adminkey: wallet.adminkey,
+      user: wallet.user,
+      inkey: wallet.inkey,
+      balance_msat: wallet.balance_msat, // TODO: To be implemented. Ref: https://t.me/lnbits/90188
+      deleted: wallet.deleted,
+    }));
+
+    // Now remove the deleted wallets.
+    const filteredWallets = walletData.filter(
+      wallet => wallet.deleted !== true,
+    );
+
+    return filteredWallets;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const getUsers = async (
+  adminKey: string,
+  filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
+): Promise<User[] | null> => {
+  /*console.log(
+    `getUsers starting ... (adminKey: ${adminKey}, filterByExtra: ${JSON.stringify(
+      filterByExtra,
+    )})`,
+  );*/
+
+  try {
+    // URL encode the extra filter
+    //const encodedExtra = encodeURIComponent(JSON.stringify(filterByExtra));
+    const encodedExtra = JSON.stringify(filterByExtra);
+    console.log('encodedExtra:', encodedExtra);
+    console.log('encodedExtra:', encodedExtra);
+
+    const response = await fetch(
+      `${nodeUrl}/usermanager/api/v1/users?extra=${encodedExtra}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': adminKey,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Error getting users response (status: ${response.status})`,
+      );
+    }
+
+    const data = await response.json();
+
+    //console.log('getUsers data:', data);
+
+    // Map the users to match the User interface
+    const usersData: User[] = await Promise.all(
+      data.map(async (user: any) => {
+        const extra = user.extra || {}; // Provide a default empty object if user.extra is null
+
+        let privateWallet = null;
+        let allowanceWallet = null;
+
+        if (user.extra) {
+          privateWallet = await getWalletById(user.id, extra.privateWalletId);
+          allowanceWallet = await getWalletById(
+            user.id,
+            extra.allowanceWalletId,
+          );
+        }
+
+        return {
+          id: user.id,
+          displayName: user.name,
+          aadObjectId: extra.aadObjectId || null,
+          email: user.email,
+          privateWallet: privateWallet,
+          allowanceWallet: allowanceWallet,
+        };
+      }),
+    );
+
+    //console.log('getUsers usersData:', usersData);
+
+    return usersData;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const getUser = async (
+  adminKey: string,
+  userId: string,
+): Promise<User | null> => {
+  /*console.log(
+    `getUser starting ... (adminKey: ${adminKey}, userId: ${userId})`,
+  );*/
+
+  if (!userId || userId === '' || userId == 'undefined') {
+    return null;
+  }
+
+  try {
+    const response = await fetch(
+      `${nodeUrl}/usermanager/api/v1/users/${userId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': adminKey,
+        },
+      },
+    );
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `Error getting user response (status: ${response.status})`,
+      );
+    }
+
+    const user = await response.json();
+
+    // Await the wallet promises
+    const privateWallet = await getWalletById(
+      user.id,
+      user.extra?.privateWalletId,
+    );
+    const allowanceWallet = await getWalletById(
+      user.id,
+      user.extra?.allowanceWalletId,
+    );
+
+    // Map the user to match the User interface
+    const userData: User = {
+      id: user.id,
+      displayName: user.name,
+      profileImg: user.profileImg,
+      aadObjectId: user.extra?.aadObjectId || null,
+      email: user.email,
+      type: user.extra?.type || 'Teammate',
+      privateWallet: privateWallet || null,
+      allowanceWallet: allowanceWallet || null,
+    };
+
+    //console.log('userData:', userData);
+
+    return userData;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const getWalletName = async (inKey: string) => {
+  //console.log(`getWalletName starting ... (inKey: ${inKey})`);
+
+  try {
+    const response = await fetch(`${nodeUrl}/api/v1/wallet`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -141,11 +365,11 @@ const getWalletName = async (inKey: string) => {
   }
 };
 
-const getPayments = async (inKey: string) => {
-  console.log(`getPayments starting ... (inKey: ${inKey})`);
+const getWalletPayments = async (inKey: string) => {
+  //console.log(`getWalletPayments starting ... (inKey: ${inKey})`);
 
   try {
-    const response = await fetch(`/api/v1/payments?limit=100`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments?limit=100`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -166,13 +390,13 @@ const getPayments = async (inKey: string) => {
 };
 
 const getWalletPayLinks = async (inKey: string, walletId: string) => {
-  console.log(
+  /*console.log(
     `getWalletPayLinks starting ... (inKey: ${inKey}, walletId: ${walletId})`,
-  );
+  );*/
 
   try {
     const response = await fetch(
-      `/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`,
+      `${nodeUrl}/lnurlp/api/v1/links?all_wallets=false&wallet=${walletId}`,
       {
         method: 'GET',
         headers: {
@@ -198,12 +422,76 @@ const getWalletPayLinks = async (inKey: string, walletId: string) => {
   }
 };
 
-// May need fixing!
-const getWalletId = async (inKey: string) => {
-  console.log(`getWalletId starting ... (inKey: ${inKey})`);
+const getWalletById = async (
+  userId: string,
+  id: string,
+): Promise<Wallet | null> => {
+  //console.log(`getWalletById starting ... (userId: ${userId}, id: ${id})`);
 
   try {
-    const response = await fetch(`/api/v1/wallets`, {
+    const accessToken = await getAccessToken(`${userName}`, `${password}`);
+
+    const response = await fetch(
+      `${nodeUrl}/users/api/v1/user/${userId}/wallet`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          //'X-Api-Key': adminKey,
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      console.error(
+        `Error getting wallet by ID response (status: ${response.status})`,
+      );
+
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Find the wallet with a matching inkey that are not deleted.
+    const filteredWallets = data.filter(
+      (wallet: any) => wallet.deleted !== true,
+    );
+    const matchingWallet = filteredWallets.find(
+      (wallet: any) => wallet.id === id,
+    );
+    //console.log('matchingWallet: ', matchingWallet);
+
+    if (!matchingWallet) {
+      console.warn(`Wallet with ID ${id} not found.`);
+      return null;
+    }
+
+    // Map the filterWallets to match the Wallets interface
+    const walletData: Wallet = {
+      id: matchingWallet.id,
+      admin: matchingWallet.admin, // TODO: Coming back as undefined.
+      name: matchingWallet.name,
+      user: matchingWallet.user,
+      adminkey: matchingWallet.adminkey,
+      inkey: matchingWallet.inkey,
+      balance_msat: matchingWallet.balance_msat,
+      deleted: matchingWallet.deleted,
+    };
+
+    return walletData;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+// May need fixing!
+const getWalletId = async (inKey: string) => {
+  //console.log(`getWalletId starting ... (inKey: ${inKey})`);
+
+  try {
+    const response = await fetch(`${nodeUrl}/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -235,12 +523,12 @@ const getWalletId = async (inKey: string) => {
 };
 
 const getInvoicePayment = async (lnKey: string, invoice: string) => {
-  console.log(
+  /*console.log(
     `getInvoicePayment starting ... (inKey: ${lnKey}, invoice: ${invoice})`,
-  );
+  );*/
 
   try {
-    const response = await fetch(`/api/v1/payments/${invoice}`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments/${invoice}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -263,23 +551,34 @@ const getInvoicePayment = async (lnKey: string, invoice: string) => {
   }
 };
 
-const getPaymentsSince = async (lnKey: string, timestamp: number) => {
-  console.log(
-    `getPaymentsSince starting ... (lnKey: ${lnKey}, timestamp: ${timestamp})`,
-  );
+const getWalletTransactionsSince = async (
+  inKey: string,
+  timestamp: number,
+  filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
+): Promise<Transaction[]> => {
+  /*console.log(
+    `getWalletTransactionsSince starting ... (lnKey: ${inKey}, timestamp: ${timestamp}, filterByExtra: ${JSON.stringify(
+      filterByExtra,
+    )}`,
+  );*/
 
   // Note that the timestamp is in seconds, not milliseconds.
   try {
     // Get walletId using the provided apiKey
     //const walletId = await getWalletId(lnKey);
+    const encodedExtra = JSON.stringify(filterByExtra);
 
-    const response = await fetch(`/api/v1/payments?limit=100`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': lnKey,
+    const response = await fetch(
+      //`/api/v1/payments?limit=100&extra=${encodedExtra}`, // This approach doesn't work on this endpoint for some reason, we need to filter afterwards.
+      `${nodeUrl}/api/v1/payments?limit=100`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': inKey,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(
@@ -294,7 +593,35 @@ const getPaymentsSince = async (lnKey: string, timestamp: number) => {
       (payment: { time: number }) => payment.time > timestamp,
     );
 
-    return paymentsSince;
+    // Further filter by the `extra` field (if provided)
+    const filteredPayments = filterByExtra
+      ? paymentsSince.filter((payment: any) => {
+          // Check if the payment's extra field matches the filterByExtra object
+          const paymentExtra = payment.extra || {};
+          return Object.keys(filterByExtra).every(
+            key => paymentExtra[key] === filterByExtra[key],
+          );
+        })
+      : paymentsSince;
+
+    // Map the payments to match the Zap interface
+    const transactionData: Transaction[] = filteredPayments.map(
+      (transaction: any) => ({
+        checking_id: transaction.id,
+        bolt11: transaction.bolt11,
+        //from: transaction.extra?.from?.id || null, // This should be in "extra" field
+        //to: transaction.extra?.to?.id || null, // This should be in "extra" field
+        memo: transaction.memo,
+        amount: transaction.amount,
+        wallet_id: transaction.wallet_id,
+        time: transaction.time,
+        extra: transaction.extra,
+      }),
+    );
+
+    //console.log('Transactions:', transactionData);
+
+    return transactionData;
   } catch (error) {
     console.error(error);
     throw error;
@@ -307,14 +634,14 @@ const createInvoice = async (
   recipientWalletId: string,
   amount: number,
   memo: string,
-  extra: object,
+  // extra: object,
 ) => {
   console.log(
-    `createInvoice starting ... (lnKey: ${lnKey}, recipientWalletId: ${recipientWalletId}, amount: ${amount}, memo: ${memo}, extra: ${extra})`,
+    // `createInvoice starting ... (lnKey: ${lnKey}, recipientWalletId: ${recipientWalletId}, amount: ${amount}, memo: ${memo}, extra: ${extra})`,
   );
 
   try {
-    const response = await fetch(`/api/v1/payments`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -324,7 +651,7 @@ const createInvoice = async (
         out: false,
         amount: amount,
         memo: memo,
-        extra: extra,
+        // extra: extra,
       }),
     });
 
@@ -342,12 +669,12 @@ const createInvoice = async (
 };
 
 const payInvoice = async (adminKey: string, paymentRequest: string) => {
-  console.log(
+  /*console.log(
     `payInvoice starting ... (adminKey: ${adminKey}, paymentRequest: ${paymentRequest})`,
-  );
+  );*/
 
   try {
-    const response = await fetch(`/api/v1/payments`, {
+    const response = await fetch(`${nodeUrl}/api/v1/payments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -383,7 +710,7 @@ const checkWalletExists = async (
 
     if (wallets && wallets.length > 0) {
       // Find the first wallet that matches the name
-      wallet =
+      const wallet =
         wallets?.find((wallet: any) => wallet.name === walletName) || null;
     }
 
@@ -400,12 +727,12 @@ const createWallet = async (
   objectID: string,
   displayName: string,
 ) => {
-  console.log(
+  /*console.log(
     `createWallet starting ... (apiKey: ${apiKey}, objectID: ${objectID}, displayName: ${displayName})`,
-  );
+  );*/
 
   try {
-    const url = `/api/v1/wallet`;
+    const url = `${nodeUrl}/api/v1/wallet`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -414,7 +741,7 @@ const createWallet = async (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: `${displayName}- ${objectID} - Receiving`,
+        name: `${displayName}`,
       }),
     });
 
@@ -443,8 +770,8 @@ async function ensureMatchingUserWallet(
   try {
     //const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
 
-    let walletName =  null;
-    if (walletType === 'Sending') {
+    let walletName = null;
+    if (walletType == 'Sending') {
       walletName = `${displayName} - ${aadObjectId} - Sending`;
     } else {
       walletName = `${displayName} - ${aadObjectId} - Receiving`;
@@ -462,18 +789,21 @@ async function ensureMatchingUserWallet(
 
 // TODO: This method needs checking!
 const getWalletIdByUserId = async (adminKey: string, userId: string) => {
-  console.log(
+  /*console.log(
     `getWalletIdByUserId starting ... (adminKey: ${adminKey}, userId: ${userId})`,
-  );
+  );*/
 
   try {
-    const response = await fetch(`/api/v1/wallets?user_id=${userId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': adminKey,
+    const response = await fetch(
+      `${nodeUrl}/api/v1/wallets?user_id=${userId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': adminKey,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(
@@ -487,6 +817,131 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   } catch (error) {
     console.error(error);
     return null;
+  }
+};
+
+const getNostrRewards = async (
+  adminKey: string,
+  stallId: string,
+): Promise<Reward[]> => {
+  /*console.log(
+    `getNostrRewards starting ... (adminKey: ${adminKey}, stallId: ${stallId})`,
+  );*/
+  try {
+    const response = await fetch(
+      `${nodeUrl}/nostrmarket/api/v1/stall/product/${stallId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': adminKey,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error getting products (status: ${response.status})`);
+    }
+
+    // Check if the response is JSON
+    const contentType = response.headers.get('content-type');
+    console.log('Content-Type:', contentType);
+
+    if (contentType && contentType.includes('application/json')) {
+      const data: Reward[] = await response.json();
+      console.log('Products:', data);
+      return data;
+    } else {
+      const text = await response.text(); // Capture non-JSON responses
+      console.log('Non-JSON response:', text);
+      throw new Error(`Expected JSON, but got: ${text}`);
+    }
+  } catch (error) {
+    console.error('Error fetching rewards:', error);
+    throw error;
+  }
+};
+
+const getUserWalletTransactions = async (
+  walletId: string,
+  apiKey: string,
+  filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
+): Promise<Transaction[]> => {
+  /*console.log(
+    `getNostrRewards starting ... (walletId: ${walletId}, apiKey: ${apiKey}, filterByExtra: ${JSON.stringify(
+      filterByExtra,
+    )}`,
+  );*/
+
+  try {
+    const response = await fetch(
+      `${nodeUrl}/usermanager/api/v1/transactions/${walletId}`,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'X-Api-Key': apiKey,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      const errorMessage = `Failed to fetch transactions for wallet ${walletId}: ${response.status} - ${response.statusText}`;
+      console.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+
+    // Further filter by the `extra` field (if provided)
+    const filteredPayments = filterByExtra
+      ? data.filter((payment: any) => {
+          // Check if the payment's extra field matches the filterByExtra object
+          const paymentExtra = payment.extra || {};
+          return Object.keys(filterByExtra).every(
+            key => paymentExtra[key] === filterByExtra[key],
+          );
+        })
+      : data;
+
+    /*console.log(
+      `Transactions fetched for wallet: ${walletId}`,
+      filteredPayments,
+    );*/ // Log fetched data
+    return filteredPayments; // Assuming data is an array of transactions
+  } catch (error) {
+    console.error(`Error fetching transactions for wallet ${walletId}:`, error);
+    throw error; // Re-throw the error to handle it in the parent function
+  }
+};
+
+const getAllowance = async (
+  adminKey: string,
+  userId: string,
+): Promise<Allowance | null> => {
+  console.log(
+    `getNostrRewards starting ... (adminKey: ${adminKey}, stallId: ${userId})`,
+  );
+  try {
+    // TODO: Implement the actual API call to fetch the allowance
+    const allowance: Allowance = {
+      id: '123',
+      name: 'Allowance',
+      wallet: '123456789',
+      toWallet: '123456789',
+      amount: 25000,
+      startDate: new Date(),
+      endDate: null,
+      frequency: 'Monthly',
+      nextPaymentDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+      lastPaymentDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+      memo: "Don't spend it all at once",
+      active: true,
+    };
+    return allowance;
+  } catch (error) {
+    console.error(`Error fetching allowances for ${userId}:`, error);
+    throw error; // Re-throw the error to handle it in the parent function
   }
 };
 
@@ -523,20 +978,19 @@ const getTotalSentAmount = async (inKey: string): Promise<number> => {
   }
 };
 export {
+  getUser,
+  getUsers,
   getWallets,
   getWalletName,
   getWalletId,
   getWalletBalance,
-  getPayments,
+  getWalletPayments,
   getWalletDetails,
   getWalletPayLinks,
   getInvoicePayment,
-  getPaymentsSince,
+  getWalletTransactionsSince,
   createInvoice,
   createWallet,
-  checkWalletExists,
-  ensureMatchingUserWallet,
   payInvoice,
   getWalletIdByUserId,
-  getTotalSentAmount
 };
