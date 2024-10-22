@@ -45,7 +45,7 @@ export const SignInButton = () => {
     <div>
       <DefaultButton
         text="Sign In"
-        onClick={() => handleLogin('popup')}
+        onClick={() => handleLogin('redirect')}
         styles={{
           root: {
             color: 'black',
