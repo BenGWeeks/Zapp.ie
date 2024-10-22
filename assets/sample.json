@@ -1,10 +1,10 @@
 [
   {
-    "name": "officedev-teamsfx-samples-bot-bot-sso",
+    "name": "officedev-teamsfx-samples-bot-Zapp.ie",
     "source": "officeDev",
     "title": "Bot App with SSO Enabled",
     "shortDescription": "A Hello World app of Microsoft Teams Bot app with SSO",
-    "url": "https://github.com/OfficeDev/TeamsFx-Samples/tree/dev/bot-sso",
+    "url": "https://github.com/OfficeDev/TeamsFx-Samples/tree/dev/Zapp.ie",
     "longDescription": [
       "This is an extended Hello World app of Microsoft Teams Bot app demonstrating how to integrate with Bot Framework SDK, TeamsFx SDK, and Graph SDK to implement SSO (Single Sign-On) feature that retrieves profile photos for currently signed-in users."
     ],
@@ -32,7 +32,7 @@
       {
         "type": "image",
         "order": 100,
-        "url": "https://raw.githubusercontent.com/OfficeDev/TeamsFx-Samples/dev/bot-sso/assets/thumbnail.png",
+        "url": "https://raw.githubusercontent.com/OfficeDev/TeamsFx-Samples/dev/Zapp.ie/assets/thumbnail.png",
         "alt": "Bot App with SSO Enabled"
       }
     ],
