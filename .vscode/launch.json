@@ -1,6 +1,20 @@
 {
     "version": "0.2.0",
     "configurations": [
+                {
+            "command": "npm start",
+            "name": "Run Web App",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/tabs"
+        },
+        {
+            "command": "npm start",
+            "name": "Run Web App",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/tabs"
+        },
         
         {
             "name": "Launch Remote (Edge)",

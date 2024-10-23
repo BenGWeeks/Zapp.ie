@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+/// <reference path="../types/global.d.ts" />
+
+import { useEffect, useState, useCallback } from 'react';
 import styles from './FeedList.module.css';
-import {
-  getUser,
-  getUsers,
-  getUserWallets,
-  getWalletTransactionsSince,
-} from '../services/lnbitsServiceLocal';
+import React, { useState } from 'react';
+import { getWallets, getPaymentsSince } from '../services/lnbitsServiceLocal';
+import { getUserName } from '../utils/walletUtilities';
 import ZapIcon from '../images/ZapIcon.svg';
+import { debounce } from 'lodash';
 
 interface FeedListProps {
   timestamp?: number | null;
@@ -25,6 +25,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const initialRender = useRef(true);
+
 
   useEffect(() => {
     const paymentsSinceTimestamp =
@@ -99,15 +100,8 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
       console.log(`Timestamp updated: ${timestamp}`);
       fetchZaps();
     }
+
   }, [timestamp]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
 
   return (
     <div className={styles.feedlist}>

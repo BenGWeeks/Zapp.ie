@@ -1,8 +1,8 @@
 import { FunctionComponent, useCallback, useEffect, useState } from 'react';
-import styles from './components/FeedComponent.module.css';
-import FeedList from './components/FeedList';
+import styles from './FeedComponent.module.css';
+import FeedList from './FeedList';
 import React from 'react';
-import { getWallets, getTotalSentAmount } from './services/lnbitsServiceLocal';
+import { getWallets, getTotalSentAmount } from '../services/lnbitsServiceLocal';
 
 const FeedComponent: FunctionComponent = () => {
   const [timestamp, setTimestamp] = useState<number>(0);
