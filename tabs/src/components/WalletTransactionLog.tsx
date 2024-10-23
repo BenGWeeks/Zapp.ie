@@ -79,7 +79,7 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
             const transactions = await getWalletTransactionsSince(
               inkey,
               paymentsSinceTimestamp,
-              null, //{ tag: 'zap' }
+              null,
             );
 
             let filteredTransactions: any = null;
