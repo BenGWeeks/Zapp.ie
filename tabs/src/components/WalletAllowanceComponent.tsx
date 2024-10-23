@@ -3,12 +3,8 @@ import './WalletAllowanceComponent.css'; // Assuming you'll use CSS for styling
 import BatteryImageDisplay from './BatteryImageDisplay';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import Calendar from '../images/Calendar.svg';
-import { getUsers } from '../services/lnbitsServiceLocal';
+import { getAllowance, getUsers } from '../services/lnbitsServiceLocal';
 import { useMsal } from '@azure/msal-react';
-import {
-  getAllowance,
-  getWalletTransactionsSince,
-} from '../services/lnbitsServiceLocal';
 
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
@@ -17,72 +13,47 @@ interface AllowanceCardProps {
   // someProp: string;
 }
 
-const WalletAllowanceCard: React.FC<AllowanceCardProps> = ({}) => {
+const WalletAllowanceCard: React.FC<AllowanceCardProps> = () => {
   const [batteryPercentage, setBatteryPercentage] = useState<number>(0);
   const [balance, setBalance] = useState<number>(0);
   const [allowance, setAllowance] = useState<Allowance | null>(null);
-  const [spentSats, setSpentSats] = useState<number>(0);
+  const [spentSats] = useState<number>(0);
 
   const { accounts } = useMsal();
-  const account = accounts[0];
-
-  const fetchAmountReceived = async () => {
-    console.log('Fetching your wallet ...');
-
-    console.log('account.localAccountId:', account.localAccountId);
-
-    const users = await getUsers(adminKey, {
-      aadObjectId: account.localAccountId,
-    });
-
-    console.log('User:', users);
-
-    if (users && users.length > 0) {
-      const user = users[0];
-      const balance = (user.allowanceWallet?.balance_msat ?? 0) / 1000;
-      setBalance(balance);
-
-      const allowance = await getAllowance(adminKey, user.id);
-      console.log('Allowance:', allowance);
-
-      if (allowance) {
-        //const spentFromAllowance = allowance?.amount - balance;
-        //setSpentSats(spentFromAllowance);
-        setAllowance(allowance);
-        setBatteryPercentage((allowance?.amount - balance / balance) * 100);
-      } else {
-        setAllowance(null);
-        setBatteryPercentage(0);
-      }
-
-      if (user) {
-        if (user.allowanceWallet?.inkey) {
-          const timestamp = Math.floor(
-            allowance?.lastPaymentDate.getTime() / 1000,
-          ); // Convert to seconds
-          const transactions = await getWalletTransactionsSince(
-            user.allowanceWallet?.inkey,
-            timestamp,
-            null,
-          );
-
-          // Sum the amounts of the transactions where the amount is negative
-          const spentSinceLastPayment = transactions
-            .filter(transaction => transaction.amount < 0)
-            .reduce(
-              (total, transaction) => total + transaction.amount / 1000,
-              0,
-            );
-
-          setSpentSats(Math.abs(spentSinceLastPayment));
-        }
-      }
-    }
-  };
 
   useEffect(() => {
+    const account = accounts[0];
+
+    const fetchAmountReceived = async () => {
+      console.log('Fetching your wallet ...');
+
+      console.log('account.localAccountId:', account.localAccountId);
+
+      const user = await getUsers(adminKey, {
+        aadObjectId: account.localAccountId,
+      });
+
+      console.log('User:', user);
+
+      if (user && user.length > 0) {
+        const balance = (user[0].allowanceWallet?.balance_msat ?? 0) / 1000;
+        setBalance(balance);
+
+        const allowance = await getAllowance(adminKey, user[0].id);
+        console.log('Allowance:', allowance);
+
+        if (allowance) {
+          setAllowance(allowance);
+          setBatteryPercentage((allowance?.amount - balance / balance) * 100);
+        } else {
+          setAllowance(null);
+          setBatteryPercentage(0);
+        }
+      }
+    };
+
     fetchAmountReceived();
-  }, []);
+  }, [accounts]);
 
   return (
     <div className="wallet-container">

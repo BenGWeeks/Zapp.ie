@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './WalletInfoCard.css';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
-import { getUsers, getUserWallets } from '../services/lnbitsServiceLocal';
+import { getUsers } from '../services/lnbitsServiceLocal';
 import { useMsal } from '@azure/msal-react';
 import SendPayment from './SendPayment';
 import ReceivePayment from './ReceivePayment';
@@ -14,7 +14,6 @@ const WalletYourWalletInfoCard: React.FC = () => {
   const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
   const [isSendPopupOpen, setIsSendPopupOpen] = useState(false);
   const { accounts } = useMsal();
-
   const account = accounts[0];
   const [myLNbitDetails, setMyLNbitDetails] = useState<User>();
 
