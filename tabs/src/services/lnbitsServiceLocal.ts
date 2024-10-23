@@ -50,46 +50,12 @@ export async function getAccessToken(
       //console.log('Request Status:', response.status);
       //console.log('Request Headers:', response.headers);
 
-      if (!response.ok) {
-        throw new Error(
-          `Error creating access token (status: ${response.status}): ${response.statusText}`,
-        );
-      }
+  if (!response.ok) {
+    throw new Error(`Error creating access token (status: ${response.status})`);
+  }
 
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Response is not in JSON format');
-      }
-
-      const data = await response.json();
-
-      if (!data || !data.access_token) {
-        throw new Error('Access token is missing in the response');
-      }
-
-      // Store the access token in memory and localStorage
-      accessToken = data.access_token;
-      if (accessToken) {
-        localStorage.setItem('accessToken', accessToken);
-        console.log('Access token fetched and stored: ' + accessToken);
-      } else {
-        throw new Error('Access token is null, cannot store in localStorage.');
-      }
-
-      // Return the access token
-      return accessToken;
-    } catch (error) {
-      console.error('Error in getAccessToken:', error);
-      // Throw an error to ensure the promise doesn't resolve with undefined
-      throw new Error('Failed to retrieve access token');
-    } finally {
-      // Reset the promise to allow future requests
-      accessTokenPromise = null;
-    }
-  })();
-
-  // Return the token promise
-  return accessTokenPromise;
+  const data = await response.json();
+  return data.access_token;
 }
 
 const getWallets = async (
@@ -102,7 +68,7 @@ const getWallets = async (
 
   try {
     const accessToken = await getAccessToken(`${userName}`, `${password}`);
-    const response = await fetch(`${nodeUrl}/api/v1/wallets`, {
+    const response = await fetch(`/api/v1/wallets`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -112,28 +78,14 @@ const getWallets = async (
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Error getting wallets response (status: ${response.status})`,
-      );
+      throw new Error(`Error fetching wallets (status: ${response.status})`);
     }
 
-    const data: Wallet[] = (await response.json()) as Wallet[];
-
-    // If filter is provided, filter the wallets by name and/or id
-    let filteredData = data;
-    if (filterByName) {
-      filteredData = filteredData.filter(wallet =>
-        wallet.name.includes(filterByName),
-      );
-    }
-    if (filterById) {
-      filteredData = filteredData.filter(wallet => wallet.id === filterById);
-    }
-
-    return filteredData;
+    const data = await response.json();
+    return data.wallets;
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.error('Failed to fetch wallets:', error);
+    return null;
   }
 };
 
@@ -747,6 +699,30 @@ const payInvoice = async (adminKey: string, paymentRequest: string) => {
   }
 };
 
+const checkWalletExists = async (
+  //apiKey: string,
+  walletName: string,
+): Promise<Wallet | null> => {
+  console.log(`checkWalletExists starting ... (walletName: ${walletName},)`);
+
+  try {
+    const wallets = await getWallets(walletName);
+    let wallet = null;
+
+    if (wallets && wallets.length > 0) {
+      // Find the first wallet that matches the name
+      const wallet =
+        wallets?.find((wallet: any) => wallet.name === walletName) || null;
+    }
+
+    return wallet;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+// TODO: This method needs checking!
 const createWallet = async (
   apiKey: string,
   objectID: string,
@@ -782,6 +758,35 @@ const createWallet = async (
     throw error;
   }
 };
+
+async function ensureMatchingUserWallet(
+  aadObjectId: string,
+  displayName: string,
+  walletType: WalletType,
+): Promise<Wallet | null> {
+  console.log(
+    `ensureMatchingUserWallet starting ... (aadObjectId: ${aadObjectId}, objectID: ${displayName}, walletType: ${walletType})`,
+  );
+
+  try {
+    //const apiKey = await getAccessToken(userName, password); // Assuming getAccessToken returns the API key
+
+    let walletName = null;
+    if (walletType == 'Sending') {
+      walletName = `${displayName} - ${aadObjectId} - Sending`;
+    } else {
+      walletName = `${displayName} - ${aadObjectId} - Receiving`;
+    }
+
+    // Check if the Receiving wallet exists
+    const wallet = await checkWalletExists(walletName);
+
+    return wallet || null; // Explicitly handle undefined case and return null
+  } catch (error) {
+    console.error(`Error ensuring user wallets (${error})`);
+    throw error;
+  }
+}
 
 // TODO: This method needs checking!
 const getWalletIdByUserId = async (adminKey: string, userId: string) => {
@@ -941,6 +946,38 @@ const getAllowance = async (
   }
 };
 
+const getTotalSentAmount = async (inKey: string): Promise<number> => {
+  console.log(`getTotalSentAmount starting ... (inKey: ${inKey})`);
+
+  try {
+    const response = await fetch(`/api/v1/payments?limit=100`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Api-Key': inKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error getting payments (status: ${response.status})`);
+    }
+
+    const data = await response.json();
+    console.log('API Response:', data);
+
+    // Calculate the total sent amount
+    const outgoingPayments = data.filter((payment: { amount: number; out: boolean }) => payment.out);
+    console.log('Outgoing Payments:', outgoingPayments);
+
+    const totalSentAmount = outgoingPayments.reduce((total: number, payment: { amount: number }) => total + payment.amount, 0);
+    console.log('Total Sent Amount (in millisatoshis):', totalSentAmount);
+
+    return totalSentAmount / 1000; // return in Sats (not millisatoshis)
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
 export {
   getUser,
   getUsers,
@@ -957,8 +994,4 @@ export {
   createWallet,
   payInvoice,
   getWalletIdByUserId,
-  getUserWallets,
-  getNostrRewards,
-  getUserWalletTransactions,
-  getAllowance,
 };

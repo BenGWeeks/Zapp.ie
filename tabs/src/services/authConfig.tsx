@@ -1,13 +1,10 @@
 import { Configuration, PopupRequest } from "@azure/msal-browser";
-const AADclientid = process.env.REACT_APP_AAD_CLIENT_ID as string;
-const TenantId = process.env.REACT_APP_TENANT_ID as string;
-console.log(AADclientid);
 
 // Config object to be passed to Msal on creation
 export const msalConfig: Configuration = {
     auth: {
-        clientId: AADclientid,
-        authority: `https://login.microsoftonline.com/${TenantId}`,
+        clientId: "6070a4e4-56eb-4c93-b889-56955b9d95d8",
+        authority: "https://login.microsoftonline.com/19ced85d-73f5-4193-8797-9fdce478db64",
         redirectUri: "/",
         postLogoutRedirectUri: "/"
     },
