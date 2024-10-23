@@ -47,7 +47,7 @@ export const SignOutButton = () => {
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              handleLogout('popup');
+              handleLogout('redirect');
             }}
             style={{ textDecoration: 'none', cursor: 'pointer'}}
             title="Sign Out"
