@@ -1,43 +1,54 @@
 // lnbitsServiceLocal.test.ts
 import {
-    getAccessToken,
-    getWallets,
-    getWalletBalance,
-    getUserWallets,
-    createInvoice,
-    payInvoice
-  } from './lnbitsServiceLocal'; // Adjust the path if necessary
-  
-  // Mock the fetch API
-  global.fetch = jest.fn();
-  
-  describe('lnbitsServiceLocal Tests', () => {
-    const mockAccessToken = 'mockedAccessToken';
-    const mockInKey = 'mockedInKey';
-    const mockAdminKey = 'mockedAdminKey';
-  
-    beforeEach(() => {
-      jest.clearAllMocks();
-      localStorage.setItem('accessToken', mockAccessToken);
+  getAccessToken,
+  getWallets,
+  getWalletBalance,
+  getUserWallets,
+  createInvoice,
+  payInvoice
+} from './lnbitsServiceLocal'; // Adjust the path if necessary
+import { 
+  expect, 
+  describe, 
+  test,
+  beforeEach,
+  jest
+ } from '@jest/globals';
+
+// Cast `fetch` to `jest.MockedFunction` in a valid way for TypeScript
+const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+mockFetch.mockImplementation(() => Promise.resolve({
+  ok: true,
+  json: async () => ({})
+}));
+
+describe('lnbitsServiceLocal Tests', () => {
+  const mockAccessToken = 'mockedAccessToken';
+  const mockInKey = 'mockedInKey';
+  const mockAdminKey = 'mockedAdminKey';
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    localStorage.setItem('accessToken', mockAccessToken);
+  });
+
+  test('getAccessToken should return the access token from localStorage', async () => {
+    const token = await getAccessToken('user', 'password');
+    expect(token).toBe(mockAccessToken);
+    expect(fetch).not.toHaveBeenCalled(); // Should not make an API call if token is cached
+  });
+
+  test('getWallets should return a filtered list of wallets', async () => {
+    const mockWallets = [{ id: 'wallet1', name: 'testWallet' }];
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockWallets,
     });
-  
-    test('getAccessToken should return the access token from localStorage', async () => {
-      const token = await getAccessToken('user', 'password');
-      expect(token).toBe(mockAccessToken);
-      expect(fetch).not.toHaveBeenCalled(); // Should not make an API call if token is cached
-    });
-  
-    test('getWallets should return a filtered list of wallets', async () => {
-      const mockWallets = [{ id: 'wallet1', name: 'testWallet' }];
-      (fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockWallets,
-      });
-  
-      const result = await getWallets();
-      expect(result).toEqual(mockWallets);
-      expect(fetch).toHaveBeenCalledWith(expect.any(String), expect.any(Object));
-    });
+
+    const result = await getWallets();
+    expect(result).toEqual(mockWallets);
+    expect(fetch).toHaveBeenCalledWith(expect.any(String), expect.any(Object));
+  });
   
     test('getWalletBalance should return the wallet balance', async () => {
       const mockBalance = { balance: 5000 };
@@ -47,7 +58,7 @@ import {
       });
   
       const balance = await getWalletBalance(mockInKey);
-      expect(balance).toBe(5); // Sats (5000 / 1000)
+      expect(balance).toBe(5); 
     });
   
     test('getUserWallets should return user wallets', async () => {
