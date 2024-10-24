@@ -2,6 +2,7 @@ name: React App Tabs to Test
 
 on:
   workflow_dispatch:
+  deployment: Testing
 
 jobs:
   build_and_deploy_job:
