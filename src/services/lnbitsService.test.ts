@@ -7,6 +7,14 @@ import {
     payInvoice
   } from './lnbitsService'; // Adjust import as necessary
   
+  import { 
+    expect, 
+    describe, 
+    test,
+    beforeEach,
+    jest
+   } from '@jest/globals';
+  
   // Mock the necessary dependencies (like fetch)
   jest.mock('./lnbitsService');
   
