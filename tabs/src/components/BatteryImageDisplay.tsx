@@ -12,8 +12,8 @@ interface BatteryImageDisplayProps {
 
 const BatteryImageDisplay: React.FC<BatteryImageDisplayProps> = ({ value }) => {
   let imageSrc = '';
-
-
+//value = 60;
+console.log('Battery level:', value);
 if (value < 1) {
 
     imageSrc = Image0;
