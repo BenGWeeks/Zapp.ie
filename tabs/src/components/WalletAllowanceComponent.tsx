@@ -3,10 +3,12 @@ import './WalletAllowanceComponent.css'; // Assuming you'll use CSS for styling
 import BatteryImageDisplay from './BatteryImageDisplay';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
 import Calendar from '../images/Calendar.svg';
-import { getAllowance, getUsers } from '../services/lnbitsServiceLocal';
+import { getAllowance, getUsers, getWalletTransactionsSince } from '../services/lnbitsServiceLocal';
 import { useMsal } from '@azure/msal-react';
+import WalletTransactionLog from './WalletTransactionLog';
 
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
+let spentSats =0
 
 interface AllowanceCardProps {
   // Define the props here if there are any, for example:
@@ -14,11 +16,11 @@ interface AllowanceCardProps {
 }
 
 const WalletAllowanceCard: React.FC<AllowanceCardProps> = () => {
-  const [batteryPercentage, setBatteryPercentage] = useState<number>(0);
-  const [balance, setBalance] = useState<number>(0);
+  const [batteryPercentage, setBatteryPercentage] = useState(0);
+    const [balance, setBalance] = useState<number>(0);
   const [allowance, setAllowance] = useState<Allowance | null>(null);
-  const [spentSats] = useState<number>(0);
-
+  const [spentSats, setSpentSats] = useState(0);
+  // calculate battery
   const { accounts } = useMsal();
 
   useEffect(() => {
@@ -41,14 +43,26 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = () => {
 
         const allowance = await getAllowance(adminKey, user[0].id);
         console.log('Allowance:', allowance);
-
+        
         if (allowance) {
           setAllowance(allowance);
-          setBatteryPercentage((allowance?.amount - balance / balance) * 100);
+          console.log("Show my balances",balance, "Show my Allowance", allowance.amount)
+       
+          setBatteryPercentage ((balance /allowance?.amount ) * 100);
+          
         } else {
           setAllowance(null);
-          setBatteryPercentage(0);
+         const  batteryPercentage = 0;
         }
+        const sevenDaysAgo = Date.now() / 1000 - 30 * 24 * 60 * 60;
+        const encodedExtra = {}
+       const userid = user[0].allowanceWallet?.inkey as string;
+       console.log("Getting transaction..")
+       console.log( "UserDetails:",userid, sevenDaysAgo, encodedExtra)
+       const transaction = await getWalletTransactionsSince(userid,sevenDaysAgo,encodedExtra)
+       console.log ("My transactions",transaction)
+       setSpentSats (transaction.filter(transaction => transaction.amount < 0).reduce((total,transaction)=> total + Math.abs(transaction.amount),0) /1000)
+       console.log("Total Sats",spentSats)
       }
     };
 
