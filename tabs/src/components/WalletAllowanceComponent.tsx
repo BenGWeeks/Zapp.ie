@@ -17,7 +17,7 @@ interface AllowanceCardProps {
 
 const WalletAllowanceCard: React.FC<AllowanceCardProps> = () => {
   const [batteryPercentage, setBatteryPercentage] = useState(0);
-    const [balance, setBalance] = useState<number>(0);
+  const [balance, setBalance] = useState<number>(0);
   const [allowance, setAllowance] = useState<Allowance | null>(null);
   const [spentSats, setSpentSats] = useState(0);
   // calculate battery
@@ -27,26 +27,19 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = () => {
     const account = accounts[0];
 
     const fetchAmountReceived = async () => {
-      console.log('Fetching your wallet ...');
-
-      console.log('account.localAccountId:', account.localAccountId);
 
       const user = await getUsers(adminKey, {
         aadObjectId: account.localAccountId,
       });
-
-      console.log('User:', user);
 
       if (user && user.length > 0) {
         const balance = (user[0].allowanceWallet?.balance_msat ?? 0) / 1000;
         setBalance(balance);
 
         const allowance = await getAllowance(adminKey, user[0].id);
-        console.log('Allowance:', allowance);
         
         if (allowance) {
           setAllowance(allowance);
-          console.log("Show my balances",balance, "Show my Allowance", allowance.amount)
        
           setBatteryPercentage ((balance /allowance?.amount ) * 100);
           
@@ -57,12 +50,9 @@ const WalletAllowanceCard: React.FC<AllowanceCardProps> = () => {
         const sevenDaysAgo = Date.now() / 1000 - 30 * 24 * 60 * 60;
         const encodedExtra = {}
        const userid = user[0].allowanceWallet?.inkey as string;
-       console.log("Getting transaction..")
-       console.log( "UserDetails:",userid, sevenDaysAgo, encodedExtra)
        const transaction = await getWalletTransactionsSince(userid,sevenDaysAgo,encodedExtra)
-       console.log ("My transactions",transaction)
        setSpentSats (transaction.filter(transaction => transaction.amount < 0).reduce((total,transaction)=> total + Math.abs(transaction.amount),0) /1000)
-       console.log("Total Sats",spentSats)
+
       }
     };
 
