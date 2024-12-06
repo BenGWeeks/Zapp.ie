@@ -13,7 +13,6 @@ interface BatteryImageDisplayProps {
 const BatteryImageDisplay: React.FC<BatteryImageDisplayProps> = ({ value }) => {
   let imageSrc = '';
 
-
 if (value < 1) {
 
     imageSrc = Image0;
