@@ -40,24 +40,32 @@ export const SignOutButton = () => {
         directionalHint: 4, // topRightEdge
         isBeakVisible: true,
     };
-
-    return (
-        <div style={{ display: 'inline' }}>
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              handleLogout('popup');
-            }}
-            style={{ textDecoration: 'none', cursor: 'pointer'}}
-            title="Sign Out"
-            aria-label="Sign Out"
-          >            
-              Sign Out
-
-          </a>
-          {open && <ContextualMenu {...menuProps} />}
-        </div>
-      );
-    };
-    
+  return (
+    <div style={{ display: 'inline' }}>
+      <button
+        onMouseEnter={() => setIsHovered(true)} // Set hover state on mouse enter
+        onMouseLeave={() => setIsHovered(false)} // Remove hover state on mouse leave
+        onClick={e => {
+          e.preventDefault();
+          handleLogout('popup');
+        }}
+        style={{
+          display: 'inline-block',
+          textDecoration: isHovered ? 'underline' : 'none', // Underline on hover
+          cursor: 'pointer',
+          background: 'none',
+          border: 'none',
+          color: 'inherit',
+          padding: 0,
+          font: 'inherit',
+          width: 'auto',
+        }}
+        title="Sign Out"
+        aria-label="Sign Out"
+      >
+        Sign Out
+      </button>
+      {open && <ContextualMenu {...menuProps} />}
+    </div>
+  );
+};
