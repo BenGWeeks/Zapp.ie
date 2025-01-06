@@ -87,8 +87,10 @@ const bot = new TeamsBot();
 
 cron.schedule('0 9 * * 1', async () => {
   console.log('Running scheduled task Allowance Topup');
-  await scheduledTopup()
-  
+  await scheduledTopup();
+}, {
+  scheduled: true,
+  timezone: "Europe/Dublin"
 });
 
 // Create HTTP server.
