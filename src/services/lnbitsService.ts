@@ -1020,6 +1020,20 @@ async function topUpWallet(walletId: string, amount: number): Promise<void> {
   }
 }
 
+async function scheduledTopup() {
+  const allowancewallets = await getWallets(process.env.LNBITS_ADMINKEY as string, 'allowance');
+  const allowanceValue = process.env.LNBITS_INITIAL_ALLOWANCE as string;
+  const hostWalletID = process.env.LNBITS_HOST_WALLET_ID as string;
+
+  if (allowancewallets) {
+    allowancewallets.forEach(wallet => {
+     createInvoice(process.env.LNBITS_ADMINKEY as string, hostWalletID, wallet.balance_msat/1000, 'Weekly Allowance cleared', {}); 
+     payInvoice(process.env.LNBITS_ADMINKEY as string, allowanceValue, {});
+     topUpWallet(wallet.id, parseInt(allowanceValue));
+    });
+  }
+}
+
 export {
   getWallets,
   createUser,
