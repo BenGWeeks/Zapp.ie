@@ -151,7 +151,7 @@ async function createZapCard() {
       id: 'zapAmount',
       placeholder: '100',
       label: 'Amount (Sats)',
-      regex: '^(?:10000|[1-9][0-9]{0,3}|0)$',
+      regex: '^(?:10000|[1-9][0-9]{0,3})$',
       isRequired: true,
       errorMessage: 'You must specify an amount between 1 and 10,000 Sats',
     },
