@@ -1,27 +1,27 @@
-import { useState } from "react";
-import { useMsal } from "@azure/msal-react";
-import { IconButton, ContextualMenu, IContextualMenuProps, IIconProps } from '@fluentui/react';
-
-const accountCircleIcon: IIconProps = { iconName: 'Contact' };
-
+import { useState } from 'react';
+import { useMsal } from '@azure/msal-react';
+import { ContextualMenu, IContextualMenuProps } from '@fluentui/react';
+ 
 export const SignOutButton = () => {
-    const { instance } = useMsal();
-
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-
-    const handleLogout = (logoutType: string) => {
-        setAnchorEl(null);
-
-        if (logoutType === "popup") {
-            instance.logoutPopup({
-                mainWindowRedirectUri: "/"
-            });
-        } else if (logoutType === "redirect") {
-            instance.logoutRedirect();
-        }
+  const { instance } = useMsal();
+ 
+  const [isHovered, setIsHovered] = useState(false); // State to track hover
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+ 
+  const handleLogout = (logoutType: string) => {
+    setAnchorEl(null);
+ 
+    if (logoutType === 'popup') {
+      instance.logoutPopup({
+        mainWindowRedirectUri: '/',
+      });
+    } else if (logoutType === 'redirect') {
+      instance.logoutRedirect();
     }
-
+  };
+ 
+ 
     const menuProps: IContextualMenuProps = {
         items: [
             {

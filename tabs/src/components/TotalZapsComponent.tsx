@@ -7,6 +7,7 @@ import {
   getUsers,
   getWalletTransactionsSince,
 } from '../services/lnbitsServiceLocal';
+import { useCache } from '../utils/CacheContext';
 export interface ZapSent {
   totalZaps: number;
   numberOfDays: number;
@@ -18,13 +19,19 @@ export interface ZapSent {
   zapsToCopilots: number;
 }
 
+interface TotalZapsComponentProps {
+  allZaps: Transaction[];
+  allUsers: User[];
+}
+
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
-const TotalZapsComponent: FunctionComponent = () => {
+const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZaps, allUsers }) => {
   const [zaps, setZaps] = useState<Transaction[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [totalZaps, setTotalZaps] = useState<number>(0);
-
+  const { cache, setCache } = useCache();
+  
   const [numberOfDays, setNumberOfDays] = useState<number>(0);
   const [numberOfUsers, setNumberOfUsers] = useState<number>(0);
   const [averagePerDay, setAveragePerDay] = useState<number>(0);
@@ -43,64 +50,28 @@ const TotalZapsComponent: FunctionComponent = () => {
     zapsFromCopilots: 0,
     zapsToCopilots: 0,
   };
+  
+  //useEffect(() => {
+    // if (allZaps.length > 0) {
+    //   console.log('Zaps AKASH: ', allZaps);
+    //   setZaps(allZaps);
+    // }
+  // }, [allZaps,totalZaps,zapsSent]);
 
   useEffect(() => {
-    const fetchZaps = async () => {
-      setError(null);
-      setLoading(true);
+    if (allZaps.length > 0) {
+      console.log('Zaps AKASH: ', allZaps);
+      setZaps(allZaps);
+    }
+    
+    //Load users from Cache or paraneter
+    console.log('load all users in Total comp', cache['allUsers'] );
+    setUsers(allUsers);
 
-      try {
-        let allZaps: Transaction[] = [];
+    console.log('length:', zaps.length);
 
-        const users = await getUsers(adminKey, {});
-        console.log('Users: ', users);
-
-        if (users) {
-          setUsers(users);
-          for (const user of users) {
-            const wallets = await getUserWallets(adminKey, user.id);
-            console.log('Wallets: ', wallets);
-            if (wallets) {
-              const allowanceWallets = wallets.filter(
-                wallet => wallet.name === 'Allowance',
-              );
-
-              for (const wallet of allowanceWallets) {
-                const transactions = await getWalletTransactionsSince(
-                  wallet.inkey,
-                  0, // all time
-                  { tag: 'zap' },
-                );
-
-                allZaps = allZaps.concat(transactions);
-              }
-            } else {
-              console.log('No wallets found for user: ', user.id);
-            }
-          }
-        }
-
-        console.log('All zaps: ', allZaps);
-
-        setZaps(allZaps); // Update zaps with new data
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(`Failed to fetch users: ${error.message}`);
-        } else {
-          setError('An unknown error occurred while fetching users');
-        }
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchZaps();
-  }, []); // Empty dependency array ensures this runs once on mount
-
-  useEffect(() => {
     if (zaps.length > 0) {
-      console.log('Zaps: ', zaps);
+      console.log('Zaps inside: ', zaps);
 
       // Calculate the total amount considering only negative values
       const total =
@@ -135,7 +106,8 @@ const TotalZapsComponent: FunctionComponent = () => {
           : 0) / 1000;
       setBiggestZap(Math.floor(maxZap)); // Already positive
     }
-  }, [zaps, users]); // This effect runs whenever zaps changes
+    setLoading(false);
+  }, [allZaps,totalZaps,zapsSent,zaps, allUsers]); // This effect runs whenever zaps changes
 
   if (error) {
     return <div className={styles.sentcomponent}>{error}</div>;

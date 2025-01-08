@@ -1,89 +1,100 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styles from './FeedList.module.css';
 import {
+  getAllWallets,
   getUser,
   getUsers,
   getUserWallets,
   getWalletTransactionsSince,
 } from '../services/lnbitsServiceLocal';
 import ZapIcon from '../images/ZapIcon.svg';
-
+import { useCache } from '../utils/CacheContext';
 interface FeedListProps {
   timestamp?: number | null;
+  allZaps: Transaction[];
+  allUsers: User[];
 }
-
 interface ZapTransaction {
   from: User | null;
   to: User | null;
   transaction: Transaction;
 }
-
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
-
-const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
+const FeedList: React.FC<FeedListProps> = ({ timestamp, allZaps, allUsers  }) => {
   const [zaps, setZaps] = useState<ZapTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const initialRender = useRef(true);
-
+  const { cache, setCache } = useCache();
+  
   useEffect(() => {
+
+    console.log('FEED PARAMETER:', allZaps);
+    //setZaps(allZaps);
+    if (cache['allZaps']) {
+    console.log('FEED cache:', cache['allZaps']);
+    }
     const paymentsSinceTimestamp =
       timestamp === null || timestamp === undefined || timestamp === 0
         ? 0
         : timestamp;
-
     const fetchZaps = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        let allZaps: ZapTransaction[] = [];
+        const paymentsSinceTimestamp =
+          timestamp === null || timestamp === undefined || timestamp === 0
+            ? 0
+            : timestamp;
 
-        const users = await getUsers(adminKey, {});
 
-        if (users) {
-          for (const user of users) {
-            const wallets = await getUserWallets(adminKey, user.id);
 
-            if (wallets) {
-              const allowanceWallets = wallets.filter(
-                wallet => wallet.name === 'Allowance',
-              );
+        // const [allwallets, transactions, users] = await Promise.all([
+        //   getAllWallets(adminKey),
+        //   getWalletTransactionsSince(adminKey, paymentsSinceTimestamp, {
+        //     tag: 'zap',
+        //   }),
+        //   getUsers(adminKey, {}),
+        // ]);
 
-              for (const wallet of allowanceWallets) {
-                const transactions = await getWalletTransactionsSince(
-                  wallet.inkey,
-                  paymentsSinceTimestamp,
-                  { tag: 'zap' },
-                );
+        let loadZaps: ZapTransaction[] = [];
 
-                let zaps: ZapTransaction[] = await Promise.all(
-                  transactions.map(async (transaction: any) => ({
-                    from: user,
-                    to: await getUser(adminKey, transaction.extra?.to?.user),
-                    transaction: transaction,
-                  })),
-                );
+        // if (allwallets) {
+        //   const allowanceWallets = allwallets.filter(
+        //     wallet => wallet.name === 'Allowance',
+        //   );
+        //   console.log('allowanceWallets', allowanceWallets);
 
-                allZaps = allZaps.concat(zaps);
-                //console.log('Transactions: ', transactions);
-              }
-            } else {
-              console.log('No wallets found for user: ', user.id);
-            }
-          }
-        }
+          const allowanceTransactions = allZaps;
 
-        console.log('All zaps: ', allZaps);
+          const allowanceZaps = allowanceTransactions
+            .flat()
+            .map(transaction => ({
+              from: null, // user,
+              to: null,//allUsers?.find(f => f.aadObjectId === transaction.extra?.to?.user) as User,
+              transaction: transaction,
+            }));
 
-        // setZaps(prevState => [...prevState, ...allZaps]); gives duplicates
-        setZaps(allZaps); // Update this line to replace the state instead of appending
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          setError(`Failed to fetch users: ${error.message}`);
-        } else {
-          setError('An unknown error occurred while fetching users');
-        }
+            loadZaps = loadZaps.concat(allowanceZaps);
+        //}
+
+        // const zaps = await Promise.all(
+        //   transactions.map(async transaction => ({
+        //     from: null,//users.
+        //     to: users?.find(f => f.aadObjectId === transaction.extra?.to?.user) as User,
+        //      //await getUser(adminKey, transaction.extra?.to?.user),
+        //     transaction: transaction,
+        //   })),
+        // );
+
+        //allZaps = allZaps.concat(loadZaps);
+
+        //setZaps(allZaps);
+      } catch (error) {
+        setError(
+          error instanceof Error ? error.message : 'An unknown error occurred',
+        );
         console.error(error);
       } finally {
         setLoading(false);
@@ -99,16 +110,13 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
       console.log(`Timestamp updated: ${timestamp}`);
       fetchZaps();
     }
-  }, [timestamp]);
-
+  }, [timestamp,allZaps,allUsers]);
   if (loading) {
     return <div>Loading...</div>;
   }
-
   if (error) {
     return <div>{error}</div>;
   }
-
   return (
     <div className={styles.feedlist}>
       <div className={styles.headercell}>
@@ -179,5 +187,4 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp }) => {
     </div>
   );
 };
-
 export default FeedList;
