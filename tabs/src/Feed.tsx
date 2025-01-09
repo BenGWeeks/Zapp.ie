@@ -43,7 +43,6 @@ const Home: React.FC = () => {
                 setCache('allUsers', allUsers);
                 setUsers(allUsers);
               }
-
               console.log('Users:', cache['allUsers']);
             }
           }
@@ -55,10 +54,7 @@ const Home: React.FC = () => {
           setError('An unknown error occurred while fetching users');
         }
         console.error(error);
-      } finally {
-        setLoading(false);
       }
-
       // Load zaps and set in cache.
       try {
         if (!cache['allZaps']) {
@@ -89,63 +85,6 @@ const Home: React.FC = () => {
     fetchZaps();
   }, [adminKey, cache, setCache]); // Add dependencies to ensure the effect runs when cache or setCache changes
 
-  // useEffect(() => {
-  //   const fetchZaps = async () => {
-  //     setError(null);
-  //     setLoading(true);
-
-  //     try {
-  //       let allZaps: Transaction[] = [];
-
-  //       //Load users and set in cache.
-  //       if (!cache['allUsers']) {
-  //         const users = await getUsers(adminKey, {});
-  //         if (users) {
-  //           setUsers(users);
-  //           setCache('allUsers', allZaps);
-  //         }
-  //       } else {
-  //         console.log('Loading Users....');
-  //         setUsers(cache['allUsers']);
-  //         console.log('Users:', users);
-  //       }
-  //     } catch (error) {
-  //       if (error instanceof Error) {
-  //         setError(`Failed to fetch users: ${error.message}`);
-  //       } else {
-  //         setError('An unknown error occurred while fetching users');
-  //       }
-  //       console.error(error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-
-  //     //Load zaps and set in cache.
-  //     if (!cache['allZaps']) {
-  //       try {
-  //         const allZaps = await fetchAllowanceWalletTransactions(adminKey);
-  //         console.log('allZaps', allZaps);
-  //         setCache('allZaps', allZaps);
-  //         setZaps(allZaps);
-  //       } catch (err) {
-  //         setError(
-  //           err instanceof Error ? err.message : 'An unknown error occurred',
-  //         );
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     } else {
-  //       console.log('cache:', cache['allZaps']);
-  //       setZaps(cache['allZaps']);
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchZaps();
-  // }, []); // Empty dependency array ensures this runs once on mount
-
-  // const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
-
   return (
     <div style={{ background: '#1F1F1F', paddingBottom: 40 }}>
       <div
@@ -169,8 +108,8 @@ const Home: React.FC = () => {
             display: 'flex',
           }}
         >
-          <TotalZapsComponent allZaps={zaps} allUsers={users} />
-          {/* <ZapActivityChartComponent lnKey={''} timestamp={timestamp} /> */}
+          <TotalZapsComponent isLoading={loading} allZaps={zaps} allUsers={users} />
+          <ZapActivityChartComponent lnKey={''} isLoading={loading} timestamp={timestamp} allZaps={zaps} allUsers={users} />
         </div>
       </div>
       <div
@@ -181,7 +120,7 @@ const Home: React.FC = () => {
           paddingTop: 0,
         }}
       >
-        <FeedComponent allZaps={zaps} allUsers={users} />
+        <FeedComponent isLoading={loading} allZaps={zaps} allUsers={users} />
       </div>
     </div>
   );

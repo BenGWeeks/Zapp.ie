@@ -2,11 +2,6 @@ import { FunctionComponent, useState, useEffect } from 'react';
 import styles from './TotalZapsComponent.module.css';
 //import lnbitsService from '../services/lnbitsServiceLocal';
 /// <reference path = "../global.d.ts" />
-import {
-  getUserWallets,
-  getUsers,
-  getWalletTransactionsSince,
-} from '../services/lnbitsServiceLocal';
 import { useCache } from '../utils/CacheContext';
 export interface ZapSent {
   totalZaps: number;
@@ -22,11 +17,10 @@ export interface ZapSent {
 interface TotalZapsComponentProps {
   allZaps: Transaction[];
   allUsers: User[];
+  isLoading: boolean;
 }
 
-const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
-
-const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZaps, allUsers }) => {
+const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZaps, allUsers, isLoading }) => {
   const [zaps, setZaps] = useState<Transaction[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [totalZaps, setTotalZaps] = useState<number>(0);
@@ -51,14 +45,8 @@ const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZap
     zapsToCopilots: 0,
   };
   
-  //useEffect(() => {
-    // if (allZaps.length > 0) {
-    //   console.log('Zaps AKASH: ', allZaps);
-    //   setZaps(allZaps);
-    // }
-  // }, [allZaps,totalZaps,zapsSent]);
-
   useEffect(() => {
+    setLoading(isLoading);
     if (allZaps.length > 0) {
       console.log('Zaps AKASH: ', allZaps);
       setZaps(allZaps);
@@ -106,8 +94,8 @@ const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZap
           : 0) / 1000;
       setBiggestZap(Math.floor(maxZap)); // Already positive
     }
-    setLoading(false);
-  }, [allZaps,totalZaps,zapsSent,zaps, allUsers]); // This effect runs whenever zaps changes
+    setLoading(isLoading);
+  }, [allZaps,isLoading]); // This effect runs whenever zaps changes //zapsSent,zaps, allUsers, totalZaps
 
   if (error) {
     return <div className={styles.sentcomponent}>{error}</div>;

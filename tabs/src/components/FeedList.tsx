@@ -1,45 +1,44 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styles from './FeedList.module.css';
-import {
-  getAllWallets,
-  getUser,
-  getUsers,
-  getUserWallets,
-  getWalletTransactionsSince,
-} from '../services/lnbitsServiceLocal';
 import ZapIcon from '../images/ZapIcon.svg';
 import { useCache } from '../utils/CacheContext';
 interface FeedListProps {
   timestamp?: number | null;
   allZaps: Transaction[];
   allUsers: User[];
+  isLoading: boolean;
 }
 interface ZapTransaction {
   from: User | null;
   to: User | null;
   transaction: Transaction;
 }
-const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
-const FeedList: React.FC<FeedListProps> = ({ timestamp, allZaps, allUsers  }) => {
+
+const FeedList: React.FC<FeedListProps> = ({
+  timestamp,
+  allZaps,
+  allUsers,
+  isLoading
+}) => {
   const [zaps, setZaps] = useState<ZapTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const initialRender = useRef(true);
   const { cache, setCache } = useCache();
-  
-  useEffect(() => {
 
-    console.log('FEED PARAMETER:', allZaps);
+  useEffect(() => {
+    //alert('FEED PARAMETER:' + timestamp);
+
     //setZaps(allZaps);
     if (cache['allZaps']) {
-    console.log('FEED cache:', cache['allZaps']);
+      console.log('FEED cache:', cache['allZaps']);
     }
     const paymentsSinceTimestamp =
       timestamp === null || timestamp === undefined || timestamp === 0
         ? 0
         : timestamp;
     const fetchZaps = async () => {
-      setLoading(true);
+      setLoading(isLoading);
       setError(null);
 
       try {
@@ -48,56 +47,29 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp, allZaps, allUsers  }) =>
             ? 0
             : timestamp;
 
-
-
-        // const [allwallets, transactions, users] = await Promise.all([
-        //   getAllWallets(adminKey),
-        //   getWalletTransactionsSince(adminKey, paymentsSinceTimestamp, {
-        //     tag: 'zap',
-        //   }),
-        //   getUsers(adminKey, {}),
-        // ]);
-
         let loadZaps: ZapTransaction[] = [];
 
-        // if (allwallets) {
-        //   const allowanceWallets = allwallets.filter(
-        //     wallet => wallet.name === 'Allowance',
-        //   );
-        //   console.log('allowanceWallets', allowanceWallets);
+        const allowanceTransactions = allZaps.filter(
+          f =>
+            f.time > paymentsSinceTimestamp && !f.memo.includes('Weekly Allowance cleared'),
+        );
 
-          const allowanceTransactions = allZaps;
+        const allowanceZaps = allowanceTransactions.flat().map(transaction => ({
+          from: allUsers?.find(f => f.id === transaction.extra?.from?.user) as User,
+          to: allUsers?.find(f => f.id === transaction.extra?.to?.user) as User,
+          transaction: transaction,
+        }));
 
-          const allowanceZaps = allowanceTransactions
-            .flat()
-            .map(transaction => ({
-              from: null, // user,
-              to: null,//allUsers?.find(f => f.aadObjectId === transaction.extra?.to?.user) as User,
-              transaction: transaction,
-            }));
+        loadZaps = loadZaps.concat(allowanceZaps);
 
-            loadZaps = loadZaps.concat(allowanceZaps);
-        //}
-
-        // const zaps = await Promise.all(
-        //   transactions.map(async transaction => ({
-        //     from: null,//users.
-        //     to: users?.find(f => f.aadObjectId === transaction.extra?.to?.user) as User,
-        //      //await getUser(adminKey, transaction.extra?.to?.user),
-        //     transaction: transaction,
-        //   })),
-        // );
-
-        //allZaps = allZaps.concat(loadZaps);
-
-        //setZaps(allZaps);
+        setZaps(loadZaps);
       } catch (error) {
         setError(
           error instanceof Error ? error.message : 'An unknown error occurred',
         );
         console.error(error);
       } finally {
-        setLoading(false);
+        setLoading(isLoading);
       }
     };
 
@@ -110,7 +82,7 @@ const FeedList: React.FC<FeedListProps> = ({ timestamp, allZaps, allUsers  }) =>
       console.log(`Timestamp updated: ${timestamp}`);
       fetchZaps();
     }
-  }, [timestamp,allZaps,allUsers]);
+  }, [timestamp, allZaps, allUsers]);
   if (loading) {
     return <div>Loading...</div>;
   }
