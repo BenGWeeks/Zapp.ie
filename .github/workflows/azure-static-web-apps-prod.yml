@@ -61,4 +61,4 @@ jobs:
       - name: Add Redirect URI
         if: github.event_name == 'pull_request'
         run: |
-          az ad app update --id 9b80eb43-d75a-43e3-8104-0d6d0f0b41ec --add web.redirectUris ${{ steps.builddeploy.outputs.deploymentUrl }}
+          az ad app update --id 9b80eb43-d75a-43e3-8104-0d6d0f0b41ec --add spa.redirectUris ${{ steps.builddeploy.outputs.deploymentUrl }}

@@ -68,7 +68,7 @@ jobs:
       - name: Add Redirect URI
         if: github.event_name == 'pull_request'
         run: |
-          az ad app update --id 9b80eb43-d75a-43e3-8104-0d6d0f0b41ec --add web.redirectUris ${{ steps.builddeploy.outputs.deploymentUrl }}
+          az ad app update --id 9b80eb43-d75a-43e3-8104-0d6d0f0b41ec --add spa.redirectUris ${{ steps.builddeploy.outputs.deploymentUrl }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -77,7 +77,7 @@ jobs:
     steps:
       - name: Remove Redirect URI
         run: |
-          az ad app update --id 9b80eb43-d75a-43e3-8104-0d6d0f0b41ec --remove web.redirectUris ${{ steps.builddeploy.outputs.deploymentUrl }}
+          az ad app update --id 9b80eb43-d75a-43e3-8104-0d6d0f0b41ec --remove spa.redirectUris ${{ steps.builddeploy.outputs.deploymentUrl }}
 
       - name: Close Pull Request
         id: closepullrequest
