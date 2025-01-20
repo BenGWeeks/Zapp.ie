@@ -75,6 +75,7 @@ jobs:
           $updatedRedirectUrisJson = $updatedRedirectUris | ConvertTo-Json -Depth 10 -Compress
           $jsonStringWithSingleQuotes = $updatedRedirectUrisJson -replace '"', "'"
           az rest --method "patch" --uri "https://graph.microsoft.com/v1.0/applications/6f3836b2-9449-45e7-aa62-810cbeaa6c5d" --headers "{'Content-Type': 'application/json'}" --body "{'spa': {'redirectUris': $jsonStringWithSingleQuotes}}"
+        shell: pwsh
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
