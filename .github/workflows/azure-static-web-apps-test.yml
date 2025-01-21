@@ -13,6 +13,8 @@ jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
+    outputs:
+      deploymentUrl: ${{ steps.builddeploy.outputs.deploymentUrl }}
     permissions:
       contents: read
       pull-requests: write
@@ -52,7 +54,7 @@ jobs:
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: '/tabs' # App source code path
           api_location: '' # Api source code path - optional
-          output_location: 'build' # Built app content directory - optional
+          output_location: 'build' # Built app content directory - optional          
           ###### End of Repository/Build Configurations ######
 
       - name: Install Azure CLI
@@ -69,7 +71,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           $currentRedirectUris = az rest --method "get" --uri "https://graph.microsoft.com/v1.0/applications/6f3836b2-9449-45e7-aa62-810cbeaa6c5d" --headers '{"Content-Type": "application/json"}' -o json --query "spa.redirectUris"
-          $newRedirectUri = ${{ steps.builddeploy.outputs }}
+          $newRedirectUri = ${{ steps.builddeploy.outputs.deploymentUrl }}
           $updatedRedirectUris = $currentRedirectUris | ConvertFrom-Json
           $updatedRedirectUris += $newRedirectUri
           $updatedRedirectUrisJson = $updatedRedirectUris | ConvertTo-Json -Depth 10 -Compress
