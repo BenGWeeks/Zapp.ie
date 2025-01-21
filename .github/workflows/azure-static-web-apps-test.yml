@@ -67,6 +67,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Echo builddeploy outputs
+        run: |
+          echo "${{ toJson(steps.builddeploy.outputs) }}" | jq .
+
       - name: Add Redirect URI
         if: github.event_name == 'pull_request'
         run: |
