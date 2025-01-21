@@ -69,7 +69,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           $currentRedirectUris = az rest --method "get" --uri "https://graph.microsoft.com/v1.0/applications/6f3836b2-9449-45e7-aa62-810cbeaa6c5d" --headers '{"Content-Type": "application/json"}' -o json --query "spa.redirectUris"
-          $newRedirectUri = ${{ steps.builddeploy.outputs.deploymentUrl }}
+          $newRedirectUri = ${{ steps.builddeploy.outputs }}
           $updatedRedirectUris = $currentRedirectUris | ConvertFrom-Json
           $updatedRedirectUris += $newRedirectUri
           $updatedRedirectUrisJson = $updatedRedirectUris | ConvertTo-Json -Depth 10 -Compress
