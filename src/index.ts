@@ -2,10 +2,6 @@
 import * as restify from 'restify';
 import * as path from 'path';
 
-// Timer for scheduling tasks
-import * as cron from 'node-cron';
-import { scheduledTopup } from './services/lnbitsService';
-
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
 import {
@@ -82,16 +78,6 @@ adapter.onTurnError = onTurnErrorHandler;
 
 // Create the bot that will handle incoming messages.
 const bot = new TeamsBot();
-
-// Schedule a task to run every Monday at 09:00am
-
-cron.schedule('0 9 * * 1', async () => {
-  console.log('Running scheduled task Allowance Topup');
-  await scheduledTopup();
-}, {
-  scheduled: true,
-  timezone: "Europe/Dublin"
-});
 
 // Create HTTP server.
 const server = restify.createServer();
