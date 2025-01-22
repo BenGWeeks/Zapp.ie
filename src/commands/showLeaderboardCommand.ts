@@ -13,6 +13,7 @@ import {
 import { getWallets, getUser } from '../services/lnbitsService';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
+const lnbitsLabel = process.env.REACT_APP_LNBITS_POINTS_LABEL as string;
 
 // New command for showing leaderboard
 export class ShowLeaderboardCommand extends SSOCommand {
@@ -45,7 +46,7 @@ export class ShowLeaderboardCommand extends SSOCommand {
                 type: 'TextBlock',
                 text: `${user.displayName}\n: ${
                   wallet.balance_msat / 1000
-                } Sats`,
+                } ${lnbitsLabel}`,
                 weight: 'Bolder',
                 size: 'Medium',
               };

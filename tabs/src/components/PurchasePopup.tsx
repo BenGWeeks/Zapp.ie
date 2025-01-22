@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import styles from './PurchasePopup.module.css';
 
+const lnbitsLabel = process.env.REACT_APP_LNBITS_POINTS_LABEL as string;
+
 interface PurchasePopupProps {
   onClose: () => void;
   wallet: Wallet;
@@ -19,7 +21,7 @@ const PurchasePopup: React.FC<PurchasePopupProps> = ({
 
   const message = hasEnoughSats
     ? `Please confirm you would like to purchase this reward.`
-    : `D'oh! You do not have enough Sats to redeem this reward yet.`;
+    : `D'oh! You do not have enough ${lnbitsLabel} to redeem this reward yet.`;
 
   const handleOverlayClick = () => {
     onClose();

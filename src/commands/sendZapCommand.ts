@@ -18,6 +18,7 @@ import { error } from 'console';
 import { UserService } from '../services/userService';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
+const lnbitsLabel = process.env.REACT_APP_LNBITS_POINTS_LABEL as string;
 
 export class SendZapCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
@@ -150,11 +151,11 @@ async function createZapCard() {
       type: 'Input.Number',
       id: 'zapAmount',
       placeholder: '100',
-      label: 'Amount (Sats)',
+      label: `Amount ${lnbitsLabel}`,
       min: 1,
       max: 10000,
       isRequired: true,
-      errorMessage: 'You must specify an amount between 1 and 10,000 Sats',
+      errorMessage: `You must specify an amount between 1 and 10,000 ${lnbitsLabel}`,
     },
   ];
 
@@ -258,7 +259,7 @@ async function messageRecipient(
       TurnContext.applyConversationReference(
         {
           type: ActivityTypes.Message,
-          text: `You have received ${zapAmount} Sats from ${sender.displayName} with a message: "${zapMessage}"`,
+          text: `You have received ${zapAmount} ${lnbitsLabel} from ${sender.displayName} with a message: "${zapMessage}"`,
         },
         reference,
         true,
@@ -327,7 +328,7 @@ async function messageRecipient(
 
     // Create the message
     const message = MessageFactory.text(
-      `You have received ${zapAmount} Sats from ${sender.displayName} with a message: "${zapMessage}"`,
+      `You have received ${zapAmount} ${lnbitsLabel} from ${sender.displayName} with a message: "${zapMessage}"`,
     );
 
     // Send the message to the new conversation
