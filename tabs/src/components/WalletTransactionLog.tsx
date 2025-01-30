@@ -194,7 +194,10 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
                         return `${diffInDays} days ago `;
                       }
                     })()}
-                    from <b>{transaction.extra?.from?.displayName ?? 'Unknown'}</b>
+                    {(transaction.amount as number) < 0 ? 'to' : 'from'}{' '} <b>{(transaction.amount as number) < 0
+                        ? transaction.extra?.to?.displayName ?? 'Unknown'
+                        : transaction.extra?.from?.displayName ??
+                          'Unknown'}{' '}</b>
                   </div>
                   <p className={styles.lightHelightInItems}>
                     {transaction.memo}

@@ -1,9 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styles from './FeedList.module.css';
 import ZapIcon from '../images/ZapIcon.svg';
-import { useCache } from '../utils/CacheContext';
+import { useCache } from '../utils/CacheContext';import { useCache } from '../utils/CacheContext';
 interface FeedListProps {
   timestamp?: number | null;
+  allZaps: Transaction[];
+  allUsers: User[];
+  isLoading: boolean;
   allZaps: Transaction[];
   allUsers: User[];
   isLoading: boolean;
@@ -22,14 +25,27 @@ const FeedList: React.FC<FeedListProps> = ({
   allUsers,
   isLoading
 }) => {
+const FeedList: React.FC<FeedListProps> = ({
+  timestamp,
+  allZaps,
+  allUsers,
+  isLoading
+}) => {
   const [zaps, setZaps] = useState<ZapTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const initialRender = useRef(true);
   const { cache, setCache } = useCache();
+  const { cache, setCache } = useCache();
 
   useEffect(() => {
+    //alert('FEED PARAMETER:' + timestamp);
+
+    //setZaps(allZaps);
+    if (cache['allZaps']) {
+      console.log('FEED cache:', cache['allZaps']);
+    }
     //alert('FEED PARAMETER:' + timestamp);
 
     //setZaps(allZaps);
@@ -41,6 +57,7 @@ const FeedList: React.FC<FeedListProps> = ({
         ? 0
         : timestamp;
     const fetchZaps = async () => {
+      setLoading(isLoading);
       setLoading(isLoading);
       setError(null);
 
@@ -62,7 +79,25 @@ const FeedList: React.FC<FeedListProps> = ({
           to: allUsers?.find(f => f.id === transaction.extra?.to?.user) as User,
           transaction: transaction,
         }));
+        const paymentsSinceTimestamp =
+          timestamp === null || timestamp === undefined || timestamp === 0
+            ? 0
+            : timestamp;
 
+        let loadZaps: ZapTransaction[] = [];
+
+        const allowanceTransactions = allZaps.filter(
+          f =>
+            f.time > paymentsSinceTimestamp && !f.memo.includes('Weekly Allowance cleared'),
+        );
+
+        const allowanceZaps = allowanceTransactions.flat().map(transaction => ({
+          from: allUsers?.find(f => f.id === transaction.extra?.from?.user) as User,
+          to: allUsers?.find(f => f.id === transaction.extra?.to?.user) as User,
+          transaction: transaction,
+        }));
+
+        loadZaps = loadZaps.concat(allowanceZaps);
         loadZaps = loadZaps.concat(allowanceZaps);
 
         setZaps(loadZaps);
@@ -70,8 +105,14 @@ const FeedList: React.FC<FeedListProps> = ({
         setError(
           error instanceof Error ? error.message : 'An unknown error occurred',
         );
+        setZaps(loadZaps);
+      } catch (error) {
+        setError(
+          error instanceof Error ? error.message : 'An unknown error occurred',
+        );
         console.error(error);
       } finally {
+        setLoading(isLoading);
         setLoading(isLoading);
       }
     };
