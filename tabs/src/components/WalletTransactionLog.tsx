@@ -167,20 +167,37 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
                         : transaction.extra?.tag ?? 'Regular transaction'}
                     </b>
                   </p>
+                  {/* 
+                    Dynamically calculate and display the time difference between the transaction and the current time.
+                    The output format adapts based on the time elapsed:
+                    - Less than 60 seconds: show in seconds.
+                    - Less than 1 hour: show in minutes.
+                    - Less than 1 day: show in hours.
+                    - More than 1 day: show in days.
+                  */}
                   <div className={styles.lightHelightInItems}>
-                    {' '}
-                    {moment(moment.now()).diff(
-                      transaction.time * 1000,
-                      'days',
-                    )}{' '}
-                    days ago{' '}
-                    {(transaction.amount as number) < 0 ? 'to' : 'from'}{' '}
-                    <b>
-                      {(transaction.amount as number) < 0
+                    {(() => {
+                      const now = moment();
+                      const transactionTime = moment(transaction.time * 1000);
+                      const diffInSeconds = now.diff(transactionTime, 'seconds');
+
+                      if (diffInSeconds < 60) {
+                        return `${diffInSeconds} seconds ago `;
+                      } else if (diffInSeconds < 3600) {
+                        const diffInMinutes = now.diff(transactionTime, 'minutes');
+                        return `${diffInMinutes} minutes ago `;
+                      } else if (diffInSeconds < 86400) {
+                        const diffInHours = now.diff(transactionTime, 'hours');
+                        return `${diffInHours} hours ago `;
+                      } else {
+                        const diffInDays = now.diff(transactionTime, 'days');
+                        return `${diffInDays} days ago `;
+                      }
+                    })()}
+                    {(transaction.amount as number) < 0 ? 'to' : 'from'}{' '} <b>{(transaction.amount as number) < 0
                         ? transaction.extra?.to?.displayName ?? 'Unknown'
                         : transaction.extra?.from?.displayName ??
-                          'Unknown'}{' '}
-                    </b>
+                          'Unknown'}{' '}</b>
                   </div>
                   <p className={styles.lightHelightInItems}>
                     {transaction.memo}
