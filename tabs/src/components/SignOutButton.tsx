@@ -3,7 +3,6 @@ import { DefaultButton } from '@fluentui/react';
 import * as microsoftTeams from '@microsoft/teams-js';
 import React, { useEffect, useState } from 'react';
 
-
 export const SignOutButton = () => {
   const { instance, accounts } = useMsal();
   const [isInTeams, setIsInTeams] = useState(false);
@@ -59,6 +58,7 @@ export const SignOutButton = () => {
     }
   };
 
+
   return (
     <a
       href="#"
@@ -82,6 +82,7 @@ export const SignOutButton = () => {
       Sign Out
     </a>
   );
+
 };
 
 export default SignOutButton;
