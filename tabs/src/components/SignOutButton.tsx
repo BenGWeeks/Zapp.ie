@@ -1,64 +1,44 @@
 import { useMsal } from '@azure/msal-react';
-import { DefaultButton } from '@fluentui/react';
-import * as microsoftTeams from '@microsoft/teams-js';
-import React, { useEffect, useState } from 'react';
-
-
+import { ContextualMenu, IContextualMenuProps } from '@fluentui/react';
+ 
 export const SignOutButton = () => {
-  const { instance, accounts } = useMsal();
-  const [isInTeams, setIsInTeams] = useState(false);
-
-  // Initialize Teams SDK and detect if running in Teams
-  useEffect(() => {
-    microsoftTeams.app
-      .initialize()
-      .then(() => {
-        microsoftTeams.app
-          .getContext()
-          .then(context => {
-            setIsInTeams(true);
-            console.log('Running inside Teams');
-          })
-          .catch(error => {
-            console.error('Error getting Teams context:', error);
-          });
-      })
-      .catch(error => {
-        console.error('Error initializing Teams SDK:', error);
+  const { instance } = useMsal();
+ 
+  const [isHovered, setIsHovered] = useState(false); // State to track hover
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+ 
+  const handleLogout = (logoutType: string) => {
+    setAnchorEl(null);
+ 
+    if (logoutType === 'popup') {
+      instance.logoutPopup({
+        mainWindowRedirectUri: '/',
       });
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      // If inside Teams, handle MSAL logout and clear session
-      if (isInTeams) {
-        console.log('Logging out from Teams');
-
-        // MSAL logout within Teams
-        await instance.logoutPopup({
-          postLogoutRedirectUri: window.location.origin + '/login',
-          account: accounts[0] || null,
-        });
-
-        console.log('Successfully logged out from MSAL in Teams');
-
-        // Optionally clear Teams-specific data here if required
-      } else {
-        console.log('Logging out from Web Browser');
-
-        // MSAL logout in a web browser context
-        await instance.logoutPopup({
-          postLogoutRedirectUri: window.location.origin + '/login',
-          account: accounts[0] || null,
-        });
-
-        console.log('Successfully logged out from MSAL in Web Browser');
-      }
-    } catch (error) {
-      console.error('Error during logout:', error);
+    } else if (logoutType === 'redirect') {
+      instance.logoutRedirect();
     }
   };
-
+ 
+ 
+    const menuProps: IContextualMenuProps = {
+        items: [
+            {
+                key: 'logoutPopup',
+                text: 'Logout using Popup',
+                onClick: () => handleLogout("popup")
+            },
+            {
+                key: 'logoutRedirect',
+                text: 'Logout using Redirect',
+                onClick: () => handleLogout("redirect")
+            }
+        ],
+        onDismiss: () => setAnchorEl(null),
+        target: anchorEl,
+        directionalHint: 4, // topRightEdge
+        isBeakVisible: true,
+    };
   return (
     <a
       href="#"
@@ -83,5 +63,3 @@ export const SignOutButton = () => {
     </a>
   );
 };
-
-export default SignOutButton;

@@ -6,7 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from '@fluentui/react';
 import { theme } from './styles/Theme'; // Adjust the import path as necessary
 import App from './App'; // Adjust the import path as necessary
-import { msalConfig } from './services/authConfig';
+import { CacheProvider } from './utils/CacheContext';
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
@@ -24,15 +24,15 @@ msalInstance.initialize().then(() => {
     }
   });
 
-  const container = document.getElementById('root');
-  const root = ReactDOM.createRoot(container!);
-  root.render(
-    <MsalProvider instance={msalInstance}>
+  ReactDOM.render(
+    <CacheProvider>
       <Router>
         <ThemeProvider theme={theme}>
           <App pca={msalInstance} />
         </ThemeProvider>
       </Router>
-    </MsalProvider>
+    </CacheProvider>,
+
+    document.getElementById('root'),
   );
 });
