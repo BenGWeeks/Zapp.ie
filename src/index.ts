@@ -8,7 +8,8 @@ import {
   CloudAdapter,
   ConfigurationServiceClientCredentialFactory,
   ConfigurationBotFrameworkAuthentication,
-  TurnContext,
+  ConfigurationBotFrameworkAuthenticationOptions,
+  TurnContext
 } from 'botbuilder';
 
 // This bot's main dialog.
@@ -16,14 +17,39 @@ import { TeamsBot } from './teamsBot';
 import config from './config';
 import { UserService } from './services/userService';
 import { FetchUserMiddleware } from './services/fetchUserMiddleware';
+import { MyStorage } from './services/storage';
+import { FileStorage } from './services/fileStorage';
+import { BotBuilderCloudAdapter } from '@microsoft/teamsfx';
+
+
+
+// Initialize custom storage
+const myStorage = new MyStorage()
+
+const storage = process.env.USE_CUSTOM_STORAGE === '1' ? myStorage : new FileStorage();
+
+// Initialize ConversationBot with notification enabled and customized storage
+const conversationBot = new BotBuilderCloudAdapter.ConversationBot({
+  adapterConfig: {
+    appId: config.botId,
+    appPassword: config.botPassword,
+  },
+  notification: {
+    enabled: true
+  },
+});
+
+
+
 
 // Create adapter.
-// See https://aka.ms/about-bot-adapter to learn more about adapters.
 const credentialsFactory = new ConfigurationServiceClientCredentialFactory({
   MicrosoftAppId: config.botId,
   MicrosoftAppPassword: config.botPassword,
-  MicrosoftAppType: 'MultiTenant',
+  MicrosoftAppType: "MultiTenant",
 });
+
+
 
 const botFrameworkAuthentication = new ConfigurationBotFrameworkAuthentication(
   {},
@@ -77,7 +103,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
 adapter.onTurnError = onTurnErrorHandler;
 
 // Create the bot that will handle incoming messages.
-const bot = new TeamsBot();
+const teamsBot = new TeamsBot();
 
 // Create HTTP server.
 const server = restify.createServer();
@@ -90,7 +116,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 server.post('/api/messages', async (req, res) => {
   await adapter
     .process(req, res, async context => {
-      await bot.run(context);
+      await teamsBot.run(context);
     })
     .catch(err => {
       // Error message including "412" means it is waiting for user's consent, which is a normal process of SSO, sholdn't throw this error.
@@ -106,3 +132,19 @@ server.get(
     directory: path.join(__dirname, '../public'),
   }),
 );
+
+// Endpoint to trigger proactive messages
+server.post('/api/notify', async (req, res) => {
+  const userId = req.body.userId;
+  const message = req.body.message;
+  console.log
+  const conversationReference = await storage.read(userId);
+  if (conversationReference[userId]) {
+    await conversationBot.adapter.continueConversationAsync(conversationReference[userId], undefined, undefined, async (context) => {
+      await context.sendActivity(message);
+    });
+    res.send(200, 'Notification sent');
+  } else {
+    res.send(404, 'User not found');
+  }
+});

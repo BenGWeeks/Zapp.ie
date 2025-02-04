@@ -41,6 +41,7 @@ let userSetupFlag = false;
 export class TeamsBot extends TeamsActivityHandler {
   conversationState: ConversationState;
   userState: UserState;
+  conversationReferences: { [key: string]: any };
   //userSetupFlagAccessor: StatePropertyAccessor<boolean>;
   //userProfileAccessor: StatePropertyAccessor<User>;
 
@@ -62,6 +63,8 @@ export class TeamsBot extends TeamsActivityHandler {
 
     this.onMessage(async (context, next) => {
       console.log('Running onMessage ...');
+      const conversationReference = TurnContext.getConversationReference(context.activity);
+      await this.storeConversationReference(conversationReference);
       const botId = context.activity.recipient.id; // Bot's ID
       const senderId = context.activity.from.id; // Sender's ID
 
@@ -321,7 +324,7 @@ export class TeamsBot extends TeamsActivityHandler {
       console.error('Error in handleTeamsSigninVerifyState:', error);
     }
   }
-
+  
   async handleTeamsSigninTokenExchange(
     context: TurnContext,
     query: SigninStateVerificationQuery,
@@ -357,5 +360,11 @@ export class TeamsBot extends TeamsActivityHandler {
       console.error('Error in onSignInInvoke:', error);
       await context.sendActivity('An error occurred during sign-in.');
     }
+  }
+
+  async storeConversationReference(conversationReference) {
+    this.conversationReferences = this.conversationReferences || {};
+    const key = conversationReference.user.id;
+    this.conversationReferences[key] = conversationReference;
   }
 }

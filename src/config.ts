@@ -9,6 +9,4 @@ const config = {
   timeout: process.env.TIMEOUT || 30000,
 };
 
-console.log('Configuration:', config);
-
 export default config;
