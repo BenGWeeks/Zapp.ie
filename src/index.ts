@@ -137,9 +137,10 @@ server.get(
 server.post('/api/notify', async (req, res) => {
   const userId = req.body.userId;
   const message = req.body.message;
-  console.log
+  console.log('Received notification request for user', userId);
   const conversationReference = await storage.read(userId);
   if (conversationReference[userId]) {
+    console.log(conversationReference[userId]);
     await conversationBot.adapter.continueConversationAsync(conversationReference[userId], undefined, undefined, async (context) => {
       await context.sendActivity(message);
     });

@@ -13,14 +13,18 @@ export class FileStorage implements Storage {
     } else {
       this.storagePath = path.join(__dirname, '../../.notification.localstore.json');
     }
+    console.log(`FileStorage initialized with path: ${this.storagePath}`);
   }
+
 
   private async readFile(): Promise<StoreItems> {
     try {
       const data = await fs.readFile(this.storagePath, 'utf8');
+      console.log(`Read data from ${this.storagePath}:`, data);
       return JSON.parse(data);
     } catch (error) {
       if (error.code === 'ENOENT') {
+        console.log(`File not found: ${this.storagePath}. Returning empty object.`);
         return {};
       }
       throw error;
@@ -29,18 +33,30 @@ export class FileStorage implements Storage {
 
   private async writeFile(data: StoreItems): Promise<void> {
     await fs.writeFile(this.storagePath, JSON.stringify(data, null, 2), 'utf8');
+    console.log(`Wrote data to ${this.storagePath}:`, JSON.stringify(data, null, 2));
   }
 
-  public async read(keys: string[]): Promise<StoreItems> {
+  public async read(keys: string | string[]): Promise<StoreItems> {
+    console.log("Reading keys:", keys, "Type:", typeof keys);
+
+    if (typeof keys === "string") {
+        keys = [keys]; // Convert single string to an array
+    } else if (!Array.isArray(keys)) {
+        throw new Error("Invalid argument: keys must be a string or an array of strings");
+    }
+
     const data = await this.readFile();
     const result: StoreItems = {};
+    
     keys.forEach(key => {
-      if (data[key]) {
-        result[key] = data[key];
-      }
+        if (data[key]) {
+            result[key] = data[key];
+        }
     });
+
     return result;
-  }
+}
+
 
   public async write(changes: { [key: string]: unknown }): Promise<void> {
     const data = await this.readFile();
