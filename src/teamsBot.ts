@@ -45,26 +45,35 @@ export class TeamsBot extends TeamsActivityHandler {
   //userSetupFlagAccessor: StatePropertyAccessor<boolean>;
   //userProfileAccessor: StatePropertyAccessor<User>;
 
-  constructor() {
+  constructor(conversationReferences) {
     super();
-
+    this.conversationReferences = conversationReferences;
     // Define the state store for your bot.
     const memoryStorage = new MemoryStorage();
     // Create conversation and user state with in-memory storage provider.
     this.conversationState = new ConversationState(memoryStorage);
     this.userState = new UserState(memoryStorage);
 
+    this.conversationReferences = conversationReferences;
+    this.onConversationUpdate(async (context, next) => {
+      this.addConversationReference(context.activity);
 
+      await next();
+  });
     // Register commands
     SSOCommandMap.register('send zap', new SendZapCommand());
     SSOCommandMap.register('show my balance', new ShowMyBalanceCommand());
     SSOCommandMap.register('withdraw my zaps', new WithdrawFundsCommand());
     SSOCommandMap.register('show leaderboard', new ShowLeaderboardCommand());
 
+    
+
     this.onMessage(async (context, next) => {
       console.log('Running onMessage ...');
-      const conversationReference = TurnContext.getConversationReference(context.activity);
-      await this.storeConversationReference(conversationReference);
+      this.addConversationReference(context.activity);
+
+      // Echo back what the user said
+
       const botId = context.activity.recipient.id; // Bot's ID
       const senderId = context.activity.from.id; // Sender's ID
 
@@ -126,6 +135,10 @@ export class TeamsBot extends TeamsActivityHandler {
         }
       }
       console.log('Text:', text);
+
+//Notification logic
+
+
 
       /*
       mentions = mentions.filter(
@@ -258,45 +271,24 @@ export class TeamsBot extends TeamsActivityHandler {
       await next();
     });
 
-    //this.onMembersAdded(async (context, next) => {
-    this.onCommand(async (context, next) => {
-      /* Retrieve the per-user setup flag
-      //const currentUser = await this.userProfileAccessor.get(context);
-      const userService = UserService.getInstance();
-      const currentUser = userService.getCurrentUser();
-      console.log('Current User:', currentUser);
-
-      if (!currentUser) {
-        console.log('Lets make sure the user is setup ...');
-
-        await context.sendActivity(
-          `Let me just check you're all setup. Bear with me a few seconds please ...`,
-        );
-
-        try {
-          // Let's  check they are setup correctly.
-          const member = await TeamsInfo.getMember(
-            context,
-            context.activity.from.id,
-          );
-
-          const userService = UserService.getInstance();
-        //  const currentUser = await userService.ensureUserSetup(member);
-
-          userService.setCurrentUser(currentUser);
-          //await this.userProfileAccessor.set(context, currentUser);
-          //await this.userState.saveChanges(context);
-
-          userSetupFlag = true; // OK, all done, we shouldn't need to do this again.
-        } catch (error) {
-          console.error('Error in onCommand handler:', error);
-          await context.sendActivity(
-            'Mmmm ... an error occurred while setting up your account!',
-          );
-        }
+    this.onMembersAdded(async (context, next) => {
+      const membersAdded = context.activity.membersAdded;
+      for (let cnt = 0; cnt < membersAdded.length; cnt++) {
+          if (membersAdded[cnt].id !== context.activity.recipient.id) {
+              const welcomeMessage = 'Welcome to the Proactive Bot sample.  Navigate to http://localhost:3978/api/notify to proactively message everyone who has previously messaged this bot.';
+              await context.sendActivity(welcomeMessage);
+          }
       }
-    }*/;
+
+      // By calling next() you ensure that the next BotHandler is run.
+      await next();
+    
   })}
+
+  addConversationReference(activity) {
+    const conversationReference = TurnContext.getConversationReference(activity);
+    this.conversationReferences[conversationReference.conversation.id] = conversationReference;
+  }
 
   async run(context: TurnContext) {
     try {
@@ -362,9 +354,4 @@ export class TeamsBot extends TeamsActivityHandler {
     }
   }
 
-  async storeConversationReference(conversationReference) {
-    this.conversationReferences = this.conversationReferences || {};
-    const key = conversationReference.user.id;
-    this.conversationReferences[key] = conversationReference;
-  }
 }

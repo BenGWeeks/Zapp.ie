@@ -5,6 +5,7 @@ env/.env.test
 env/.env.prod
 .localConfigs
 appPackage/build
+.notification.json
 
 # dependencies
 node_modules/

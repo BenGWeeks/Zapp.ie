@@ -18,15 +18,12 @@ import config from './config';
 import { UserService } from './services/userService';
 import { FetchUserMiddleware } from './services/fetchUserMiddleware';
 import { MyStorage } from './services/storage';
-import { FileStorage } from './services/fileStorage';
 import { BotBuilderCloudAdapter } from '@microsoft/teamsfx';
 
 
 
 // Initialize custom storage
 const myStorage = new MyStorage()
-
-const storage = process.env.USE_CUSTOM_STORAGE === '1' ? myStorage : new FileStorage();
 
 // Initialize ConversationBot with notification enabled and customized storage
 const conversationBot = new BotBuilderCloudAdapter.ConversationBot({
@@ -35,8 +32,9 @@ const conversationBot = new BotBuilderCloudAdapter.ConversationBot({
     appPassword: config.botPassword,
   },
   notification: {
-    enabled: true
-  },
+    enabled: true 
+      }
+      
 });
 
 
@@ -103,7 +101,10 @@ const onTurnErrorHandler = async (context: TurnContext, error: Error) => {
 adapter.onTurnError = onTurnErrorHandler;
 
 // Create the bot that will handle incoming messages.
-const teamsBot = new TeamsBot();
+
+const conversationReferences = {}
+
+const teamsBot = new TeamsBot(conversationReferences);
 
 // Create HTTP server.
 const server = restify.createServer();
@@ -134,18 +135,15 @@ server.get(
 );
 
 // Endpoint to trigger proactive messages
-server.post('/api/notify', async (req, res) => {
-  const userId = req.body.userId;
-  const message = req.body.message;
-  console.log('Received notification request for user', userId);
-  const conversationReference = await storage.read(userId);
-  if (conversationReference[userId]) {
-    console.log(conversationReference[userId]);
-    await conversationBot.adapter.continueConversationAsync(conversationReference[userId], undefined, undefined, async (context) => {
-      await context.sendActivity(message);
-    });
-    res.send(200, 'Notification sent');
-  } else {
-    res.send(404, 'User not found');
+server.get('/api/notify', async (req, res) => {
+  for (const conversationReference of Object.values(conversationReferences)) {
+      await adapter.continueConversationAsync(process.env.MicrosoftAppId, conversationReference, async context => {
+          await context.sendActivity('proactive hello');
+      });
   }
+
+  res.setHeader('Content-Type', 'text/html');
+  res.writeHead(200);
+  res.write('<html><body><h1>Proactive messages have been sent.</h1></body></html>');
+  res.end();
 });
