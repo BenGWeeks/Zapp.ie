@@ -18,6 +18,7 @@ import Users from './Users';
 import './App.css';
 import Rewards from './Rewards';
 import Wallet from './Wallet';
+import Settings from './Settings';
 
 type AppProps = {
   pca: IPublicClientApplication;
@@ -73,6 +74,14 @@ function Pages() {
         element={
           <RequireAuth>
             <Wallet />
+          </RequireAuth>
+        }
+      />
+            <Route
+        path="/Settings"
+        element={
+          <RequireAuth>
+            <Settings />
           </RequireAuth>
         }
       />
