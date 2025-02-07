@@ -134,16 +134,39 @@ server.get(
   }),
 );
 
-// Endpoint to trigger proactive messages
+// Listen for incoming notifications and send proactive messages to users.
 server.get('/api/notify', async (req, res) => {
+  console.log(JSON.stringify(conversationReferences));
   for (const conversationReference of Object.values(conversationReferences)) {
-      await adapter.continueConversationAsync(process.env.MicrosoftAppId, conversationReference, async context => {
-          await context.sendActivity('proactive hello');
-      });
+    console.log(JSON.stringify(conversationReferences, null, 2));
+    await adapter.continueConversationAsync(process.env.MicrosoftAppId, conversationReference, async (turnContext) => {
+      await turnContext.sendActivity('proactive hello');
+    });
   }
 
   res.setHeader('Content-Type', 'text/html');
   res.writeHead(200);
   res.write('<html><body><h1>Proactive messages have been sent.</h1></body></html>');
   res.end();
+});
+
+// Listen for incoming custom notifications and send proactive messages to users.
+server.post('/api/notify', (req, res, next) => {
+  for (const msg of req.body) {
+      for (const conversationReference of Object.values(conversationReferences)) {
+          adapter.continueConversationAsync(process.env.MicrosoftAppId, conversationReference, async (turnContext) => {
+              await turnContext.sendActivity(msg);
+          });
+      }
+  }
+  res.setHeader('Content-Type', 'text/html');
+  res.writeHead(200);
+  res.write('Proactive messages have been sent.');
+  res.end();
+});
+// Gracefully shutdown HTTP server
+["exit", "uncaughtException", "SIGINT", "SIGTERM", "SIGUSR1", "SIGUSR2"].forEach((event) => {
+  process.on(event, () => {
+    server.close();
+  });
 });

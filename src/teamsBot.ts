@@ -39,6 +39,7 @@ interface CancellationToken {
 let userSetupFlag = false;
 
 export class TeamsBot extends TeamsActivityHandler {
+  public conversationReferences1: any;  
   conversationState: ConversationState;
   userState: UserState;
   conversationReferences: { [key: string]: any };
@@ -47,7 +48,7 @@ export class TeamsBot extends TeamsActivityHandler {
 
   constructor(conversationReferences) {
     super();
-    this.conversationReferences = conversationReferences;
+    this.conversationReferences1 = conversationReferences;
     // Define the state store for your bot.
     const memoryStorage = new MemoryStorage();
     // Create conversation and user state with in-memory storage provider.
@@ -273,22 +274,26 @@ export class TeamsBot extends TeamsActivityHandler {
 
     this.onMembersAdded(async (context, next) => {
       const membersAdded = context.activity.membersAdded;
+      
       for (let cnt = 0; cnt < membersAdded.length; cnt++) {
-          if (membersAdded[cnt].id !== context.activity.recipient.id) {
-              const welcomeMessage = 'Welcome to the Proactive Bot sample.  Navigate to http://localhost:3978/api/notify to proactively message everyone who has previously messaged this bot.';
-              await context.sendActivity(welcomeMessage);
-          }
+        if (membersAdded[cnt].id !== context.activity.recipient.id) {
+          const welcomeMessage = `Welcome to the Proactive Bot sample.  Navigate to ${process.env.PROVISIONOUTPUT__BOTOUTPUT__SITEENDPOINT}/api/notify to proactively message everyone who has previously messaged this bot.`;
+          await context.sendActivity(welcomeMessage);
+        }
       }
+
 
       // By calling next() you ensure that the next BotHandler is run.
       await next();
     
-  })}
+  });
+}
 
-  addConversationReference(activity) {
-    const conversationReference = TurnContext.getConversationReference(activity);
-    this.conversationReferences[conversationReference.conversation.id] = conversationReference;
-  }
+addConversationReference(activity) {
+  const conversationReference = TurnContext.getConversationReference(activity);
+  this.conversationReferences[conversationReference.conversation.id] = conversationReference;
+}
+
 
   async run(context: TurnContext) {
     try {
