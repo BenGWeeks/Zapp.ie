@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CurrencySetting from './components/currencySetting'
+import CurrencySetting from './components/RewardsNameSetting'
 import styles from './components/setting.module.css';
 import ProvidedBy from './images/ProvidedBy.svg';
 

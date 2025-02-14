@@ -20,6 +20,9 @@ import Rewards from './Rewards';
 import Wallet from './Wallet';
 import Settings from './Settings';
 
+//Importing settings
+import { RewardNameProvider } from './components/RewardNameContext';
+
 type AppProps = {
   pca: IPublicClientApplication;
 };
@@ -32,11 +35,13 @@ function App({ pca }: AppProps) {
 
   return (
     <MsalProvider instance={pca}>
+      <RewardNameProvider>
       <PageLayout>
         <Stack horizontalAlign="center">
           <Pages />
         </Stack>
       </PageLayout>
+      </RewardNameProvider>
     </MsalProvider>
   );
 }
@@ -85,6 +90,7 @@ function Pages() {
           </RequireAuth>
         }
       />
+      
     </Routes>
   );
 }

@@ -1,6 +1,7 @@
 /// <reference path="../types/global.d.ts" />
+import { RewardNameContext } from './RewardNameContext';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
 import {
   getWalletTransactionsSince,
@@ -14,7 +15,9 @@ interface ZapContributionsChartProps {
   timestamp: number; // Timestamp in seconds since the epoch
 }
 
+
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
+
 
 function generateDateRange(fromDate: string, toDate: string): string[] {
   const dates = [];
@@ -72,16 +75,23 @@ const transformZapsToActivities = (
   return activities;
 };
 
+
 const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
   lnKey,
   timestamp,
 }) => {
+
+
+
   const [activities, setActivities] = useState<Activity[]>([]);
   //const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    
     const fetchActivities = async () => {
+      
       try {
+        
         let allZaps: Transaction[] = [];
         if (lnKey === '') {
           const users = await getUsers(adminKey, {});
@@ -113,6 +123,7 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
             tag: 'zap',
           }); // This currently only gets zaps for the specified wallet.
         }
+        
         console.log('Chart transactions: ', allZaps);
         const fromDate = new Date(timestamp * 1000).toISOString().split('T')[0];
         const toDate = new Date().toISOString().split('T')[0];
@@ -121,19 +132,22 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
           fromDate,
           toDate,
         );
-        setActivities(activitiesData);
+
       } catch (error) {
         console.error('Error fetching zaps:', error);
       } finally {
         //setLoading(false);
-      }
+      }        
     };
-
-    fetchActivities();
+     fetchActivities();
   }, [lnKey, timestamp]);
 
+  const rewardNameContext = useContext(RewardNameContext);
+  const  rewardName  = rewardNameContext.rewardName;
+  
+
   return (
-    <div className={styles.zapactivitychartbox}>
+        <div className={styles.zapactivitychartbox}>
       <h2 className={styles.zapactivitycharttitle}>Zap activity</h2>
       {activities.length > 0 ? (
         <ActivityCalendar
@@ -146,7 +160,7 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
           }}
           colorScheme="dark"
           labels={{
-            totalCount: '{{count}} Sats zapped (up until yesterday)',
+            totalCount: `{{count}} ${rewardName} zapped (up until yesterday)`,
           }}
         />
       ) : (
@@ -157,5 +171,6 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
     </div>
   );
 };
+
 
 export default ZapContributionsChart;
