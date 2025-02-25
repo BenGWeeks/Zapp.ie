@@ -4,6 +4,11 @@ import { RewardNameContext } from './RewardNameContext';
 import React, { useEffect, useState, useContext } from 'react';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
 import styles from './ZapActivityChartComponent.module.css';
+import {
+  getWalletTransactionsSince,
+  getUsers,
+  getUserWallets,
+} from '../services/lnbitsServiceLocal';
 
 interface ZapContributionsChartProps {
   lnKey: string;
