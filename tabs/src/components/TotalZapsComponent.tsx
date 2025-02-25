@@ -1,4 +1,5 @@
-import { FunctionComponent, useState, useEffect } from 'react';
+import { RewardNameContext } from './RewardNameContext';
+import { FunctionComponent, useState, useEffect, useContext } from 'react';
 import styles from './TotalZapsComponent.module.css';
 //import lnbitsService from '../services/lnbitsServiceLocal';
 /// <reference path = "../global.d.ts" />
@@ -13,6 +14,7 @@ export interface ZapSent {
   zapsFromCopilots: number;
   zapsToCopilots: number;
 }
+const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
 interface TotalZapsComponentProps {
   allZaps: Transaction[];
@@ -94,12 +96,18 @@ const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZap
           : 0) / 1000;
       setBiggestZap(Math.floor(maxZap)); // Already positive
     }
-    setLoading(isLoading);
-  }, [allZaps,isLoading]); // This effect runs whenever zaps changes //zapsSent,zaps, allUsers, totalZaps
+  }, [zaps, users]); // This effect runs whenever zaps changes
+  const rewardNameContext = useContext(RewardNameContext);
+  if (!rewardNameContext) {
+    return null; // or handle the case where the context is not available
+  }
+const rewardsName = rewardNameContext.rewardName;
+
 
   if (error) {
     return <div className={styles.sentcomponent}>{error}</div>;
   }
+
 
   return (
     <div className={styles.sentcomponent}>
@@ -110,7 +118,7 @@ const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZap
           <span className={styles.bigNumber}>
             {zapsSent.totalZaps.toLocaleString()}
           </span>
-          <span className={`${styles.sats} ${styles.satsBig}`}> Sats</span>
+          <span className={`${styles.sats} ${styles.satsBig}`}> {rewardsName}</span>
         </div>
         <div className={styles.zapStats}>
           <table width="100%" className={`${styles.statsTable} `}>
@@ -155,7 +163,7 @@ const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZap
                       <span className={`${styles.zapValues}`}>
                         {zapsSent.averagePerUser.toLocaleString()}
                       </span>{' '}
-                      Sats
+                      {rewardsName}
                     </>
                   )}
                 </td>
@@ -170,7 +178,7 @@ const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZap
                       <span className={`${styles.zapValues}`}>
                         {zapsSent.averagePerDay.toLocaleString()}
                       </span>{' '}
-                      Sats
+                      {rewardsName}
                     </>
                   )}
                 </td>
@@ -185,7 +193,7 @@ const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZap
                       <span className={`${styles.zapValues}`}>
                         {zapsSent.biggestZap.toLocaleString()}
                       </span>{' '}
-                      Sats
+                      {rewardsName}
                     </>
                   )}
                 </td>

@@ -4,6 +4,7 @@ const path = require('path');
 // Read environment variables
 const contentUrl = process.env.CONTENT_URL;
 const websiteUrl = process.env.WEBSITE_URL;
+const lnbitpoints = process.env.LNBITS_POINTS_LABEL;
 
 // Check for missing environment variables
 if (!contentUrl || !websiteUrl) {
@@ -19,7 +20,8 @@ try {
   // Replace placeholders with environment variables
   const manifest = template
     .replace(/{{CONTENT_URL}}/g, contentUrl)
-    .replace(/{{WEBSITE_URL}}/g, websiteUrl);
+    .replace(/{{WEBSITE_URL}}/g, websiteUrl)
+    .replace(/{{WEBSITE_URL}}/g, lnbitpoints);
 
   // Write the final manifest.json file
   const outputPath = path.join(__dirname, 'appPackage','manifest.json');

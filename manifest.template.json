@@ -43,8 +43,8 @@
                     ],
                     "commands": [
                         {
-                            "title": "Send Zap",
-                            "description": "Send a Zap to a user"
+                            "title": "Send ${{LNBITS_POINTS_LABEL}}",
+                            "description": "Send a ${{LNBITS_POINTS_LABEL}} to a user"
                         },
                         {
                             "title": "Show my balance",

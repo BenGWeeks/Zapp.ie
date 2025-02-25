@@ -32,6 +32,7 @@ import { UserService } from './services/userService';
 import { access } from 'fs';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
+const lnbitsLabel = process.env.LNBITS_POINTS_LABEL as string;
 interface CancellationToken {
   isCancellationRequested: boolean;
 }
@@ -99,7 +100,7 @@ export class TeamsBot extends TeamsActivityHandler {
           );
 
           await context.sendActivity(
-            `Awesome! You sent ${context.activity.value.zapAmount} Sats to your colleague with a zap!`,
+            `Awesome! You sent ${context.activity.value.zapAmount} ${lnbitsLabel} to your colleague with a zap!`,
           );
         }
       } catch (error) {

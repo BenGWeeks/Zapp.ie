@@ -18,8 +18,14 @@ import Users from './Users';
 import './App.css';
 import Rewards from './Rewards';
 import Wallet from './Wallet';
+import Settings from './Settings';
+
+//Importing settings
+import { RewardNameProvider } from './components/RewardNameContext';
+
 import AuthStart from './AuthStart';
 import AuthEnd from './AuthEnd';
+
 
 
 type AppProps = {
@@ -28,23 +34,69 @@ type AppProps = {
 
 function App({ pca }: AppProps) {
   return (
-    <MsalProvider instance={pca}> 
-     <PageLayout> 
-     <Stack horizontalAlign="center">    
-        <Routes>
-          <Route path="/feed" element={<RequireAuth><Feed /></RequireAuth>} />
-          <Route path="/users" element={<RequireAuth><Users /></RequireAuth>} />
-          <Route path="/rewards" element={<RequireAuth><Rewards /></RequireAuth>} />
-          <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth-start" element={<AuthStart />} />
-          <Route path="/auth-end" element={<AuthEnd />} />
-          <Route path="*" element={<Navigate to="/feed" replace />} />         
-        </Routes>
-      </Stack>
-      </PageLayout>   
+
+    <MsalProvider instance={pca}>
+      <RewardNameProvider>
+      <PageLayout>
+        <Stack horizontalAlign="center">
+          <Pages />
+        </Stack>
+      </PageLayout>
+      </RewardNameProvider>
+
     </MsalProvider>
   );
 }
 
+
+function Pages() {
+  return (
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route
+        path="/feed"
+        element={
+          <RequireAuth>
+            <Feed />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <RequireAuth>
+            <Users />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/Rewards"
+        element={
+          <RequireAuth>
+            <Rewards />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/Wallet"
+        element={
+          <RequireAuth>
+            <Wallet />
+          </RequireAuth>
+        }
+      />
+            <Route
+        path="/Settings"
+        element={
+          <RequireAuth>
+            <Settings />
+          </RequireAuth>
+        }
+      />
+      
+    </Routes>
+  );
+}
+
 export default App;
+
