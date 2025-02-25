@@ -10,7 +10,7 @@ const websiteUrl = envConfig.WEBSITE_URL;
 
 // Check for missing environment variables
 if (!contentUrl || !websiteUrl) {
-  console.error('Error: CONTENT_URL and WEBSITE_URL environment variables must be set.');
+  console.error('Error: CONTENT_URL and WEBSITE_URL environment variables added to your envirfonment file.');
   process.exit(1);
 }
 
