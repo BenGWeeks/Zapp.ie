@@ -1,23 +1,27 @@
-// lnbitsService.ts
+import { console } from 'inspector';
+import { getCredentials } from '../services/utils';
+import { HttpRequest } from  "@azure/functions"
 
-/// <reference path="../../src/types/global.d.ts" />
+/// <reference path= "../types/global.d.ts" />
 
-import dotenvFlow from 'dotenv-flow';
+; // Import HttpRequest from the appropriate library
 
-dotenvFlow.config({ path: './env' });
+const { password, siteUrl, username, adminKey } = getCredentials({} as HttpRequest);
+let lnbiturl: string | null = null;
+
+// Function to set the lnbiturl based on the request
+export function setLnbitUrl(req: HttpRequest) {
+    const { siteUrl} = getCredentials(req);
+    lnbiturl = siteUrl;   
+}
+
+
+// Load the environment variables from the .env file
+
 let globalWalletId: string | null = null;
 
-
-//import dotenv from 'dotenv';
-//dotenv.config();
-
-const lnbiturl = process.env.LNBITS_NODE_URL as string;
-const userName = process.env.LNBITS_USERNAME as string;
-const password = process.env.LNBITS_PASSWORD as string;
-//const adminkey = process.env.LNBITS_ADMINKEY as string; // This changes per wallet!
-
 // Store token in localStorage (persists between page reloads)
-let accessToken = null;
+let accessToken: string | null = null;
 
 // LNBits API is documented here:
 // https://demo.lnbits.com/docs/
@@ -26,29 +30,24 @@ let accessToken = null;
 let accessTokenPromise: Promise<string> | null = null; // To cache the pending token request
 
 export async function getAccessToken(
+  req: HttpRequest,
   username: string,
   password: string,
 ): Promise<string> {
-  /*console.log(
-    `getAccessToken starting ... (username: ${username}, filterById: ${password}))`,
-  );*/
+  if (!lnbiturl) {
+    setLnbitUrl(req);
+  }
+
   if (accessToken) {
-    //console.log('Using cached access token: ' + accessToken);
     return accessToken;
   } else {
     console.log('No cached access token found');
   }
-
-  // If there's already a token request in progress, return the existing promise
   if (accessTokenPromise) {
     console.log('Returning ongoing access token request');
     return accessTokenPromise;
   }
-
-  // No access token and no request in progress, create a new one
   console.log('No cached access token found, requesting a new one');
-
-  // Store the promise of the request
   accessTokenPromise = (async (): Promise<string> => {
     try {
       const response = await fetch(`${lnbiturl}/api/v1/auth`, {
@@ -59,54 +58,33 @@ export async function getAccessToken(
         },
         body: JSON.stringify({ username, password }),
       });
-
-      //console.log('Request URL:', response.url);
-      //console.log('Request Status:', response.status);
-      //console.log('Request Headers:', response.headers);
-
       if (!response.ok) {
         throw new Error(
           `Error creating access token (status: ${response.status}): ${response.statusText}`,
         );
       }
-
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         throw new Error('Response is not in JSON format');
       }
-
-      const data = await response.json();
-
+      const data = await response.json() as { access_token: string };
       if (!data || !data.access_token) {
         throw new Error('Access token is missing in the response');
       }
-
-      // Store the access token in memory and localStorage
       accessToken = data.access_token;
-      if (accessToken) {
-        //localStorage.setItem('accessToken', accessToken);
-        console.log('Access token fetched and stored: ' + accessToken);
-      } else {
-        throw new Error('Access token is null, cannot store in localStorage.');
-      }
-
-      // Return the access token
       return accessToken;
     } catch (error) {
       console.error('Error in getAccessToken:', error);
-      // Throw an error to ensure the promise doesn't resolve with undefined
       throw new Error('Failed to retrieve access token');
     } finally {
-      // Reset the promise to allow future requests
       accessTokenPromise = null;
     }
   })();
-
-  // Return the token promise
   return accessTokenPromise;
 }
 
 const getWallets = async (
+  req: HttpRequest,
   adminKey: string,
   filterByName?: string,
   filterById?: string,
@@ -132,12 +110,11 @@ const getWallets = async (
       );
     }
 
-    const data = await response.json();
+    const data = await response.json() as Wallet[];
 
     // If filter is provided, filter the wallets by name and/or id
     let filteredData = data;
     if (filterByName) {
-      console.log('Filtering by name:', filterByName);
       filteredData = filteredData.filter(wallet =>
         wallet.name.includes(filterByName),
       );
@@ -148,7 +125,7 @@ const getWallets = async (
 
     // Map the wallets to match the Wallet interface
     let walletData: Wallet[] = await Promise.all(
-      filteredData.map(async (filteredData: any) => ({
+      data.map(async (filteredData: any) => ({
         id: filteredData.id,
         admin: filteredData.admin,
         name: filteredData.name,
@@ -158,10 +135,10 @@ const getWallets = async (
         // See: https://github.com/lnbits/lnbits/issues/2690
         deleted: (
           await getWalletById(filteredData.user, filteredData.id)
-        )?.deleted,
+        )?.deleted ?? false,
         balance_msat: (
-          await getWalletById(filteredData.user, filteredData.id)
-        )?.balance_msat,
+          await getWalletById( filteredData.user, filteredData.id)
+        )?.balance_msat ?? 0,
       })),
     );
 
@@ -171,20 +148,24 @@ const getWallets = async (
     return walletData;
   } catch (error) {
     console.error(error);
-    return error;
+    return null;
   }
 };
 
 const getUserWallets = async (
+  req: HttpRequest,
   adminKey: string,
   userId: string,
 ): Promise<Wallet[] | null> => {
+  if (!lnbiturl) {
+    setLnbitUrl(req);
+  }
   console.log(
     `getUserWallets starting ... (adminKey: ${adminKey}, userId: ${userId})`,
   );
 
   try {
-    const accessToken = await getAccessToken(`${userName}`, `${password}`);
+    const accessToken = await getAccessToken(req,`${username}`, `${password}`);
     const response = await fetch(
       `${lnbiturl}/users/api/v1/user/${userId}/wallet`,
       {
@@ -203,12 +184,12 @@ const getUserWallets = async (
       );
     }
 
-    const data: Wallet[] = await response.json();
+    const data: Wallet[] = await response.json() as Wallet[];
 
     // Map the wallets to match the Wallet interface
     let walletData: Wallet[] = data.map((wallet: any) => ({
       id: wallet.id,
-      admin: null, // TODO: To be implemented. Ref: https://t.me/lnbits/90188
+      admin: '', // TODO: To be implemented. Ref: https://t.me/lnbits/90188
       name: wallet.name,
       adminkey: wallet.adminkey,
       user: wallet.user,
@@ -230,6 +211,7 @@ const getUserWallets = async (
 };
 
 const getUsers = async (
+  req: HttpRequest,
   adminKey: string,
   filterByExtra: { [key: string]: string } | null, // Pass the extra field as an object
 ): Promise<User[] | null> => {
@@ -262,24 +244,21 @@ const getUsers = async (
       );
     }
 
-    const data = await response.json();
+    const data = await response.json() as User[];
 
     console.log('getUsers data:', data);
 
     // Map the users to match the User interface
-    const usersData: User[] = await Promise.all(
+    const usersData: any = await Promise.all(
       data.map(async (user: any) => {
         const extra = user.extra || {}; // Provide a default empty object if user.extra is null
 
-        let privateWallet = null;
-        let allowanceWallet = null;
+        let privateWallet: Wallet | null = null;
+        let allowanceWallet: Wallet | null = null;
 
         if (user.extra) {
-          privateWallet = await getWalletById(user.id, extra.privateWalletId);
-          allowanceWallet = await getWalletById(
-            user.id,
-            extra.allowanceWalletId,
-          );
+          privateWallet = await getWalletById( user.id, extra.privateWalletId);
+          allowanceWallet = await getWalletById(  user.id, extra.allowanceWalletId);
         }
 
         return {
@@ -301,6 +280,7 @@ const getUsers = async (
 };
 
 const createUser = async (
+  req: HttpRequest,
   adminKey: string,
   userName: string,
   walletName: string,
@@ -341,14 +321,14 @@ const createUser = async (
       );
     }
 
-    const user = await response.json();
+    const user = await response.json() as any;
 
     // Await the wallet promises
-    const privateWallet = await getWalletById(
+    const privateWallet = await getWalletById(      
       user.id,
       user.extra?.privateWalletId,
     );
-    const allowanceWallet = await getWalletById(
+    const allowanceWallet = await getWalletById(     
       user.id,
       user.extra?.allowanceWalletId,
     );
@@ -371,69 +351,15 @@ const createUser = async (
     return userData;
   } catch (error) {
     console.error(error);
-    return error;
+    return null;
   }
 };
 
-const getUser = async (
-  adminKey: string,
-  userId: string,
-): Promise<User | null> => {
-  console.log(
-    `createUser starting ... (adminKey: ${adminKey}, userId: ${userId})`,
-  );
 
-  try {
-    const response = await fetch(
-      `${lnbiturl}/usermanager/api/v1/users/${userId}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Api-Key': adminKey,
-        },
-      },
-    );
 
-    if (!response.ok) {
-      throw new Error(
-        `Error getting user response (status: ${response.status})`,
-      );
-    }
-
-    const user = await response.json();
-
-    // Await the wallet promises
-    const privateWallet = await getWalletById(
-      user.id,
-      user.extra?.privateWalletId,
-    );
-    const allowanceWallet = await getWalletById(
-      user.id,
-      user.extra?.allowanceWalletId,
-    );
-
-    // Map the user to match the User interface
-    const userData: User = {
-      id: user.id,
-      displayName: user.name,
-      profileImg: user.profileImg,
-      aadObjectId: user.extra?.aadObjectId || null,
-      email: user.email,
-      privateWallet: privateWallet,
-      allowanceWallet: allowanceWallet,
-    };
-
-    console.log('userData:', userData);
-
-    return userData;
-  } catch (error) {
-    console.error(error);
-    return error;
-  }
-};
 
 const updateUser = async (
+  req: HttpRequest,
   adminKey: string,
   userId: string,
   extra: { [key: string]: string }, // Ensure extra is an object, not a string
@@ -468,7 +394,7 @@ const updateUser = async (
       throw new Error(`Error getting response (status: ${response.status})`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
 
     // Await the wallet promises
     const privateWallet = await getWalletById(
@@ -480,8 +406,8 @@ const updateUser = async (
       data.extra?.allowanceWalletId,
     );
 
-    console.log('privateWallet :', privateWallet);
-    console.log('allowanceWallet :', allowanceWallet);
+    console.log('privateWallet 111:', privateWallet);
+    console.log('allowanceWallet 111:', allowanceWallet);
 
     // Map the user to match the User interface
     const userData: User = {
@@ -499,11 +425,12 @@ const updateUser = async (
     return userData;
   } catch (error) {
     console.error(error);
-    return error;
+    return null;
   }
 };
 
 const createWallet = async (
+  req: HttpRequest,
   adminKey: string,
   userId: string,
   walletName: string,
@@ -534,7 +461,7 @@ const createWallet = async (
       throw new Error(`Error getting response (status: ${response.status})`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
 
     // Await the wallet promises
     const walletWithBalance = await getWalletById(data.user, data.id);
@@ -547,8 +474,8 @@ const createWallet = async (
       adminkey: data.adminkey,
       user: data.user,
       inkey: data.inkey,
-      balance_msat: walletWithBalance?.balance_msat,
-      deleted: walletWithBalance?.deleted,
+      balance_msat: walletWithBalance?.balance_msat ?? 0,
+      deleted: walletWithBalance?.deleted ?? false,
     };
 
     console.log('createWallet data:', walletData);
@@ -556,7 +483,7 @@ const createWallet = async (
     return walletData;
   } catch (error) {
     console.error(error);
-    return error;
+    return null;
   }
 };
 
@@ -606,7 +533,7 @@ const getWalletBalance = async (inKey: string) => {
       );
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
 
     console.log('Balance:', data.balance / 1000); // Convert to Sats
 
@@ -633,7 +560,7 @@ const getWalletName = async (inKey: string) => {
       throw new Error(`Error getting wallet name (status: ${response.status})`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
 
     return data.name;
   } catch (error) {
@@ -706,9 +633,9 @@ const getWalletById = async (
   id: string,
 ): Promise<Wallet | null> => {
   console.log(`getWalletById starting ... (userId: ${userId}, id: ${id})`);
-
+const req= {} as HttpRequest;
   try {
-    const accessToken = await getAccessToken(`${userName}`, `${password}`);
+    const accessToken = await getAccessToken(req,`${username}`, `${password}`);
     const response = await fetch(
       `${lnbiturl}/users/api/v1/user/${userId}/wallet`,
       {
@@ -729,7 +656,7 @@ const getWalletById = async (
       return null;
     }
 
-    const data = await response.json();
+    const data = await response.json() as Wallet[];
 
     // Find the wallet with a matching inkey that are not deleted.
     const filteredWallets = data.filter(
@@ -785,7 +712,7 @@ const getWalletIdFromKey = async (inKey: string) => {
       return null;
     }
 
-    const data = await response.json();
+    const data = await response.json() as Wallet[];
 
     // Find the wallet with a matching inkey
     const wallet = data.find((wallet: any) => wallet.inkey === inKey);
@@ -856,7 +783,7 @@ const getPaymentsSince = async (lnKey: string, timestamp: number) => {
       );
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
 
     // Filter the payments to only include those since the provided timestamp
     const paymentsSince = data.filter(
@@ -874,8 +801,8 @@ const getPaymentsSince = async (lnKey: string, timestamp: number) => {
   }
 };
 
-// TODO: This method needs checking!
 const createInvoice = async (
+  req: HttpRequest,
   lnKey: string,
   recipientWalletId: string,
   amount: number,
@@ -885,21 +812,25 @@ const createInvoice = async (
   console.log(
     `createInvoice starting ... (lnKey: ${lnKey}, recipientWalletId: ${recipientWalletId}, amount: ${amount}, memo: ${memo}, extra: ${extra})`,
   );
-
-  try {
-    const response = await fetch(`${lnbiturl}/api/v1/payments`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': lnKey,
-      },
-      body: JSON.stringify({
-        out: false,
-        amount: amount,
-        memo: memo,
-        extra: extra,
-      }),
-    });
+  if (!lnbiturl) {
+    console.log('Setting lnbiturl ...');
+    setLnbitUrl(req);
+}
+try {
+  const response = await fetch(`${lnbiturl}/api/v1/payments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Api-Key': lnKey,
+    },
+    body: JSON.stringify({
+      out: false,
+      amount: amount,
+      memo: memo,
+      extra: extra,
+      unit: 'sat',
+    }),
+  });
 
     console.log('createInvoice: response:', response);
 
@@ -918,6 +849,7 @@ const createInvoice = async (
 };
 
 const payInvoice = async (
+  req: HttpRequest,
   adminKey: string,
   paymentRequest: string,
   extra: object,
@@ -981,7 +913,7 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
       );
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     console.log('getWalletIdByUserId: data:', data);
 
     return data.id;
@@ -991,8 +923,37 @@ const getWalletIdByUserId = async (adminKey: string, userId: string) => {
   }
 };
 
-async function topUpWallet(walletId: string, amount: number): Promise<void> {
-  const accessToken = await getAccessToken(`${userName}`, `${password}`);
+const getUser = async(req: HttpRequest, userId: string, adminKey: string): Promise<any> =>{
+  
+  console.log(`Getting User starting ... (adminKey: ${adminKey}, userId: ${userId})`);
+  const { siteUrl } = getCredentials(req);
+  const lnbiturl = siteUrl
+   
+  try {
+     const url = `${lnbiturl}/usermanager/api/v1/users/${userId}`;
+     console.log('URL:', url);
+      const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-Api-Key': adminKey,
+          },
+      });
+
+      if (!response.ok) {
+          throw new Error(`Error getting user (status: ${response.status}): ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data;
+  } catch (error) {
+      console.error('Error in getUser:', error);
+      return null;
+  }
+}
+
+async function topUpWallet(walletId: string, amount: number,  req: HttpRequest): Promise<void> {
+  const accessToken = await getAccessToken(req,`${username}`, `${password}`);
 
   const url = `${lnbiturl}/users/api/v1/topup`;
   const body = {
@@ -1021,45 +982,10 @@ async function topUpWallet(walletId: string, amount: number): Promise<void> {
   }
 }
 
-async function scheduledTopup() {
-  const allowancewallets = await getWallets(process.env.LNBITS_ADMINKEY as string, 'Allowance',);
-  const allowanceValue = process.env.LNBITS_INITIAL_ALLOWANCE as string;
-  const hostWalletId = process.env.LNBITS_HOST_WALLET_ID as string;
-  const hostUserId =process.env.LNBITS_HOST_USER_ID as string;
-
-  const host = getWalletById(hostUserId, hostWalletId);
-
-  console.log('Wallets' , allowancewallets)
-
-
-  if (allowancewallets) {
-    allowancewallets.forEach(async wallet => {
-     const User = await getUser(process.env.LNBITS_ADMINKEY as string, wallet.user);
-  
-     const extra = {
-      from: wallet,
-      to: host,
-      tag: 'zap',
-    }
-
-    console.log('Extra:', extra);
-    if(wallet.balance_msat >0){
-
-     const paymentRequest = await createInvoice(
-      process.env.LNBITS_INKEY as string,
-       hostWalletId, wallet.balance_msat/1000,
-        `${User.displayName} Weekly Allowance cleared`,
-        extra ); 
-      await payInvoice(wallet.adminkey , paymentRequest, extra)}
-     topUpWallet(wallet.id, parseInt(allowanceValue));
-    });
-  }
-}
-
 export {
+  getUser,
   getWallets,
   createUser,
-  getUser,
   updateUser,
   getUsers,
   getWalletName,
@@ -1071,10 +997,9 @@ export {
   getUserWallets,
   getInvoicePayment,
   getPaymentsSince,
-  createInvoice,
   createWallet,
   payInvoice,
   getWalletIdByUserId,
   topUpWallet,
-  scheduledTopup,
+  createInvoice,
 };

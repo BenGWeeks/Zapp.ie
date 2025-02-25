@@ -3,21 +3,18 @@ import { RewardNameContext } from './RewardNameContext';
 
 import React, { useEffect, useState, useContext } from 'react';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
-import {
-  getWalletTransactionsSince,
-  getUsers,
-  getUserWallets,
-} from '../services/lnbitsServiceLocal';
 import styles from './ZapActivityChartComponent.module.css';
 
 interface ZapContributionsChartProps {
   lnKey: string;
   timestamp: number; // Timestamp in seconds since the epoch
+  allZaps: Transaction[];
+  allUsers: User[];
+  isLoading: boolean;
 }
 
 
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
-
 
 function generateDateRange(fromDate: string, toDate: string): string[] {
   const dates = [];
@@ -79,6 +76,8 @@ const transformZapsToActivities = (
 const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
   lnKey,
   timestamp,
+  allZaps,
+  allUsers
 }) => {
 
 
