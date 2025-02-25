@@ -16,9 +16,13 @@ import { ConnectorClient } from 'botframework-connector';
 import { getUsers, payInvoice, createInvoice } from '../services/lnbitsService';
 import { error } from 'console';
 import { UserService } from '../services/userService';
+import { getRewardName } from '../services/fetchRewardsName';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
 const lnbitsLabel = process.env.REACT_APP_LNBITS_POINTS_LABEL as string;
+
+const globalRewardName = getRewardName()
+console.log(`Reward Name is `, globalRewardName);
 
 export class SendZapCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
