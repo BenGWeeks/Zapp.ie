@@ -28,8 +28,11 @@ try {
   // Split the version into its components
   const versionParts = currentVersion.split('.').map(Number);
 
-  // Increment the patch version (the last number)
-  versionParts[2] += 1;
+  // Increment the patch version (the last number) only for Test and Prod environments
+  const environment = envConfig.ENVIRONMENT;
+  if (environment === 'Test' || environment === 'Prod') {
+    versionParts[2] += 1;
+  }
 
   // Join the version parts back into a string
   const newVersion = versionParts.join('.');
