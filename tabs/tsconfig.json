@@ -21,6 +21,6 @@
     "types": ["react", "react-dom", "node"],
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src","backend"],
   "exclude": ["node_modules", "dist"]
 }
