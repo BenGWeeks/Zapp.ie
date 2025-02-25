@@ -26,95 +26,96 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Calculate the timestamp for 30 days ago
-  const sevenDaysAgo = Date.now() / 1000 - 30 * 24 * 60 * 60;
-
-  // Use the provided timestamp or default to 7 days ago
-  const paymentsSinceTimestamp = sevenDaysAgo;
-  const activeTabForData =
-    activeTab === null || activeTab === undefined || activeTab === ''
-      ? 'all'
-      : activeTab;
-  console.log('activeTabForData: ', activeTabForData);
-
-  console.log('activeWallet: ', activeWallet);
-
-  const getAllUsers = async () => {
-    const users = await getUsers(adminKey, {});
-    if (users) {
-      setUsers(users);
-    }
-    console.log('Users: ', users);
-  };
-
   const { accounts } = useMsal();
-  const account = accounts[0];
-
-  const fetchTransactions = async () => {
-    console.log('Fetching payments since: ', paymentsSinceTimestamp);
-    setLoading(true);
-    setError(null);
-
-    let allTransactions: Transaction[] = [];
-
-    try {
-      const currentUserLNbitDetails = await getUsers(adminKey, {
-        aadObjectId: account.localAccountId,
-      });
-
-      console.log('Current user: ', currentUserLNbitDetails);
-
-      if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
-        let inkey: any = null;
-
-        if (activeWallet === 'Private') {
-          inkey = currentUserLNbitDetails[0].privateWallet?.inkey;
-        } else {
-          inkey = currentUserLNbitDetails[0].allowanceWallet?.inkey;
-        }
-
-        if (inkey) {
-          const transactions = await getWalletTransactionsSince(
-            inkey,
-            paymentsSinceTimestamp,
-            null, //{ tag: 'zap' }
-          );
-
-          let filteredTransactions: any = null;
-
-          if (activeTab === 'sent')
-            filteredTransactions = transactions.filter(f => f.amount < 0);
-          else if (activeTab === 'received')
-            filteredTransactions = transactions.filter(f => f.amount > 0);
-          else filteredTransactions = transactions;
-
-          for (const transaction of filteredTransactions) {
-            transaction.extra.from = users.filter(
-              u => u.id === transaction.extra?.from?.user,
-            )[0];
-            transaction.extra.to = users.filter(
-              u => u.id === transaction.extra?.to?.user,
-            )[0];
-          }
-
-          allTransactions = allTransactions.concat(filteredTransactions);
-          console.log('Transactions: ', allTransactions);
-        }
-      }
-      setTransactions(prevState => [...prevState, ...allTransactions]);
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(`Failed to fetch transactions: ${error.message}`);
-      } else {
-        setError('An unknown error occurred while fetching transactions');
-      }
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
+    // Calculate the timestamp for 30 days ago
+    const sevenDaysAgo = Date.now() / 1000 - 30 * 24 * 60 * 60;
+
+    // Use the provided timestamp or default to 7 days ago
+    const paymentsSinceTimestamp = sevenDaysAgo;
+    const activeTabForData =
+      activeTab === null || activeTab === undefined || activeTab === ''
+        ? 'all'
+        : activeTab;
+    console.log('activeTabForData: ', activeTabForData);
+
+    console.log('activeWallet: ', activeWallet);
+
+    const getAllUsers = async () => {
+      const users = await getUsers(adminKey, {});
+      if (users) {
+        setUsers(users);
+      }
+      console.log('Users: ', users);
+    };
+
+    const account = accounts[0];
+
+    const fetchTransactions = async () => {
+      console.log('Fetching payments since: ', paymentsSinceTimestamp);
+      setLoading(true);
+      setError(null);
+
+      let allTransactions: Transaction[] = [];
+
+      try {
+        const currentUserLNbitDetails = await getUsers(adminKey, {
+          aadObjectId: account.localAccountId,
+        });
+
+        console.log('Current user: ', currentUserLNbitDetails);
+
+        if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
+          let inkey: any = null;
+
+          if (activeWallet === 'Private') {
+            inkey = currentUserLNbitDetails[0].privateWallet?.inkey;
+          } else {
+            inkey = currentUserLNbitDetails[0].allowanceWallet?.inkey;
+          }
+
+          if (inkey) {
+            const transactions = await getWalletTransactionsSince(
+              inkey,
+              paymentsSinceTimestamp,
+              null,
+            );
+
+            let filteredTransactions: any = null;
+
+            if (activeTab === 'sent')
+              filteredTransactions = transactions.filter(f => f.amount < 0);
+            else if (activeTab === 'received')
+              filteredTransactions = transactions.filter(f => f.amount > 0);
+            else filteredTransactions = transactions;
+
+            for (const transaction of filteredTransactions) {
+              transaction.extra.from = users.filter(
+                u => u.id === transaction.extra?.from?.user,
+              )[0];
+              transaction.extra.to = users.filter(
+                u => u.id === transaction.extra?.to?.user,
+              )[0];
+            }
+
+            allTransactions = allTransactions.concat(filteredTransactions);
+            console.log('Transactions: ', allTransactions);
+          }
+        }
+        setTransactions(prevState => [...prevState, ...allTransactions]);
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(`Failed to fetch transactions: ${error.message}`);
+        } else {
+          setError('An unknown error occurred while fetching transactions');
+        }
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     setTransactions([]);
     getAllUsers();
     fetchTransactions();
@@ -166,14 +167,37 @@ const WalletTransactionLog: React.FC<WalletTransactionLogProps> = ({
                         : transaction.extra?.tag ?? 'Regular transaction'}
                     </b>
                   </p>
+                  {/* 
+                    Dynamically calculate and display the time difference between the transaction and the current time.
+                    The output format adapts based on the time elapsed:
+                    - Less than 60 seconds: show in seconds.
+                    - Less than 1 hour: show in minutes.
+                    - Less than 1 day: show in hours.
+                    - More than 1 day: show in days.
+                  */}
                   <div className={styles.lightHelightInItems}>
-                    {' '}
-                    {moment(moment.now()).diff(
-                      transaction.time * 1000,
-                      'days',
-                    )}{' '}
-                    days ago from{' '}
-                    <b>{transaction.extra?.from?.displayName ?? 'Unknown'} </b>
+                    {(() => {
+                      const now = moment();
+                      const transactionTime = moment(transaction.time * 1000);
+                      const diffInSeconds = now.diff(transactionTime, 'seconds');
+
+                      if (diffInSeconds < 60) {
+                        return `${diffInSeconds} seconds ago `;
+                      } else if (diffInSeconds < 3600) {
+                        const diffInMinutes = now.diff(transactionTime, 'minutes');
+                        return `${diffInMinutes} minutes ago `;
+                      } else if (diffInSeconds < 86400) {
+                        const diffInHours = now.diff(transactionTime, 'hours');
+                        return `${diffInHours} hours ago `;
+                      } else {
+                        const diffInDays = now.diff(transactionTime, 'days');
+                        return `${diffInDays} days ago `;
+                      }
+                    })()}
+                    {(transaction.amount as number) < 0 ? 'to' : 'from'}{' '} <b>{(transaction.amount as number) < 0
+                        ? transaction.extra?.to?.displayName ?? 'Unknown'
+                        : transaction.extra?.from?.displayName ??
+                          'Unknown'}{' '}</b>
                   </div>
                   <p className={styles.lightHelightInItems}>
                     {transaction.memo}

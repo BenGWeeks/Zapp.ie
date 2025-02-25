@@ -2,8 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
+const env = process.env.TEAMSFX_ENV || 'local';
+
 const envFilePath = path.join(__dirname, '..', 'env', '.env.dev');
-const envOutputPath = path.join(__dirname, '..', 'env', '.env.local');
+const envOutputPath = path.join(__dirname, '..', 'env', `.env.${env}`);
 
 // Load environment variables from .env.dev
 const envConfig = dotenv.parse(fs.readFileSync(envFilePath));

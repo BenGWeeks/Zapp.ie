@@ -1,45 +1,27 @@
-import {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-} from 'react';
+import { FunctionComponent, useEffect, useState, useRef } from 'react';
 import styles from './UserListComponent.module.css';
 import { getUsers } from '../services/lnbitsServiceLocal';
+import { useCache } from '../utils/CacheContext';
 
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
 const UserListComponent: FunctionComponent = () => {
-  const onBodyContentsContainerClick = useCallback(() => {
-    // Add your code here
-  }, []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const fetchCalled = useRef(false); // Ref to track if fetchUsers has been called
+  const { cache, setCache } = useCache();
 
   const fetchUsers = async () => {
-    console.log('fetchUsers ...');
+    //Load users from Cache or paraneter
+    console.log('load all ALL users in USERS');
     setLoading(true);
     setError(null);
 
-    try {
-      const users = await getUsers(adminKey, {});
-
-      if (users) {
-        setUsers(prevState => [...prevState, ...users]);
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(`Failed to fetch users: ${error.message}`);
-      } else {
-        setError('An unknown error occurred while fetching users');
-      }
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+    const allUsers = cache['allUsers'] as User[];
+    console.log('load all users in USER comp', allUsers);
+    setUsers(allUsers);
+    setLoading(false);
   };
 
   useEffect(() => {

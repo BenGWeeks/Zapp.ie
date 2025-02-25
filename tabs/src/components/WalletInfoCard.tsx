@@ -1,29 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import './WalletInfoCard.css';
 import ArrowClockwise from '../images/ArrowClockwise.svg';
-import { getUsers, getUserWallets } from '../services/lnbitsServiceLocal';
+import { getUsers } from '../services/lnbitsServiceLocal';
 import { useMsal } from '@azure/msal-react';
-
-// interface WalletYourWalletInfoCardProps {
-//   totalSats: number;
-// }
+import SendPayment from './SendPayment';
+import ReceivePayment from './ReceivePayment';
 
 const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
 
 const WalletYourWalletInfoCard: React.FC = () => {
   const [balance, setBalance] = useState<number>();
 
-  const { instance, accounts } = useMsal();
+  const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
+  const [isSendPopupOpen, setIsSendPopupOpen] = useState(false);
+  const { accounts } = useMsal();
   const account = accounts[0];
+  const [myLNbitDetails, setMyLNbitDetails] = useState<User>();
 
   const fetchAmountReceived = async () => {
     console.log('Fetching your wallet ...');
-
+    
     const currentUserLNbitDetails = await getUsers(adminKey, {
       aadObjectId: account.localAccountId,
     });
 
     if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
+      setMyLNbitDetails(currentUserLNbitDetails[0]);
       if (currentUserLNbitDetails && currentUserLNbitDetails.length > 0) {
         const bal =
           (currentUserLNbitDetails[0].privateWallet?.balance_msat ?? 0) / 1000;
@@ -35,6 +37,24 @@ const WalletYourWalletInfoCard: React.FC = () => {
   useEffect(() => {
     fetchAmountReceived();
   });
+  const handleOpenReceivePopup = () => {
+    setIsReceivePopupOpen(true);
+  };
+
+  const handleCloseReceivePopup = () => {
+    setIsReceivePopupOpen(false);
+  };
+
+  const handleOpenSendPopup = () => {
+    setIsSendPopupOpen(true);
+  };
+
+  const handleCloseSendPopup = () => {
+    setIsSendPopupOpen(false);
+  };
+
+  // Buttons should be disabled if balance is undefined (still loading)
+  const isLoading = false; // balance === undefined;
 
   return (
     <div className="wallet-info">
@@ -59,15 +79,48 @@ const WalletYourWalletInfoCard: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="row wallet-buttons">
-        <div className="col-md-2">
+      <div className="wallet-buttons">
+        <div>
           {' '}
-          <button className="receive-btn">Receive</button>
+          <button
+            onClick={handleOpenReceivePopup}
+            className="receive-btn"
+            disabled={isLoading}
+          >
+            Receive
+          </button>
         </div>
-        <div className="col-md-2">
-          <button className="send-btn">Send</button>
+        <div>
+          <button
+            onClick={handleOpenSendPopup}
+            className="send-btn"
+            disabled={isLoading}
+          >
+            Send
+          </button>
         </div>
-        <div className="col-md-8">
+        {isReceivePopupOpen && (
+          <div className="overlay" onClick={handleCloseReceivePopup}>
+            <div className="popup" onClick={e => e.stopPropagation()}>
+              <ReceivePayment
+                onClose={handleCloseReceivePopup}
+                currentUserLNbitDetails={myLNbitDetails!}
+              />
+            </div>
+          </div>
+        )}
+
+        {isSendPopupOpen && (
+          <div className="overlay" onClick={handleCloseSendPopup}>
+            <div className="popup" onClick={e => e.stopPropagation()}>
+              <SendPayment
+                onClose={handleCloseSendPopup}
+                currentUserLNbitDetails={myLNbitDetails!}
+              />
+            </div>
+          </div>
+        )}
+        <div className="col-md-6">
           <span></span>
         </div>
       </div>
