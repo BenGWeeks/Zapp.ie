@@ -1,6 +1,6 @@
 {
   "name": "tabs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.24.0",
