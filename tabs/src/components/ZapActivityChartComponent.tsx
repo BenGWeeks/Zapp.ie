@@ -1,10 +1,7 @@
-/// <reference path="../types/global.d.ts" />
-
+// filepath: /c:/projects/ZapVibes/tabs/src/components/ZapActivityChartComponent.tsx
 import React, { useEffect, useState } from 'react';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
 import styles from './ZapActivityChartComponent.module.css';
-import { count } from 'console';
-// Removed unused imports
 
 interface ZapContributionsChartProps {
   lnKey: string;
@@ -22,6 +19,7 @@ function generateDateRange(fromDate: string, toDate: string): string[] {
   while (currentDate <= endDate) {
     dates.push(currentDate.toISOString().split('T')[0]);
     currentDate.setDate(currentDate.getDate() + 1);
+    console.log('Current date: ', currentDate);
   }
 
   return dates;
@@ -73,14 +71,19 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
   lnKey,
   timestamp,
   allZaps,
-  allUsers
+  allUsers,
+  isLoading,
 }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
-  //const [loading, setLoading] = useState<boolean>(true);
-  // Removed unused prop
+
   useEffect(() => {
     const fetchActivities = async () => {
       try {
+        if (allZaps.length === 0) {
+          console.log('No transactions available');
+          return;
+        }
+
         console.log('Chart transactions: ', allZaps);
         const fromDate = new Date(timestamp * 1000).toISOString().split('T')[0];
         const toDate = new Date().toISOString().split('T')[0];
@@ -93,18 +96,20 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
         console.log('Activities data: ', activitiesData);
       } catch (error) {
         console.error('Error fetching zaps:', error);
-      } finally {
-        //setLoading(false);
       }
     };
 
     fetchActivities();
-  }, [lnKey, timestamp]);
+  }, [lnKey, timestamp, allZaps]);
 
   return (
     <div className={styles.zapactivitychartbox}>
       <h2 className={styles.zapactivitycharttitle}>Zap activity</h2>
-      {activities.length > 0 ? (
+      {isLoading ? (
+        <div style={{ marginLeft: 0, marginRight: 'auto' }}>
+          Loading activity data ...
+        </div>
+      ) : activities.length > 0 ? (
         <ActivityCalendar
           data={activities}
           blockSize={12}
@@ -120,11 +125,11 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
         />
       ) : (
         <div style={{ marginLeft: 0, marginRight: 'auto' }}>
-          Loading activity data ...
+          No activity data available
         </div>
       )}
     </div>
   );
 };
 
-export default ZapContributionsChart
+export default ZapContributionsChart;
