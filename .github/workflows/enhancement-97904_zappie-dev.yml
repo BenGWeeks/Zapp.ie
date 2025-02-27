@@ -24,6 +24,8 @@ jobs:
           node-version: '20.x'
 
       - name: npm install, build, and test
+        env:
+          CI: false
         run: |
           cd tabs
           npm install
