@@ -65,4 +65,5 @@ jobs:
           app-name: 'zappie-dev'
           slot-name: 'Production'
           package: .
+          app_location: '/tabs'
           
