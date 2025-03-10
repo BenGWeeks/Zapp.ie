@@ -65,7 +65,7 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'zappie-dev'
-          slot-name: 'Development'
+          slot-name: 'development'
           package: .
 
           
