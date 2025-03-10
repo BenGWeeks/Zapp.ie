@@ -67,7 +67,6 @@ jobs:
           app-name: 'zappie-dev'
           slot-name: 'Production'
           package: .
-          target-path: '/tabs'
           startup-command: npm install
             npm start
           
