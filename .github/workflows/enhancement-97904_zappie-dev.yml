@@ -65,9 +65,8 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'zappie-dev'
-          slot-name: 'Production'
+          slot-name: 'Development'
           package: .
-          startup-command: npm install
-            npm start
+
           
           
