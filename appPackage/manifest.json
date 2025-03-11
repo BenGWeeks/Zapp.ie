@@ -118,6 +118,7 @@
                 "channelTab"
             ], 
             "name": "Wallet", 
+
             "contentUrl": "https://zappie-dev-development.azurewebsites.net/wallet", 
             "websiteUrl": "https://zappie-dev-development.azurewebsites.net/wallet"
         },

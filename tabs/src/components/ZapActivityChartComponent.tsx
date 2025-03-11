@@ -1,4 +1,3 @@
-// filepath: /c:/projects/ZapVibes/tabs/src/components/ZapActivityChartComponent.tsx
 import React, { useEffect, useState,useContext } from 'react';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
 import styles from './ZapActivityChartComponent.module.css';
@@ -106,6 +105,7 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
 
     fetchActivities();
   }, [lnKey, timestamp, allZaps]);
+
    const rewardNameContext = useContext(RewardNameContext);
   if (!rewardNameContext) {
     return null; // or handle the case where the context is not available
