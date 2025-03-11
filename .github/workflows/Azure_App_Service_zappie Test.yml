@@ -69,7 +69,7 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'zappie-dev'
-          slot-name: 'testing'
+          slot-name: pr-${{ github.event.pull_request.number || 'testing' }}
           package: .
 
           
