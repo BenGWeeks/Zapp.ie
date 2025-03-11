@@ -1,14 +1,7 @@
-/// <reference path="../types/global.d.ts" />
-import { RewardNameContext } from './RewardNameContext';
-
-import React, { useEffect, useState, useContext } from 'react';
+// filepath: /c:/projects/ZapVibes/tabs/src/components/ZapActivityChartComponent.tsx
+import React, { useEffect, useState } from 'react';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
 import styles from './ZapActivityChartComponent.module.css';
-import {
-  getWalletTransactionsSince,
-  getUsers,
-  getUserWallets,
-} from '../services/lnbitsServiceLocal';
 
 interface ZapContributionsChartProps {
   lnKey: string;
@@ -18,9 +11,6 @@ interface ZapContributionsChartProps {
   isLoading: boolean;
 }
 
-
-const adminKey = process.env.REACT_APP_LNBITS_ADMINKEY as string;
-
 function generateDateRange(fromDate: string, toDate: string): string[] {
   const dates = [];
   const currentDate = new Date(fromDate);
@@ -29,6 +19,7 @@ function generateDateRange(fromDate: string, toDate: string): string[] {
   while (currentDate <= endDate) {
     dates.push(currentDate.toISOString().split('T')[0]);
     currentDate.setDate(currentDate.getDate() + 1);
+    console.log('Current date: ', currentDate);
   }
 
   return dates;
@@ -68,7 +59,6 @@ const transformZapsToActivities = (
     } else if (totalAmount >= 3000) {
       level = 4;
     }
-
     return { date, count: totalAmount, level };
   });
 
@@ -77,57 +67,23 @@ const transformZapsToActivities = (
   return activities;
 };
 
-
 const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
   lnKey,
   timestamp,
   allZaps,
-  allUsers
+  allUsers,
+  isLoading,
 }) => {
-
-
-
   const [activities, setActivities] = useState<Activity[]>([]);
-  //const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    
     const fetchActivities = async () => {
-      
       try {
-        
-        let allZaps: Transaction[] = [];
-        if (lnKey === '') {
-          const users = await getUsers(adminKey, {});
-          console.log('Fetching zaps for all users:', users);
-          if (users) {
-            for (const user of users) {
-              const wallets = await getUserWallets(adminKey, user.id);
-              console.log('Fetching zaps for all wallets:', wallets);
-              if (wallets) {
-                const allowanceWallets = wallets.filter(
-                  wallet => wallet.name === 'Allowance',
-                );
-
-                for (const wallet of allowanceWallets) {
-                  const transactions = await getWalletTransactionsSince(
-                    wallet.inkey,
-                    timestamp,
-                    { tag: 'zap' },
-                  );
-                  allZaps = allZaps.concat(transactions);
-                }
-              }
-            }
-          }
-        } else {
-          console.log('Fetching zaps for wallet:', lnKey);
-          console.log('Fetching zaps since:', timestamp);
-          allZaps = await getWalletTransactionsSince(lnKey, timestamp, {
-            tag: 'zap',
-          }); // This currently only gets zaps for the specified wallet.
+        if (allZaps.length === 0) {
+          console.log('No transactions available');
+          return;
         }
-        
+
         console.log('Chart transactions: ', allZaps);
         const fromDate = new Date(timestamp * 1000).toISOString().split('T')[0];
         const toDate = new Date().toISOString().split('T')[0];
@@ -136,24 +92,24 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
           fromDate,
           toDate,
         );
-
+        setActivities(activitiesData);
+        console.log('Activities data: ', activitiesData);
       } catch (error) {
         console.error('Error fetching zaps:', error);
-      } finally {
-        //setLoading(false);
-      }        
+      }
     };
-     fetchActivities();
-  }, [lnKey, timestamp]);
 
-  const rewardNameContext = useContext(RewardNameContext);
-  const  rewardName  = rewardNameContext.rewardName;
-  
+    fetchActivities();
+  }, [lnKey, timestamp, allZaps]);
 
   return (
-        <div className={styles.zapactivitychartbox}>
+    <div className={styles.zapactivitychartbox}>
       <h2 className={styles.zapactivitycharttitle}>Zap activity</h2>
-      {activities.length > 0 ? (
+      {isLoading ? (
+        <div style={{ marginLeft: 0, marginRight: 'auto' }}>
+          Loading activity data ...
+        </div>
+      ) : activities.length > 0 ? (
         <ActivityCalendar
           data={activities}
           blockSize={12}
@@ -164,17 +120,16 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
           }}
           colorScheme="dark"
           labels={{
-            totalCount: `{{count}} ${rewardName} zapped (up until yesterday)`,
+            totalCount: '{{count}} Sats zapped (up until yesterday)',
           }}
         />
       ) : (
         <div style={{ marginLeft: 0, marginRight: 'auto' }}>
-          Loading activity data ...
+          No activity data available
         </div>
       )}
     </div>
   );
 };
-
 
 export default ZapContributionsChart;
