@@ -2,6 +2,8 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
 import styles from './setting.module.css';
 import { getRewardName, updateRewardName } from '../apiService';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CurrencySetting: FunctionComponent = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -29,11 +31,12 @@ const CurrencySetting: FunctionComponent = () => {
     try {
       const data = await updateRewardName(currency);
       console.log('Reward name saved:', data.rewardName);
+      toast.success('Reward name has been updated successfully!');
     } catch (error) {
       console.error('Error updating reward name:', error);
+      toast.error('Error updating reward name.');
     }
   };
-
   return (
     <div className={styles.currencySetting}>
       <label className={styles.label}>Reward Name</label>
@@ -57,6 +60,7 @@ const CurrencySetting: FunctionComponent = () => {
           </button>
         )}
       </div>
+      <ToastContainer />
     </div>
   );
 };
