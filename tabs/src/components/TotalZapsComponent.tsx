@@ -1,9 +1,11 @@
-import { RewardNameContext } from './RewardNameContext';
 import { FunctionComponent, useState, useEffect, useContext } from 'react';
 import styles from './TotalZapsComponent.module.css';
 //import lnbitsService from '../services/lnbitsServiceLocal';
 /// <reference path = "../global.d.ts" />
 import { useCache } from '../utils/CacheContext';
+import { RewardNameContext } from './RewardNameContext';
+import { getRewardName, updateRewardName } from '../apiService';
+
 export interface ZapSent {
   totalZaps: number;
   numberOfDays: number;
@@ -35,6 +37,24 @@ const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZap
   const [biggestZap, setBiggestZap] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { rewardName, setRewardName } = useContext(RewardNameContext);
+
+  // Get updated Reward Name from context
+  useEffect(() => {
+    const fetchRewardName = async () => {
+      try {
+        const data = await getRewardName();
+        setRewardName(data.rewardName);
+      } catch (error) {
+        console.error('Error fetching reward name:', error);
+      }
+    };
+
+    fetchRewardName();
+  }, [setRewardName]);
+
+  const rewardsName = rewardName;
 
   const zapsSent: ZapSent = {
     totalZaps: totalZaps,
@@ -97,16 +117,12 @@ const TotalZapsComponent: FunctionComponent<TotalZapsComponentProps> = ({ allZap
       setBiggestZap(Math.floor(maxZap)); // Already positive
     }
   }, [zaps, users]); // This effect runs whenever zaps changes
-  const rewardNameContext = useContext(RewardNameContext);
-  if (!rewardNameContext) {
-    return null; // or handle the case where the context is not available
-  }
-const rewardsName = rewardNameContext.rewardName;
-
+  
 
   if (error) {
     return <div className={styles.sentcomponent}>{error}</div>;
   }
+
 
 
   return (

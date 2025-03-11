@@ -11,6 +11,8 @@ import RequireAuth from './components/RequireAuth';
 
 // Sample app imports
 import { PageLayout } from './components/PageLayout';
+import { RewardNameProvider } from './components/RewardNameContext';
+
 
 // Import the pages
 import Login from './Login';
@@ -55,6 +57,7 @@ function TitleUpdater() {
 function App({ pca }: AppProps) {
   return (
     <MsalProvider instance={pca}> 
+    <RewardNameProvider>
     <TitleUpdater />
      <PageLayout> 
      <Stack horizontalAlign="center">    
@@ -71,6 +74,7 @@ function App({ pca }: AppProps) {
         </Routes>
       </Stack>
       </PageLayout>
+      </RewardNameProvider>
      </MsalProvider>
   );
 }
