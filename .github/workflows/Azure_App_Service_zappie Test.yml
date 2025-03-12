@@ -6,11 +6,11 @@ name: Deploy to Azure Web App Service-Test
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
