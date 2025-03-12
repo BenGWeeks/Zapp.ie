@@ -65,9 +65,14 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B9914647A5AC4DE3BA57B966B533CE4C }}
       - name: 'Ensure Slot Exists'
         run: |
-          SLOT_NAME=pr-${{ github.event.pull_request.number }} || 'testing'
+          if [[ -n "${{ github.event.pull_request.number }}" ]]; then
+                SLOT_NAME="pr-${{ github.event.pull_request.number }}"
+              else
+                SLOT_NAME="testing"
+              fi
           RESOURCE_GROUP="rg-Zappie-dev"
           APP_NAME="zappie-dev"
+          echo "Using slot: $SLOT_NAME"
     
           # Check if the slot exists
           SLOT_EXISTS=$(az webapp deployment slot list --resource-group $RESOURCE_GROUP --name $APP_NAME --query "[?name=='$SLOT_NAME']" -o tsv)
@@ -86,7 +91,7 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'zappie-dev'
-          slot-name: pr-${{ github.event.pull_request.number }} || 'testing'
+          slot-name: ${{ github.event.pull_request.number && format('pr-{0}', github.event.pull_request.number) || 'testing' }}
           package: .
 
           
