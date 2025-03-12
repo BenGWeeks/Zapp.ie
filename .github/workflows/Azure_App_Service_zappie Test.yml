@@ -63,13 +63,30 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C9108189951C4733A4D6582BFAE86E9A }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8DB206750A6341348101327101E60EA9 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B9914647A5AC4DE3BA57B966B533CE4C }}
+      - name: 'Ensure Slot Exists'
+        run: |
+          SLOT_NAME=pr-${{ github.event.pull_request.number }} || 'testing'
+          RESOURCE_GROUP="rg-Zappie-dev"
+          APP_NAME="zappie-dev"
+    
+          # Check if the slot exists
+          SLOT_EXISTS=$(az webapp deployment slot list --resource-group $RESOURCE_GROUP --name $APP_NAME --query "[?name=='$SLOT_NAME']" -o tsv)
+    
+          # If the slot doesn't exist, create it
+          if [[ -z "$SLOT_EXISTS" ]]; then
+            echo "Slot $SLOT_NAME does not exist. Creating..."
+            az webapp deployment slot create --resource-group $RESOURCE_GROUP --name $APP_NAME --slot $SLOT_NAME
+          else
+            echo "Slot $SLOT_NAME already exists."
+          fi
+        shell: bash
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
           app-name: 'zappie-dev'
-          slot-name: pr-${{ github.event.pull_request.number || 'testing' }}
+          slot-name: pr-${{ github.event.pull_request.number }} || 'testing'
           package: .
 
           
