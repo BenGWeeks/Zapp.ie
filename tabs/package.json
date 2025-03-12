@@ -1,14 +1,16 @@
 {
   "name": "tabs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.24.0",
     "@azure/msal-react": "^2.1.0",
     "@fluentui/react": "^8.120.6",
+    "@microsoft/teams-js": "^2.34.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/user-event": "^13.5.0",
     "@yudiel/react-qr-scanner": "^2.0.8",
+    "axios": "^1.8.1",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv-flow": "^4.1.0",
@@ -22,7 +24,9 @@
     "react-qr-code": "^2.0.15",
     "react-router-dom": "^6.26.1",
     "react-scripts": "5.0.1",
+    "react-toastify": "^11.0.5",
     "web-vitals": "^2.1.4"
+
   },
   "resolutions": {
     "chroma-js": "2.4.2"
