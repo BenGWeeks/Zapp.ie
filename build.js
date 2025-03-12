@@ -2,11 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
+
 // Read environment variables from .env.dev file
 const envFilePath = path.join(__dirname, '.', 'env', '.env.dev');
 const envConfig = dotenv.parse(fs.readFileSync(envFilePath));
 const contentUrl = envConfig.CONTENT_URL;
 const websiteUrl = envConfig.WEBSITE_URL;
+
 
 // Check for missing environment variables
 if (!contentUrl || !websiteUrl) {
@@ -43,7 +45,8 @@ try {
   // Replace placeholders with environment variables
   const updatedManifest = JSON.stringify(manifest, null, 2)
     .replace(/{{CONTENT_URL}}/g, contentUrl)
-    .replace(/{{WEBSITE_URL}}/g, websiteUrl);
+    .replace(/{{WEBSITE_URL}}/g, websiteUrl)
+    .replace(/{{WEBSITE_URL}}/g, lnbitpoints);
 
   // Write the final manifest.json file
   const outputPath = path.join(__dirname, 'appPackage', 'manifest.json');

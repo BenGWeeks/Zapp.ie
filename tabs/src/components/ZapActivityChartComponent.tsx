@@ -1,7 +1,9 @@
-// filepath: /c:/projects/ZapVibes/tabs/src/components/ZapActivityChartComponent.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useContext } from 'react';
 import ActivityCalendar, { Activity } from 'react-activity-calendar';
 import styles from './ZapActivityChartComponent.module.css';
+import { RewardNameContext } from './RewardNameContext';
+
+
 
 interface ZapContributionsChartProps {
   lnKey: string;
@@ -77,6 +79,7 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
   const [activities, setActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
+    
     const fetchActivities = async () => {
       try {
         if (allZaps.length === 0) {
@@ -97,10 +100,17 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
       } catch (error) {
         console.error('Error fetching zaps:', error);
       }
+      
     };
 
     fetchActivities();
   }, [lnKey, timestamp, allZaps]);
+
+   const rewardNameContext = useContext(RewardNameContext);
+  if (!rewardNameContext) {
+    return null; // or handle the case where the context is not available
+  }
+const rewardsName = rewardNameContext.rewardName;
 
   return (
     <div className={styles.zapactivitychartbox}>
@@ -120,7 +130,7 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
           }}
           colorScheme="dark"
           labels={{
-            totalCount: '{{count}} Sats zapped (up until yesterday)',
+            totalCount: `{{count}} ${rewardsName} zapped (up until yesterday)`,
           }}
         />
       ) : (
