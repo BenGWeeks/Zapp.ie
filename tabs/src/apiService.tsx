@@ -10,6 +10,7 @@ const getAuthToken = () => {
 
 export const getRewardName = async () => {
   try {
+    console.log('Fetching reward name');
     const response = await axios.get(`${API_URL}/reward-name`, {
       headers: {
         Authorization: getAuthToken(),

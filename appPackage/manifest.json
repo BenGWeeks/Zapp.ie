@@ -77,8 +77,8 @@
                 "channelTab"
             ], 
             "name": "Feed", 
-            "contentUrl": "{{CONTENT_URL}}", 
-            "websiteUrl": "{{WEBSITE_URL}}"
+            "contentUrl": "https://zappie-dev-development.azurewebsites.net", 
+            "websiteUrl": "https://zappie-dev-development.azurewebsites.net"
         }, 
         { 
             "entityId": "usersTab", 
@@ -91,8 +91,8 @@
                 "channelTab"
             ], 
             "name": "Users", 
-            "contentUrl": "{{CONTENT_URL}}/users", 
-            "websiteUrl": "{{WEBSITE_URL}}/users"
+            "contentUrl": "https://zappie-dev-development.azurewebsites.net/users", 
+            "websiteUrl": "https://zappie-dev-development.azurewebsites.net/users"
         } ,       { 
             "entityId": "rewardsTab", 
             "scopes": [       
@@ -104,8 +104,8 @@
                 "channelTab"
             ], 
             "name": "Rewards", 
-            "contentUrl": "{{CONTENT_URL}}/rewards", 
-            "websiteUrl": "{{WEBSITE_URL}}/rewards"
+            "contentUrl": "https://zappie-dev-development.azurewebsites.net/rewards", 
+            "websiteUrl": "https://zappie-dev-development.azurewebsites.net/rewards"
         },
                { 
             "entityId": "walletTab", 
@@ -118,8 +118,9 @@
                 "channelTab"
             ], 
             "name": "Wallet", 
-            "contentUrl": "{{CONTENT_URL}}/wallet", 
-            "websiteUrl": "{{WEBSITE_URL}}/wallet"
+
+            "contentUrl": "https://zappie-dev-development.azurewebsites.net/wallet", 
+            "websiteUrl": "https://zappie-dev-development.azurewebsites.net/wallet"
         },
         { 
             "entityId": "settingsTab", 
@@ -132,8 +133,8 @@
                 "channelTab"
             ], 
             "name": "Settings", 
-            "contentUrl": "{{CONTENT_URL}}/settings", 
-            "websiteUrl": "{{WEBSITE_URL}}/settings"
+            "contentUrl": "https://zappie-dev-development.azurewebsites.net/settings", 
+            "websiteUrl": "https://zappie-dev-development.azurewebsites.net/settings"
         }
     ],
     "permissions": [
