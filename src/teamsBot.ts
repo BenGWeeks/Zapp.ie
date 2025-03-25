@@ -28,6 +28,7 @@ import {
   createUser,
   createWallet,
   updateUser,
+  getWalletBalance,
 } from './services/lnbitsService';
 import { UserService } from './services/userService';
 import { access } from 'fs';
@@ -133,6 +134,10 @@ export class TeamsBot extends TeamsActivityHandler {
             .map((name) => `- ${name}`)
             .join('\n');
 
+          //fetch remainingBalance
+          const remainingBalance = await getWalletBalance(currentUser.allowanceWallet.inkey);
+          console.log('Remaining Balance:', remainingBalance);
+
           // Update adaptive card to read-only with list of recipients
           const updatedCard = {
             type: 'AdaptiveCard',
@@ -158,6 +163,12 @@ export class TeamsBot extends TeamsActivityHandler {
                 type: 'TextBlock',
                 text: `**Amount (Sats):** ${zapAmount}`,
                 wrap: true
+              },
+              {
+                type: 'TextBlock',
+                text: `**Remaining Amount (Sats):** ${remainingBalance}`,
+                wrap: true,
+                color: 'Good',
               },
             ],
             $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
