@@ -6,15 +6,10 @@ import {
   MemoryStorage,
   ConversationState,
   UserState,
-  TeamInfo,
   CardFactory,
-  Middleware,
   MessageFactory,
-  TeamsInfo,
-  StatePropertyAccessor,
-  Mention
 } from 'botbuilder';
-import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
+import {  SSOCommandMap } from './commands/SSOCommandMap';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { OnBehalfOfUserCredential } from '@microsoft/teamsfx';
 import { SendZapCommand, SendZap } from './commands/sendZapCommand';
@@ -23,15 +18,8 @@ import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
 import {
   getUser,
-  getUsers,
-  getWalletById,
-  createUser,
-  createWallet,
-  updateUser,
   getWalletBalance,
 } from './services/lnbitsService';
-import { UserService } from './services/userService';
-import { access } from 'fs';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
 interface CancellationToken {
