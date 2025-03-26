@@ -179,7 +179,7 @@ const FeedList: React.FC<FeedListProps> = ({
             To {sortField === 'to' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
           </b>
           {/* Memo header without sorting/hover effect */}
-          <b className={styles.string2}>Memo</b>
+          <b className={styles.string2}>Memo NEw</b>
           <div
             className={`${styles.stringWrapper} ${styles.hoverable}`}
             onClick={() => handleSort('amount')}
