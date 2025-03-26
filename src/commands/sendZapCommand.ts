@@ -13,7 +13,7 @@ import {
   TeamsActivityHandler,
 } from 'botbuilder';
 import { ConnectorClient } from 'botframework-connector';
-import { getUsers, payInvoice, createInvoice } from '../services/lnbitsService';
+import { getUsers, payInvoice, createInvoice, getWalletBalance } from '../services/lnbitsService';
 import { error } from 'console';
 import { UserService } from '../services/userService';
 
@@ -25,7 +25,8 @@ export class SendZapCommand extends SSOCommand {
       console.log("Running SendZapCommand's execute method.");
 
       // Await the createZapCard function and log the result
-      const card = await createZapCard();
+      const currentUser = context.turnState.get('user');
+      const card = await createZapCard(currentUser);
       console.log('createZapCard:', card); // Log the card content
 
       // Create the message with the adaptive card
@@ -236,11 +237,12 @@ export async function SendZap(
 }
 
 // Function to create an adaptive card
-async function createZapCard() {
+async function createZapCard(sender: User,) {
   console.log('Creating Zap Card ...');
   const walletChoices = await populateWalletChoices();
 
   // TODO: Add the users current balance to here!
+  const currentBalance = await getWalletBalance(sender.allowanceWallet.inkey);
 
   const cardBody = [
     {
@@ -270,6 +272,12 @@ async function createZapCard() {
       regex: '^(?:10000|[1-9][0-9]{0,3})$',
       isRequired: true,
       errorMessage: 'You must specify an amount between 1 and 10,000 Sats',
+    },
+    {
+      type: 'TextBlock',
+      text: `**Current Available Balance (Sats):** ${currentBalance}`,
+      wrap: true,
+      color: 'Good',
     },
   ];
 
