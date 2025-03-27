@@ -46,6 +46,7 @@ jobs:
           REACT_APP_TENANT_ID: ${{ secrets.TENANT_ID }}
           REACT_APP_AAD_CLIENT_ID: ${{ secrets.AAD_CLIENT_ID }}
           REACT_APP_LNBITS_STORE_OWNER_EMAIL: ${{ secrets.LNBITS_STORE_OWNER_EMAIL }}
+          REACT_APP_API_URL: 'https://happy-grass-0cba10710-73.centralus.5.azurestaticapps.net'
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)

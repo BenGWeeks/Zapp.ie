@@ -11,8 +11,14 @@ import {
   MessageFactory,
 } from 'botbuilder';
 import { getWallets, getUser } from '../services/lnbitsService';
+import { getRewardName } from '../services/fetchRewardsName';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
+let globalRewardName: string;
+
+(async () => {
+  globalRewardName = await getRewardName();
+})();
 
 // New command for showing leaderboard
 export class ShowLeaderboardCommand extends SSOCommand {
@@ -45,7 +51,7 @@ export class ShowLeaderboardCommand extends SSOCommand {
                 type: 'TextBlock',
                 text: `${user.displayName}\n: ${
                   wallet.balance_msat / 1000
-                } Sats`,
+                } ${globalRewardName}`,
                 weight: 'Bolder',
                 size: 'Medium',
               };

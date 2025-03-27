@@ -20,6 +20,7 @@ import {
 } from './services/lnbitsService';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
+const lnbitsLabel = process.env.LNBITS_POINTS_LABEL as string;
 interface CancellationToken {
   isCancellationRequested: boolean;
 }
@@ -166,7 +167,7 @@ export class TeamsBot extends TeamsActivityHandler {
           await context.updateActivity(updatedMessage);
     
           await context.sendActivity(
-            `Awesome! You sent ${zapAmount} Sats with a zap to your colleagues with a zap!`,
+            `Awesome! You sent ${context.activity.value.zapAmount} ${lnbitsLabel} to your colleague with a zap!`,
           );
         }
     
