@@ -22,7 +22,7 @@ export const getRewardName = async () => {
     }
 
     const data = await response.json();
-    return data;
+    return data.rewardName;
   } catch (error) {
     console.error('Error fetching reward name:', error);
     throw error;
