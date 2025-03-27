@@ -79,6 +79,7 @@
             "name": "Feed", 
             "contentUrl": "https://zappie-dev-development.azurewebsites.net", 
             "websiteUrl": "https://zappie-dev-development.azurewebsites.net"
+
         }, 
         { 
             "entityId": "usersTab", 
@@ -93,6 +94,7 @@
             "name": "Users", 
             "contentUrl": "https://zappie-dev-development.azurewebsites.net/users", 
             "websiteUrl": "https://zappie-dev-development.azurewebsites.net/users"
+
         } ,       { 
             "entityId": "rewardsTab", 
             "scopes": [       
@@ -118,7 +120,6 @@
                 "channelTab"
             ], 
             "name": "Wallet", 
-
             "contentUrl": "https://zappie-dev-development.azurewebsites.net/wallet", 
             "websiteUrl": "https://zappie-dev-development.azurewebsites.net/wallet"
         },

@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
-
 // Read environment variables from .env.dev file
 const envFilePath = path.join(__dirname, '.', 'env', '.env.dev');
 const envConfig = dotenv.parse(fs.readFileSync(envFilePath));

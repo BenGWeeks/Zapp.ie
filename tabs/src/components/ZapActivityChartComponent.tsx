@@ -3,8 +3,6 @@ import ActivityCalendar, { Activity } from 'react-activity-calendar';
 import styles from './ZapActivityChartComponent.module.css';
 import { RewardNameContext } from './RewardNameContext';
 
-
-
 interface ZapContributionsChartProps {
   lnKey: string;
   timestamp: number; // Timestamp in seconds since the epoch
@@ -77,10 +75,8 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
   isLoading,
 }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
-
   useEffect(() => {
-    
-    const fetchActivities = async () => {
+        const fetchActivities = async () => {
       try {
         if (allZaps.length === 0) {
           console.log('No transactions available');
@@ -143,3 +139,4 @@ const rewardsName = rewardNameContext.rewardName;
 };
 
 export default ZapContributionsChart;
+

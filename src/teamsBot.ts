@@ -6,30 +6,18 @@ import {
   MemoryStorage,
   ConversationState,
   UserState,
-  TeamInfo,
   CardFactory,
-  Middleware,
-  MessageFactory,
-  TeamsInfo,
-  StatePropertyAccessor,
+  MessageFactory
 } from 'botbuilder';
-import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
-import { Client } from '@microsoft/microsoft-graph-client';
-import { OnBehalfOfUserCredential } from '@microsoft/teamsfx';
+import {  SSOCommandMap } from './commands/SSOCommandMap';
 import { SendZapCommand, SendZap } from './commands/sendZapCommand';
 import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
 import {
   getUser,
-  getUsers,
-  getWalletById,
-  createUser,
-  createWallet,
-  updateUser,
+  getWalletBalance,
 } from './services/lnbitsService';
-import { UserService } from './services/userService';
-import { access } from 'fs';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
 const lnbitsLabel = process.env.LNBITS_POINTS_LABEL as string;
@@ -74,226 +62,138 @@ export class TeamsBot extends TeamsActivityHandler {
       }
 
       try {
+        let textMessage = context.activity.text || '';
+        const mentions = TurnContext.getMentions(context.activity);
+    
+        // Check if the bot is mentioned
+        const botMentioned = mentions.some(mention => mention.mentioned.id === botId);
+    
+        if (botMentioned) {
+          // Remove the mention from the text
+          mentions.forEach(mention => {
+            if (mention.mentioned.id === botId) {
+              textMessage = textMessage.replace(mention.text, '').trim();
+            }
+          });
+        }
+    
         if (
           context.activity.value &&
           context.activity.value.action === 'submitZaps'
         ) {
           const currentUser = context.turnState.get('user');
-
-          const receiverId = context.activity.value.zapReceiverId;
-          const receiver = await getUser(adminKey, receiverId);
-
+    
+          let receiverIds = context.activity.value.zapReceiverId;
+          if (typeof receiverIds === 'string' && receiverIds.indexOf(',') > -1) {
+            receiverIds = receiverIds.split(',').map((id: string) => id.trim());
+          } else if (typeof receiverIds === 'string') {
+            receiverIds = [receiverIds];
+          }
+    
+          const zapMessage = context.activity.value.zapMessage;
+          const zapAmount = context.activity.value.zapAmount;
+    
           if (!currentUser.allowanceWallet.id) {
             throw new Error('No sending wallet found.');
           }
-
-          if (!receiver.privateWallet) {
-            throw new Error('Receiver wallet not found.');
+    
+          let successfulRecipients: string[] = [];
+    
+          for (const recId of receiverIds) {
+            const receiver = await getUser(adminKey, recId);
+    
+            if (!receiver.privateWallet) {
+              throw new Error('Receiver wallet not found.');
+            }
+    
+            await SendZap(
+              currentUser,
+              receiver,
+              zapMessage,
+              zapAmount,
+              context,
+              false
+            );
+    
+            successfulRecipients.push(receiver.displayName);
           }
+          const bulletReceivers = successfulRecipients
+            .map((name) => `- ${name}`)
+            .join('\n');
 
-          await SendZap(
-            currentUser,
-            receiver,
-            context.activity.value.zapMessage,
-            context.activity.value.zapAmount,
-            context,
-          );
-
+          //fetch remainingBalance
+          const remainingBalance = await getWalletBalance(currentUser.allowanceWallet.inkey);
+          console.log('Remaining Balance:', remainingBalance);
+          
+          // Update adaptive card to read-only with list of recipients
+          const updatedCard = {
+            type: 'AdaptiveCard',
+            body: [
+              {
+                type: 'TextBlock',
+                text: `Zap sent!`,
+                weight: 'Bolder',
+                size: 'Large',
+                color: 'Good',
+              },
+              {
+                type: 'TextBlock',
+                text: `**Receivers:**\n${bulletReceivers}`,
+                wrap: true
+              },
+              {
+                type: 'TextBlock',
+                text: `**Message:** ${zapMessage}`,
+                wrap: true
+              },
+              {
+                type: 'TextBlock',
+                text: `**Amount (Sats):** ${zapAmount}`,
+                wrap: true
+              },
+              {
+                type: 'TextBlock',
+                text: `**Remaining Amount (Sats):** ${remainingBalance}`,
+                wrap: true,
+                color: 'Good',
+              },
+            ],
+            $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
+            version: '1.2',
+          };
+    
+          const updatedMessage = MessageFactory.attachment(CardFactory.adaptiveCard(updatedCard));
+          updatedMessage.id = context.activity.replyToId;
+          await context.updateActivity(updatedMessage);
+    
           await context.sendActivity(
             `Awesome! You sent ${context.activity.value.zapAmount} ${lnbitsLabel} to your colleague with a zap!`,
           );
         }
-      } catch (error) {
-        console.error('Error in onMessage handler:', error.message);
-        await context.sendActivity(
-          `Oops! Unable to send zap (${error.message})`,
-        );
-      }
-
-      let text = '';
-      if (context.activity.text) {
-        text = context.activity.text.trim().toLowerCase();
+    
         // Trigger command by IM text
-        const command = SSOCommandMap.get(text);
+         if(textMessage){
+        const command = SSOCommandMap.get(textMessage.toLowerCase());
         if (command) {
           await command.execute(context);
         } else {
-          await context.sendActivity(
-            "D'oh! I'm sorry, but I didn't recognize that command. But don't worry, I'm always getting better!",
-          );
-        }
-      }
-      console.log('Text:', text);
-
-      /*
-      mentions = mentions.filter(
-        mention => mention.mentioned.id !== context.activity.recipient.id,
-      );
-      console.log('Mentions:', mentions);
-
-
-      const uniqueMentions = [];
-      const mentionMap = new Map();
-      mentions.forEach(mention => {
-        if (!mentionMap.has(mention.mentioned.id)) {
-          mentionMap.set(mention.mentioned.id, mention);
-          uniqueMentions.push(mention);
-        }
-      });
-
-      // Log the unique mentions
-      console.log('Unique Mentions:', uniqueMentions);
-
-      // Check if the message contains the text "send zap" and has at least one valid mention, or context.activity.value.action === 'submitZaps'
-      if (
-        (text.toLowerCase().includes('send zap') &&
-          uniqueMentions.length > 0) ||
-        context.activity.value.action === 'submitZaps'
-      ) {
-        if (text.toLowerCase().includes('send zap')) {
-        }
-        const mentionedUser = uniqueMentions[0].mentioned;
-        globalMentionedUserName = mentionedUser.name;
-
-        // Log the ObjectID of the mentioned user
-        console.log('Mentioned User ObjectID:', mentionedUser.id);
-
-        // Ensure the mentioned user is not the bot itself
-        if (mentionedUser.id !== context.activity.recipient.id) {
-          const sendZapCommand = new SendZapCommand();
-          await sendZapCommand.execute(context);
-        } else {
-          await context.sendActivity(
-            MessageFactory.text('You cannot send a zap to the bot itself.'),
-          );
-        }
-      } else {
-        //await context.sendActivity(
-        //  MessageFactory.text('Invalid command or no valid mentions detected.'),
-        //);
-      }
-      // Clear the mentions variable
-      mentions = [];
-
-      try {
-        // Retrieve user information
-        const userId =
-          context.activity.from.aadObjectId || context.activity.from.id;
-        const userName = context.activity.from.name;
-
-        // Log user information
-        console.log(`Zap from userId: ${userId}`);
-        console.log(`Zap from userName: ${userName}`);
-        const { privateWalletId, allowanceWalletId } = await ensureUserWallet(
-          userId,
-          userName,
-        );
-
-        let txt = context.activity.text;
-        // remove the mention of this bot
-        const removedMentionText = TurnContext.removeRecipientMention(
-          context.activity,
-        );
-        if (removedMentionText) {
-          // Remove the line break
-          txt = removedMentionText.toLowerCase().replace(/\n|\r/g, '').trim();
-        }
-
-        if (
-          context.activity.value &&
-          context.activity.value.action === 'submitZaps'
-        ) {
-          const amount = context.activity.value.zapAmount;
-
-          if (!amount || isNaN(amount)) {
             await context.sendActivity(
-              MessageFactory.text('Invalid amount specified.'),
+              "D'oh! I'm sorry, but I didn't recognize that command. But don't worry, I'm always getting better!",
             );
-            return;
-          }
+          }}
+        } catch (error) {
+          console.error('Error in onMessage handler:', error.message);
+          await context.sendActivity(
+            `Oops! Unable to send zap (${error.message})`,
+          );
+        }  
 
-          try {
-            // Assuming recipientWalletId is known or retrieved from context
-            //const recipientWalletId = 'recipient-wallet-id'; // Replace with actual recipient wallet ID
-            const recipientWalletId = context.activity.value.recipientWalletId;
-
-            // Create an invoice
-            const paymentRequest = await createInvoice(
-              recipientWalletId,
-              parseInt(amount),
-            );
-
-            if (!paymentRequest) {
-              await context.sendActivity(
-                MessageFactory.text('Failed to create invoice.'),
-              );
-              return;
-            }
-
-            // Pay the invoice
-            const paymentResult = await payInvoice(paymentRequest);
-
-            if (paymentResult) {
-              await context.sendActivity(
-                MessageFactory.text('Zaps submitted successfully!'),
-              );
-            } else {
-              await context.sendActivity(
-                MessageFactory.text('Failed to submit zaps.'),
-              );
-            }
-          } catch (error) {
-            console.error('Error handling submit zaps:', error);
-            await context.sendActivity(
-              MessageFactory.text('An error occurred while submitting zaps.'),
-            );
-          }
-        }
-      } catch (error) {
-        console.error('Error in onMessage handler:', error);
-      }
-        */
-      await next();
-    });
+        await next();
+        });
 
     //this.onMembersAdded(async (context, next) => {
     this.onCommand(async (context, next) => {
-      /* Retrieve the per-user setup flag
-      //const currentUser = await this.userProfileAccessor.get(context);
-      const userService = UserService.getInstance();
-      const currentUser = userService.getCurrentUser();
-      console.log('Current User:', currentUser);
-
-      if (!currentUser) {
-        console.log('Lets make sure the user is setup ...');
-
-        await context.sendActivity(
-          `Let me just check you're all setup. Bear with me a few seconds please ...`,
-        );
-
-        try {
-          // Let's  check they are setup correctly.
-          const member = await TeamsInfo.getMember(
-            context,
-            context.activity.from.id,
-          );
-
-          const userService = UserService.getInstance();
-        //  const currentUser = await userService.ensureUserSetup(member);
-
-          userService.setCurrentUser(currentUser);
-          //await this.userProfileAccessor.set(context, currentUser);
-          //await this.userState.saveChanges(context);
-
-          userSetupFlag = true; // OK, all done, we shouldn't need to do this again.
-        } catch (error) {
-          console.error('Error in onCommand handler:', error);
-          await context.sendActivity(
-            'Mmmm ... an error occurred while setting up your account!',
-          );
-        }
-      }
-    }*/;
+    ;
   })}
 
   async run(context: TurnContext) {
@@ -353,7 +253,7 @@ export class TeamsBot extends TeamsActivityHandler {
       } else {
         await context.sendActivity('Failed to ensure wallet.');
       }
-        */
+      */
     } catch (error) {
       console.error('Error in onSignInInvoke:', error);
       await context.sendActivity('An error occurred during sign-in.');
