@@ -49,7 +49,6 @@ export async function SendZap(
   receiver: User,
   zapMessage: string,
   zapAmount: number,
-  context: TurnContext,
   updateCard: boolean = true
 ): Promise<void> {
   try {
@@ -98,140 +97,7 @@ export async function SendZap(
     );
 
     console.log('Payment Result:', result);
-
-    if (result && result.payment_hash && updateCard) {
-      // Updated adaptive card (read-only)
-      const updatedCard = {
-        type: 'AdaptiveCard',
-        body: [
-          {
-            type: 'TextBlock',
-            text: `Zap sent!`,
-            weight: 'Bolder',
-            size: 'Large',
-            color: 'Good',
-          },
-          {
-            type: 'ColumnSet',
-            columns: [
-              {
-                type: 'Column',
-                width: 'auto',
-                items: [
-                  {
-                    type: 'TextBlock',
-                    text: `Receiver:`,
-                    weight: 'Bolder', 
-                  },
-                ],
-              },
-              {
-                type: 'Column',
-                width: 'stretch',
-                items: [
-                  {
-                    type: 'TextBlock',
-                    text: `${receiver.displayName}`, 
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            type: 'ColumnSet',
-            columns: [
-              {
-                type: 'Column',
-                width: 'auto',
-                items: [
-                  {
-                    type: 'TextBlock',
-                    text: `Message:`,
-                    weight: 'Bolder',
-                  },
-                ],
-              },
-              {
-                type: 'Column',
-                width: 'stretch',
-                items: [
-                  {
-                    type: 'TextBlock',
-                    text: `${zapMessage}`,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            type: 'ColumnSet',
-            columns: [
-              {
-                type: 'Column',
-                width: 'auto',
-                items: [
-                  {
-                    type: 'TextBlock',
-                    text: `Amount (Sats):`,
-                    weight: 'Bolder',
-                  },
-                ],
-              },
-              {
-                type: 'Column',
-                width: 'stretch',
-                items: [
-                  {
-                    type: 'TextBlock',
-                    text: `${zapAmount}`,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-        $schema: 'http://adaptivecards.io/schemas/adaptive-card.json',
-        version: '1.2',
-      };
-
-      // Update responsive card in message
-      const updatedMessage = MessageFactory.attachment(
-        CardFactory.adaptiveCard(updatedCard),
-      );
-
-      updatedMessage.id = context.activity.replyToId; // The ID of the current message is used.
-      await context.updateActivity(updatedMessage);
-
-      console.log('Adaptive card updated to read-only.');
-    }
-
-    try {
-      await messageRecipient(sender, receiver, zapAmount, zapMessage, context);
-    } catch (error) {
-      console.error(
-        'Failed to send a message to the recipient. (' + error.message + ')',
-      );
-    }
-    // TODO: Errors here are not being caught for some reason. Need to fix this. Mario.
-
-    /*
-    if (result && result.payment_hash) {
-      const mention = {
-        mentioned: {
-          id: userId,
-          name: userName,
-        },
-        text: `<at>${userName}</at>`,
-        type: 'mention',
-      };
-
-      await context.sendActivity(
-        `Successfully sent ${amount} zap to ${userName}.`,
-      );
-    } else {
-      await context.sendActivity('Failed to pay the invoice.');
-    }
-      */
+    
   } catch (error) {
     throw new Error(error.message);
   }
