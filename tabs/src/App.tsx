@@ -44,6 +44,8 @@ function TitleUpdater() {
       "/auth-start": "Authenticating...",
       "/auth-end": "Authentication Complete",
       "/settings": "Settings - Zapp.ie",
+
+
     };
 
     document.title = titles[location.pathname] || "Zapp.ie"; 
@@ -57,6 +59,7 @@ function TitleUpdater() {
 function App({ pca }: AppProps) {
   return (
     <MsalProvider instance={pca}> 
+
     <RewardNameProvider>
     <TitleUpdater />
      <PageLayout> 

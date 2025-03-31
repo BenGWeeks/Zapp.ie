@@ -1,6 +1,6 @@
 {
   "name": "tabs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@azure/msal-browser": "^3.24.0",
@@ -26,6 +26,8 @@
     "react-scripts": "5.0.1",
     "react-toastify": "^11.0.5",
     "web-vitals": "^2.1.4"
+    "webrtc-adapter": "^9.0.1"
+
   },
   "resolutions": {
     "chroma-js": "2.4.2"
