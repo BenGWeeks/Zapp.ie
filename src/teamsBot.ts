@@ -182,7 +182,7 @@ export class TeamsBot extends TeamsActivityHandler {
         } catch (error) {
           console.error('Error in onMessage handler:', error.message);
           await context.sendActivity(
-            `Oops! Unable to send zap (${error.message})`,
+            `${error.message}`,
           );
         }  
 

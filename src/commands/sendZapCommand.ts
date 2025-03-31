@@ -58,10 +58,11 @@ export async function SendZap(
     // Validate that the sender has enough balance
     const currentBalance = sender.allowanceWallet.balance_msat / 1000; // Convert msat to sat
     if (zapAmount > currentBalance) {
-      await context.sendActivity(
-        `D'oh! You cannot send more than your available balance. Your current balance is ${currentBalance} Sats.`,
-      );
-      return; // Stop further processing
+      //await context.sendActivity(
+      //  `D'oh! You cannot send more than your available balance. Your current balance is ${currentBalance} Sats.`,
+      //);
+      throw new Error(`D'oh! You cannot send more than your available balance. Your current balance is ${currentBalance} Sats.`);
+      //return; // Stop further processing
     }
 
     // Extra information to be logged for tracking from which wallet the zap is sent from and to whom
@@ -232,7 +233,7 @@ export async function SendZap(
     }
       */
   } catch (error) {
-    throw new Error('Failed to send zaps. (' + error.message + ')');
+    throw new Error(error.message);
   }
 }
 
