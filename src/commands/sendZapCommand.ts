@@ -55,6 +55,15 @@ export async function SendZap(
   try {
     console.log('Sending zap ...');
 
+    // Validate that the sender has enough balance
+    const currentBalance = sender.allowanceWallet.balance_msat / 1000; // Convert msat to sat
+    if (zapAmount > currentBalance) {
+      await context.sendActivity(
+        `D'oh! You cannot send more than your available balance. Your current balance is ${currentBalance} Sats.`,
+      );
+      return; // Stop further processing
+    }
+
     // Extra information to be logged for tracking from which wallet the zap is sent from and to whom
     const extra = {
       from: sender.allowanceWallet,
@@ -202,15 +211,6 @@ export async function SendZap(
         'Failed to send a message to the recipient. (' + error.message + ')',
       );
     }
-
-    try {
-      await messageRecipient(sender, receiver, zapAmount, zapMessage, context);
-    } catch (error) {
-      console.error(
-        'Failed to send a message to the recipient. (' + error.message + ')',
-      );
-    }
-
     // TODO: Errors here are not being caught for some reason. Need to fix this. Mario.
 
     /*
