@@ -30,9 +30,12 @@
     "botbuilder-dialogs": "^4.18.0",
     "dotenv": "^16.4.5",
     "dotenv-flow": "^4.1.0",
+    "express": "^4.21.2",
     "isomorphic-fetch": "^3.0.0",
     "jest": "^29.7.0",
+    "pug": "^3.0.3",
     "restify": "^10.0.0",
+    "stjs": "^0.0.5",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

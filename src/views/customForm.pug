@@ -1,0 +1,47 @@
+doctype html
+html
+  head
+    title Send Some Zaps
+    link(rel="stylesheet" href=cssPath)
+  body
+    .container
+      .header
+        img.profile(src=imagePath alt="Profile Picture")
+        h1 Send some zaps
+        p Show gratitude, thanks and recognizing awesomeness to others in your team
+      
+      form
+        .form-group
+          label(for="send-to") Send zaps to
+          select#send-to
+            option(value="") -- Select --
+            option(value="user1") User 1
+            option(value="user2") User 2
+        
+        .form-group
+          label Specify amount
+          .amount-buttons
+            button(type="button") 5,000
+            button(type="button") 10,000
+            button(type="button") 25,000
+
+        .form-group
+          label(for="value") Value
+          select#value
+            option(value="") -- Select --
+            option(value="low") Low
+            option(value="medium") Medium
+            option(value="high") High
+        
+        .form-group
+          label(for="description") Description
+          textarea#description(placeholder="Enter description here...")
+
+        .form-group.checkbox-group
+          label(for="send-anonymously")
+            input#send-anonymously(type="checkbox")
+            | Send anonymously
+
+        .form-buttons
+          button(type="button" class="cancel") Cancel
+          button(type="submit" class="send") Send

@@ -5,32 +5,15 @@ import {
   SigninStateVerificationQuery,
   MemoryStorage,
   ConversationState,
-  UserState,
-  TeamInfo,
-  CardFactory,
-  Middleware,
-  MessageFactory,
-  TeamsInfo,
-  StatePropertyAccessor,
-  Mention
+  UserState,InvokeResponse
 } from 'botbuilder';
-import { SSOCommand, SSOCommandMap } from './commands/SSOCommandMap';
-import { Client } from '@microsoft/microsoft-graph-client';
-import { OnBehalfOfUserCredential } from '@microsoft/teamsfx';
+import { SSOCommandMap } from './commands/SSOCommandMap';
 import { SendZapCommand, SendZap } from './commands/sendZapCommand';
 import { ShowMyBalanceCommand } from './commands/showMyBalanceCommand';
 import { WithdrawFundsCommand } from './commands/withdrawFundsCommand';
 import { ShowLeaderboardCommand } from './commands/showLeaderboardCommand';
-import {
-  getUser,
-  getUsers,
-  getWalletById,
-  createUser,
-  createWallet,
-  updateUser,
-} from './services/lnbitsService';
-import { UserService } from './services/userService';
-import { access } from 'fs';
+import { getUser} from './services/lnbitsService';
+import { fetchTemplates } from './dialogs/cardTemplate'
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
 interface CancellationToken {
@@ -76,6 +59,27 @@ export class TeamsBot extends TeamsActivityHandler {
       try {
         let textMessage = context.activity.text || '';
         const mentions = TurnContext.getMentions(context.activity);
+
+        // Handle task module request from text
+        console.log('textMessage:', textMessage);
+        if (textMessage === 'open task') {
+          console.log('Opening task module...');
+          const taskModuleName = 'customform'; // Change this
+          const taskResponse = fetchTemplates[taskModuleName];
+
+          if (taskResponse) {
+            console.log('Task module found:', taskResponse.task);
+            const taskInvokeResponse: InvokeResponse = {
+              status: 200,
+              body: taskResponse.task, // Ensure the correct structure is sent
+            };console.log('Sending invoke response:', taskInvokeResponse);
+
+            await context.sendActivity({ type: 'invokeResponse', value: taskInvokeResponse });
+          } else {
+            await context.sendActivity('Task module not found.');
+          }
+        }
+
     
         // Check if the bot is mentioned
         const botMentioned = mentions.some(mention => mention.mentioned.id === botId);
@@ -124,11 +128,7 @@ export class TeamsBot extends TeamsActivityHandler {
         const command = SSOCommandMap.get(textMessage.toLowerCase());
         if (command) {
           await command.execute(context);
-        } else {
-          await context.sendActivity(
-            "D'oh! I'm sorry, but I didn't recognize that command. But don't worry, I'm always getting better!",
-          );
-        }}
+        } }
       } catch (error) {
         console.error('Error in onMessage handler:', error.message);
         await context.sendActivity(
@@ -139,10 +139,13 @@ export class TeamsBot extends TeamsActivityHandler {
       await next();
     });
 
+    
     //this.onMembersAdded(async (context, next) => {
     this.onCommand(async (context, next) => {
     ;
   })}
+
+  
 
   async run(context: TurnContext) {
     try {

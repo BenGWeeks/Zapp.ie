@@ -1,6 +1,10 @@
 // Import required packages
 import * as restify from 'restify';
 import * as path from 'path';
+import pug from 'pug';
+import express from 'express';
+
+const baseUrl = process.env.BASE_URL || 'http://localhost:4000';
 
 // Import required bot services.
 // See https://aka.ms/bot-services to learn more about the different parts of a bot.
@@ -106,3 +110,33 @@ server.get(
     directory: path.join(__dirname, '../public'),
   }),
 );
+
+// Serve the Task Module page using Pug
+server.get('/customform', (req, res, next) => {
+  try {
+      const filePath = path.join(process.cwd(), 'src', 'views', 'customForm.pug');
+      console.log("Looking for file at:", filePath); // Debugging output
+      const compiledFunction = pug.compileFile(filePath);
+      const html = compiledFunction({
+          cssPath: `${baseUrl}/styles/customForm.css`,
+          imagePath: `${baseUrl}/images/zappie.png`,
+      });
+
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(html);
+  } catch (error) {
+      console.error('Error rendering Pug template:', error);
+      res.status(500);
+      res.end('Error rendering page');
+  }
+  return next();
+});
+
+// Create an Express app for static files
+const staticServer = express();
+staticServer.use(express.static(path.join(process.cwd(), 'src', 'views')))
+
+// Start Express on a different port (e.g., 4000)
+staticServer.listen(4000, () => {
+  console.log("Express static server running on port 4000");
+});

@@ -1,0 +1,25 @@
+// filepath: /c:/projects/ZapVibes/src/cards/taskModuleCard.json
+{
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.5",
+    "body": [
+      {
+        "type": "TextBlock",
+        "text": "Click the button below to open the Task Module",
+        "wrap": true
+      }
+    ],
+    "actions": [
+      {
+        "type": "Action.Submit",
+        "title": "Open Task Module",
+        "data": {
+          "msteams": {
+            "type": "task/fetch"
+          },
+          "action": "openTaskModule"
+        }
+      }
+    ]
+  }

@@ -1,4 +1,4 @@
-version: v1.2
+version: v1.8
 
 additionalMetadata:
   sampleTag: Bot:Zapp.ie
@@ -55,7 +55,7 @@ provision:
     with:
       manifestPath: ./appPackage/manifest.json
       outputZipPath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
-      outputJsonPath: ./appPackage/build/manifest.${{TEAMSFX_ENV}}.json
+      outputFolder: ./appPackage/build
 
   - uses: teamsApp/validateAppPackage
     with:

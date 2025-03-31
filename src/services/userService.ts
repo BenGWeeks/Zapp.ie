@@ -1,6 +1,6 @@
 // userService.ts
 
-/// <reference path="../../src/types/global.d.ts" />
+/// <reference path="../types/global.d.ts" />
 import {
   ConsoleTranscriptLogger,
   TeamsChannelAccount,

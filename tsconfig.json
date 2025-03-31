@@ -10,7 +10,7 @@
     "tsBuildInfoFile": "./lib/.tsbuildinfo",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "typeRoots": ["./src/types", "./node_modules/@types"], // Ensure node_modules/@types is included
+    "typeRoots": ["src/types", "./node_modules/@types"], // Ensure node_modules/@types is included
     "noEmit": false,
     "skipLibCheck": true // Skip type checking of all declaration files (*.d.ts)
   },
