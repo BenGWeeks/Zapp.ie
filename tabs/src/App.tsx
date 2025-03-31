@@ -45,7 +45,6 @@ function TitleUpdater() {
       "/auth-end": "Authentication Complete",
       "/settings": "Settings - Zapp.ie",
 
-
     };
 
     document.title = titles[location.pathname] || "Zapp.ie"; 

@@ -101,6 +101,7 @@ const ZapContributionsChart: React.FC<ZapContributionsChartProps> = ({
 
     fetchActivities();
   }, [lnKey, timestamp, allZaps]);
+
    const rewardNameContext = useContext(RewardNameContext);
   if (!rewardNameContext) {
     return null; // or handle the case where the context is not available
