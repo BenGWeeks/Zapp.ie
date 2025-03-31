@@ -124,6 +124,9 @@ export class TeamsBot extends TeamsActivityHandler {
           const remainingBalance = await getWalletBalance(currentUser.allowanceWallet.inkey);
           console.log('Remaining Balance:', remainingBalance);
           
+          // Assuming zapAmount is the amount sent to each receiver
+          const totalAmountSent = receiverIds.length * zapAmount;
+
           // Update adaptive card to read-only with list of recipients
           const updatedCard = {
             type: 'AdaptiveCard',
@@ -150,6 +153,14 @@ export class TeamsBot extends TeamsActivityHandler {
                 text: `**Amount (Sats):** ${zapAmount}`,
                 wrap: true
               },
+              
+              {
+                type: 'TextBlock',
+                text: `Remaining Amount (Sats): ${totalAmountSent}`,
+                wrap: true,
+                color: 'Good',
+              },
+
               {
                 type: 'TextBlock',
                 text: `**Remaining Amount (Sats):** ${remainingBalance}`,
