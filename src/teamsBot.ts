@@ -156,11 +156,10 @@ export class TeamsBot extends TeamsActivityHandler {
               
               {
                 type: 'TextBlock',
-                text: `Remaining Amount (Sats): ${totalAmountSent}`,
+                text: `Total Amount (Sats): ${totalAmountSent}`,
                 wrap: true,
                 color: 'Good',
               },
-
               {
                 type: 'TextBlock',
                 text: `**Remaining Amount (Sats):** ${remainingBalance}`,
