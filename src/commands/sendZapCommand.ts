@@ -26,7 +26,8 @@ export class SendZapCommand extends SSOCommand {
       console.log("Running SendZapCommand's execute method.");
 
       // Await the createZapCard function and log the result
-      const card = await createZapCard();
+      const currentUser = context.turnState.get('user');
+      const card = await createZapCard(currentUser);
       console.log('createZapCard:', card); // Log the card content
 
       // Create the message with the adaptive card
@@ -54,6 +55,16 @@ export async function SendZap(
 ): Promise<void> {
   try {
     console.log('Sending zap ...');
+
+    // Validate that the sender has enough balance
+    const currentBalance = sender.allowanceWallet.balance_msat / 1000; // Convert msat to sat
+    if (zapAmount > currentBalance) {
+      //await context.sendActivity(
+      //  `D'oh! You cannot send more than your available balance. Your current balance is ${currentBalance} Sats.`,
+      //);
+      throw new Error(`D'oh! You cannot send more than your available balance. Your current balance is ${currentBalance} Sats.`);
+      //return; // Stop further processing
+    }
 
     // Extra information to be logged for tracking from which wallet the zap is sent from and to whom
     const extra = {
@@ -262,16 +273,17 @@ export async function SendZap(
     }
       */
   } catch (error) {
-    throw new Error('Failed to send zaps. (' + error.message + ')');
+    throw new Error(error.message);
   }
 }
 
 // Function to create an adaptive card
-async function createZapCard() {
+async function createZapCard(sender: User,) {
   console.log('Creating Zap Card ...');
   const walletChoices = await populateWalletChoices();
 
   // TODO: Add the users current balance to here!
+  const currentBalance = await getWalletBalance(sender.allowanceWallet.inkey);
 
   const cardBody = [
     {
@@ -301,6 +313,12 @@ async function createZapCard() {
       regex: '^(?:10000|[1-9][0-9]{0,3})$',
       isRequired: true,
       errorMessage: `You must specify an amount between 1 and 10,000 ${lnbitsLabel}`,
+    },
+    {
+      type: 'TextBlock',
+      text: `**Current Available Balance (Sats):** ${currentBalance}`,
+      wrap: true,
+      color: 'Good',
     },
   ];
 
