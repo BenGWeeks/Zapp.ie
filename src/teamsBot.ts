@@ -110,6 +110,7 @@ export class TeamsBot extends TeamsActivityHandler {
               receiver,
               zapMessage,
               zapAmount,
+              context,
               false
             );
     

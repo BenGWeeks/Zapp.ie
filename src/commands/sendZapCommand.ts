@@ -43,6 +43,7 @@ export async function SendZap(
   receiver: User,
   zapMessage: string,
   zapAmount: number,
+  context: TurnContext,
   updateCard: boolean = true
 ): Promise<void> {
   try {
