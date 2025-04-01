@@ -44,8 +44,8 @@ try {
   // Replace placeholders with environment variables
   const updatedManifest = JSON.stringify(manifest, null, 2)
     .replace(/{{CONTENT_URL}}/g, contentUrl)
-    .replace(/{{WEBSITE_URL}}/g, websiteUrl)
-    .replace(/{{WEBSITE_URL}}/g, lnbitpoints);
+    .replace(/{{WEBSITE_URL}}/g, websiteUrl);
+
 
   // Write the final manifest.json file
   const outputPath = path.join(__dirname, 'appPackage', 'manifest.json');
