@@ -41,7 +41,6 @@ export class TeamsBot extends TeamsActivityHandler {
     this.conversationState = new ConversationState(memoryStorage);
     this.userState = new UserState(memoryStorage);
 
-
     // Register commands
     SSOCommandMap.register('send zap', new SendZapCommand());
     SSOCommandMap.register('show my balance', new ShowMyBalanceCommand());
