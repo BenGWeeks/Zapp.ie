@@ -1,11 +1,11 @@
 # yaml-language-server: $schema=https://aka.ms/teams-toolkit/v1.2/yaml.schema.json
 version: v1.2
- 
+
 additionalMetadata:
   sampleTag: Zapp.ie
- 
+
 environmentFolderPath: ./env
- 
+
 provision:
   - uses: aadApp/create # Creates a new Azure Active Directory (AAD) app to authenticate users if the environment variable that stores clientId is empty
     with:
@@ -35,7 +35,7 @@ provision:
     # the specified environment variable(s).
     writeToEnvironmentFile:
       teamsAppId: TEAMS_APP_ID
- 
+
   # Create or reuse an existing Azure Active Directory application for bot.
   - uses: botAadApp/create
     with:
@@ -46,7 +46,7 @@ provision:
       botId: BOT_ID
       # The Azure Active Directory application's client secret created for bot.
       botPassword: SECRET_BOT_PASSWORD
- 
+
   - uses: arm/deploy # Deploy given ARM templates parallelly.
     with:
       subscriptionId: ${{AZURE_SUBSCRIPTION_ID}} # The AZURE_SUBSCRIPTION_ID is a built-in environment variable. TeamsFx will ask you select one subscription if its value is empty. You're free to reference other environment varialbe here, but TeamsFx will not ask you to select subscription if it's empty in this case.
@@ -56,7 +56,7 @@ provision:
           parameters: ./infra/azure.parameters.json
           deploymentName: Create-resources-for-bot
       bicepCliVersion: v0.9.1 # Teams Toolkit will download this bicep CLI version from github for you, will use bicep CLI in PATH if you remove this config.
- 
+
   - uses: aadApp/update # Apply the AAD manifest to an existing AAD app. Will use the object id in manifest file to determine which AAD app to update.
     with:
       manifestPath: ./aad.manifest.json # Relative path to teamsfx folder. Environment variables in manifest will be replaced before apply to AAD app
@@ -86,7 +86,7 @@ provision:
     with:
       # Relative path to teamsfx folder. This is the path for built zip file.
       appPackagePath: ./appPackage/build/appPackage.${{TEAMSFX_ENV}}.zip
- 
+
 deploy:
   - uses: cli/runNpmCommand
     with:
@@ -99,7 +99,7 @@ deploy:
       artifactFolder: .
       ignoreFile: .webappignore
       resourceId: ${{BOT_AZURE_APP_SERVICE_RESOURCE_ID}}
- 
+
 publish:
   # Validate using manifest schema
   - uses: teamsApp/validateManifest
@@ -135,5 +135,3 @@ publish:
     writeToEnvironmentFile:
       publishedAppId: TEAMS_APP_PUBLISHED_APP_ID
 projectId: 3f0da022-ef44-417c-9230-abfdf716db26
- 
- 
