@@ -29,8 +29,6 @@ let userSetupFlag = false;
 export class TeamsBot extends TeamsActivityHandler {
   conversationState: ConversationState;
   userState: UserState;
-  //userSetupFlagAccessor: StatePropertyAccessor<boolean>;
-  //userProfileAccessor: StatePropertyAccessor<User>;
 
   constructor() {
     super();
