@@ -124,7 +124,8 @@ export class TeamsBot extends TeamsActivityHandler {
               zapMessage,
               zapAmount,
               context,
-              false
+              false,
+              globalRewardName
             );
     
             successfulRecipients.push(receiver.displayName);

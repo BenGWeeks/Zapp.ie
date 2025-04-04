@@ -19,18 +19,16 @@ import {
 import { getRewardName } from '../services/fetchRewardsName';
 
 const adminKey = process.env.LNBITS_ADMINKEY as string;
-let globalRewardName: string;
-
-(async () => {
-  globalRewardName = await getRewardName();
-  console.log(`Reward Name is `, JSON.stringify(globalRewardName));
-})();
 
 export class ShowMyBalanceCommand extends SSOCommand {
   async execute(context: TurnContext): Promise<void> {
     try {
       //await context.sendActivity('Showing your balance...');
       console.log('Showing your balance...');
+
+      // Fetch the latest reward name
+      const globalRewardName = await getRewardName();
+      console.log('Fetched Reward Name:', globalRewardName);
 
       // Retrieve the user object from the turn state
       const user = context.turnState.get('user') as User;
