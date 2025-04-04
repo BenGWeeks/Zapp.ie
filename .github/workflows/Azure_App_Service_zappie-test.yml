@@ -60,9 +60,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C9108189951C4733A4D6582BFAE86E9A }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8DB206750A6341348101327101E60EA9 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B9914647A5AC4DE3BA57B966B533CE4C }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_TEST }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_TEST }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_TEST }}
       - name: 'Ensure Slot Exists'
         run: |
           if [[ -n "${{ github.event.pull_request.number }}" ]]; then
