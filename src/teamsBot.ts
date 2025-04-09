@@ -42,8 +42,6 @@ let userSetupFlag = false;
 export class TeamsBot extends TeamsActivityHandler {
   conversationState: ConversationState;
   userState: UserState;
-  //userSetupFlagAccessor: StatePropertyAccessor<boolean>;
-  //userProfileAccessor: StatePropertyAccessor<User>;
 
   constructor() {
     super();
@@ -53,7 +51,6 @@ export class TeamsBot extends TeamsActivityHandler {
     // Create conversation and user state with in-memory storage provider.
     this.conversationState = new ConversationState(memoryStorage);
     this.userState = new UserState(memoryStorage);
-
 
     // Register commands
     SSOCommandMap.register('send zap', new SendZapCommand());
@@ -138,6 +135,9 @@ export class TeamsBot extends TeamsActivityHandler {
           const remainingBalance = await getWalletBalance(currentUser.allowanceWallet.inkey);
           console.log('Remaining Balance:', remainingBalance);
           
+          // Assuming zapAmount is the amount sent to each receiver
+          const totalAmountSent = receiverIds.length * zapAmount;
+
           // Update adaptive card to read-only with list of recipients
           const updatedCard = {
             type: 'AdaptiveCard',
@@ -163,6 +163,13 @@ export class TeamsBot extends TeamsActivityHandler {
                 type: 'TextBlock',
                 text: `**Amount (${globalRewardName}):** ${zapAmount}`,
                 wrap: true
+              },
+              
+              {
+                type: 'TextBlock',
+                text: `Total Amount (Sats): ${totalAmountSent}`,
+                wrap: true,
+                color: 'Good',
               },
               {
                 type: 'TextBlock',
